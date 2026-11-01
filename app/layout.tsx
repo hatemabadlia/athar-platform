@@ -5,6 +5,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Chatbot } from "@/components/chatbot";
 import { CrisisBanner } from "@/components/crisis-banner";
+import { OfflineSync } from "@/components/offline-sync";
 import { getViewer } from "@/lib/server/guards";
 import { activeCrises } from "@/lib/data/crisis";
 import { publicEnv } from "@/lib/env";
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
   title: { default: "إيثار | منصة التطوع الذكية في الجزائر", template: "%s · إيثار" },
   description: "إيثار: نداءات تطوع وتبرع بالدم وإغاثة موثّقة بمراجعة بشرية، مع كشف المنشورات القديمة والمكررة، في كل ولايات الجزائر.",
   openGraph: { type: "website", locale: "ar_DZ", siteName: "إيثار — Athar" },
-  manifest: "/manifest.webmanifest",
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = { themeColor: "#0f766e", width: "device-width", initialScale: 1 };
@@ -35,6 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-[2000] focus:rounded-lg focus:bg-white focus:px-3 focus:py-2 focus:shadow">تخطَّ إلى المحتوى</a>
         <Navbar viewer={viewer ? { email: viewer.email, isStaff: viewer.isStaff, isMinistry: viewer.isMinistry } : null} />
         <CrisisBanner crises={crises} />
+        <OfflineSync />
         <main id="main" className="flex-1">{children}</main>
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-slate-500">

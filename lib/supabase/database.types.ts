@@ -146,6 +146,12 @@ isOneToOne: false
                   }
                   Relationships: [
                     {
+      foreignKeyName: "alerts_association_fk"
+      columns: ["association_id"]
+isOneToOne: false
+      referencedRelation: "associations"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "alerts_baladiya_id_fkey"
       columns: ["baladiya_id"]
 isOneToOne: false
@@ -183,6 +189,76 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "alerts_wilaya_code_fkey"
+      columns: ["wilaya_code"]
+isOneToOne: false
+      referencedRelation: "wilayas"
+      referencedColumns: ["code"]
+    }
+                  ]
+                },"app_settings": {
+                  Row: {
+                    "key": string,"source": string,"updated_at": string,"updated_by": string | null,"value": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "key": string,"source": string,"updated_at"?: string,"updated_by"?: string | null,"value": NonNullable<Json>
+                  }
+                  Update: {
+                    "key"?: string,"source"?: string,"updated_at"?: string,"updated_by"?: string | null,"value"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "app_settings_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "app_settings_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"associations": {
+                  Row: {
+                    "applicant_id": string,"approval_number": string,"contact_email": string | null,"contact_phone": string | null,"created_at": string,"description": string,"document_paths": (string)[],"id": string,"name": string,"review_note": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"status": Database["public"]['Enums']["review_status"],"wilaya_code": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "applicant_id": string,"approval_number": string,"contact_email"?: string | null,"contact_phone"?: string | null,"created_at"?: string,"description"?: string,"document_paths"?: (string)[],"id"?: string,"name": string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"status"?: Database["public"]['Enums']["review_status"],"wilaya_code": number
+                  }
+                  Update: {
+                    "applicant_id"?: string,"approval_number"?: string,"contact_email"?: string | null,"contact_phone"?: string | null,"created_at"?: string,"description"?: string,"document_paths"?: (string)[],"id"?: string,"name"?: string,"review_note"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"status"?: Database["public"]['Enums']["review_status"],"wilaya_code"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "associations_applicant_id_fkey"
+      columns: ["applicant_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "associations_applicant_id_fkey"
+      columns: ["applicant_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "associations_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "associations_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "associations_wilaya_code_fkey"
       columns: ["wilaya_code"]
 isOneToOne: false
       referencedRelation: "wilayas"
@@ -267,6 +343,38 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"beneficiary_registrations": {
+                  Row: {
+                    "beneficiary_hash": string,"campaign_id": string,"id": number,"registered_at": string,"registered_by": string,"season": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "beneficiary_hash": string,"campaign_id": string,"id"?: never,"registered_at"?: string,"registered_by": string,"season": string
+                  }
+                  Update: {
+                    "beneficiary_hash"?: string,"campaign_id"?: string,"id"?: never,"registered_at"?: string,"registered_by"?: string,"season"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "beneficiary_registrations_campaign_id_fkey"
+      columns: ["campaign_id"]
+isOneToOne: false
+      referencedRelation: "campaigns"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "beneficiary_registrations_registered_by_fkey"
+      columns: ["registered_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "beneficiary_registrations_registered_by_fkey"
+      columns: ["registered_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"blood_compatibility": {
                   Row: {
                     "donor": Database["public"]['Enums']["blood_type"],"recipient": Database["public"]['Enums']["blood_type"]
@@ -280,6 +388,172 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"blood_donations": {
+                  Row: {
+                    "alert_id": string | null,"confirmed_at": string | null,"confirmed_by": string | null,"created_at": string,"donated_on": string,"id": number,"institution": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "alert_id"?: string | null,"confirmed_at"?: string | null,"confirmed_by"?: string | null,"created_at"?: string,"donated_on": string,"id"?: never,"institution"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "alert_id"?: string | null,"confirmed_at"?: string | null,"confirmed_by"?: string | null,"created_at"?: string,"donated_on"?: string,"id"?: never,"institution"?: string | null,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "blood_donations_alert_id_fkey"
+      columns: ["alert_id"]
+isOneToOne: false
+      referencedRelation: "alerts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "blood_donations_confirmed_by_fkey"
+      columns: ["confirmed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "blood_donations_confirmed_by_fkey"
+      columns: ["confirmed_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "blood_donations_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "blood_donations_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"blood_donors": {
+                  Row: {
+                    "available": boolean,"consented_at": string,"last_donation_at": string | null,"notify_by_sms": boolean,"updated_at": string,"user_id": string,"wilaya_code": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "available"?: boolean,"consented_at"?: string,"last_donation_at"?: string | null,"notify_by_sms"?: boolean,"updated_at"?: string,"user_id": string,"wilaya_code": number
+                  }
+                  Update: {
+                    "available"?: boolean,"consented_at"?: string,"last_donation_at"?: string | null,"notify_by_sms"?: boolean,"updated_at"?: string,"user_id"?: string,"wilaya_code"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "blood_donors_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "blood_donors_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: true
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "blood_donors_wilaya_code_fkey"
+      columns: ["wilaya_code"]
+isOneToOne: false
+      referencedRelation: "wilayas"
+      referencedColumns: ["code"]
+    }
+                  ]
+                },"campaign_contributions": {
+                  Row: {
+                    "campaign_id": string,"created_at": string,"id": number,"note": string | null,"recorded_by": string,"units": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "campaign_id": string,"created_at"?: string,"id"?: never,"note"?: string | null,"recorded_by": string,"units": number
+                  }
+                  Update: {
+                    "campaign_id"?: string,"created_at"?: string,"id"?: never,"note"?: string | null,"recorded_by"?: string,"units"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaign_contributions_campaign_id_fkey"
+      columns: ["campaign_id"]
+isOneToOne: false
+      referencedRelation: "campaigns"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaign_contributions_recorded_by_fkey"
+      columns: ["recorded_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaign_contributions_recorded_by_fkey"
+      columns: ["recorded_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"campaign_shifts": {
+                  Row: {
+                    "campaign_id": string,"capacity": number,"ends_at": string,"id": string,"location": string,"starts_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "campaign_id": string,"capacity": number,"ends_at": string,"id"?: string,"location": string,"starts_at": string
+                  }
+                  Update: {
+                    "campaign_id"?: string,"capacity"?: number,"ends_at"?: string,"id"?: string,"location"?: string,"starts_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaign_shifts_campaign_id_fkey"
+      columns: ["campaign_id"]
+isOneToOne: false
+      referencedRelation: "campaigns"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"campaigns": {
+                  Row: {
+                    "association_id": string | null,"created_at": string,"created_by": string,"description": string,"ends_on": string,"goal_units": number,"id": string,"kind": string,"season": string,"starts_on": string,"status": string,"title": string,"unit_label": string,"wilaya_code": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "association_id"?: string | null,"created_at"?: string,"created_by": string,"description"?: string,"ends_on": string,"goal_units": number,"id"?: string,"kind": string,"season": string,"starts_on": string,"status"?: string,"title": string,"unit_label"?: string,"wilaya_code"?: number | null
+                  }
+                  Update: {
+                    "association_id"?: string | null,"created_at"?: string,"created_by"?: string,"description"?: string,"ends_on"?: string,"goal_units"?: number,"id"?: string,"kind"?: string,"season"?: string,"starts_on"?: string,"status"?: string,"title"?: string,"unit_label"?: string,"wilaya_code"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "campaigns_association_id_fkey"
+      columns: ["association_id"]
+isOneToOne: false
+      referencedRelation: "associations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaigns_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaigns_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "campaigns_wilaya_code_fkey"
+      columns: ["wilaya_code"]
+isOneToOne: false
+      referencedRelation: "wilayas"
+      referencedColumns: ["code"]
+    }
                   ]
                 },"categories": {
                   Row: {
@@ -608,6 +882,82 @@ isOneToOne: false
     },{
       foreignKeyName: "deletion_requests_user_id_fkey"
       columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"donation_items": {
+                  Row: {
+                    "association_id": string | null,"baladiya_name": string | null,"category": string,"created_at": string,"description": string,"expires_at": string,"id": string,"kind": string,"owner_id": string,"quantity": number,"status": string,"title": string,"unit": string,"wilaya_code": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "association_id"?: string | null,"baladiya_name"?: string | null,"category": string,"created_at"?: string,"description"?: string,"expires_at"?: string,"id"?: string,"kind": string,"owner_id": string,"quantity"?: number,"status"?: string,"title": string,"unit"?: string,"wilaya_code": number
+                  }
+                  Update: {
+                    "association_id"?: string | null,"baladiya_name"?: string | null,"category"?: string,"created_at"?: string,"description"?: string,"expires_at"?: string,"id"?: string,"kind"?: string,"owner_id"?: string,"quantity"?: number,"status"?: string,"title"?: string,"unit"?: string,"wilaya_code"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "donation_items_association_id_fkey"
+      columns: ["association_id"]
+isOneToOne: false
+      referencedRelation: "associations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "donation_items_owner_id_fkey"
+      columns: ["owner_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "donation_items_owner_id_fkey"
+      columns: ["owner_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "donation_items_wilaya_code_fkey"
+      columns: ["wilaya_code"]
+isOneToOne: false
+      referencedRelation: "wilayas"
+      referencedColumns: ["code"]
+    }
+                  ]
+                },"donation_matches": {
+                  Row: {
+                    "created_at": string,"id": string,"need_id": string,"offer_id": string,"pickup_note": string | null,"proposed_by": string,"quantity": number,"status": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"need_id": string,"offer_id": string,"pickup_note"?: string | null,"proposed_by": string,"quantity": number,"status"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"need_id"?: string,"offer_id"?: string,"pickup_note"?: string | null,"proposed_by"?: string,"quantity"?: number,"status"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "donation_matches_need_id_fkey"
+      columns: ["need_id"]
+isOneToOne: false
+      referencedRelation: "donation_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "donation_matches_offer_id_fkey"
+      columns: ["offer_id"]
+isOneToOne: false
+      referencedRelation: "donation_items"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "donation_matches_proposed_by_fkey"
+      columns: ["proposed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "donation_matches_proposed_by_fkey"
+      columns: ["proposed_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
       referencedColumns: ["id"]
@@ -947,6 +1297,38 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"shift_signups": {
+                  Row: {
+                    "created_at": string,"shift_id": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"shift_id": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"shift_id"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "shift_signups_shift_id_fkey"
+      columns: ["shift_id"]
+isOneToOne: false
+      referencedRelation: "campaign_shifts"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "shift_signups_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "shift_signups_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"sms_messages": {
                   Row: {
                     "body": string,"created_at": string,"crisis_id": string | null,"direction": string,"error": string | null,"id": number,"phone": string,"provider": string,"provider_id": string | null,"status": string,"user_id": string | null
@@ -1213,8 +1595,14 @@ isOneToOne: false
 "alert_wilaya":
 { Args: { "a": string }; Returns: number
                            },
+"campaign_progress":
+{ Args: { "campaign": string }; Returns: Json
+                           },
 "can_administer":
 { Args: { "w": number }; Returns: boolean
+                           },
+"can_manage_campaign":
+{ Args: { "c": string }; Returns: boolean
                            },
 "can_moderate":
 { Args: { "w": number }; Returns: boolean
@@ -1230,6 +1618,9 @@ isOneToOne: false
                            },
 "close_crisis":
 { Args: { "crisis": string,"report": string }; Returns: undefined
+                           },
+"compatible_donor_count":
+{ Args: { "alert": string }; Returns: number
                            },
 "confirm_alert_volunteer":
 { Args: { "alert": string,"confirmed": boolean,"hours"?: number,"volunteer": string }; Returns: undefined
@@ -1302,17 +1693,29 @@ isOneToOne: false
 "my_points":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"notify_compatible_donors":
+{ Args: { "alert": string }; Returns: number
+                           },
 "portal_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"propose_match":
+{ Args: { "need": string,"note"?: string,"offer": string,"qty": number }; Returns: string
+                           },
 "rate_limit_hit":
 { Args: { "k": string,"max_hits": number,"window_seconds": number }; Returns: boolean
+                           },
+"register_beneficiary":
+{ Args: { "campaign": string,"hash": string }; Returns: Json
                            },
 "request_account_deletion":
 { Args: { "reason"?: string }; Returns: string
                            },
 "review_alert":
 { Args: { "action": string,"alert": string,"merge_target"?: string,"note"?: string }; Returns: Database["public"]['Enums']["alert_status"]
+                           },
+"review_association":
+{ Args: { "approve": boolean,"assoc": string,"note"?: string }; Returns: undefined
                            },
 "review_report":
 { Args: { "approve": boolean,"report": string }; Returns: undefined
@@ -1323,8 +1726,14 @@ isOneToOne: false
 "revoke_role":
 { Args: { "r": Database["public"]['Enums']["app_role"],"target": string }; Returns: undefined
                            },
+"shift_taken":
+{ Args: { "shift": string }; Returns: number
+                           },
 "submit_report":
 { Args: { "activity"?: string,"alert"?: string,"attended_count": number,"hours_total": number,"organization"?: string,"outcome": string,"resources_used"?: string }; Returns: string
+                           },
+"update_match":
+{ Args: { "match": string,"new_status": string }; Returns: Json
                            },
 "verify_certificate":
 { Args: { "cert": string }; Returns: Json

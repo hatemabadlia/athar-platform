@@ -33,7 +33,8 @@ export async function POST(req: Request) {
   const allowed = await rateLimit(key, viewer?.isStaff ? 120 : viewer ? 10 : 5, 600);
   if (!allowed) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
-  if (!viewer?.isStaff) {
+  // Anonymous submissions need Turnstile; signed-in users already passed email OTP and are rate-limited per account.
+  if (!viewer) {
     const t = await verifyTurnstile(b.turnstileToken);
     if (!t.ok) return NextResponse.json({ error: "captcha_failed" }, { status: 400 });
   }

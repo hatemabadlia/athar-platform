@@ -5,6 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { enqueue } from "@/lib/outbox";
 
 declare global {
   interface Window { turnstile?: { render: (el: HTMLElement, o: { sitekey: string; callback: (t: string) => void; "expired-callback": () => void }) => string } }
@@ -18,6 +19,7 @@ export function SubmitForm({ turnstileSiteKey, signedIn }: { turnstileSiteKey: s
   const [token, setToken] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [queued, setQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const widget = useRef<HTMLDivElement>(null);
   const rendered = useRef(false);
@@ -41,7 +43,11 @@ export function SubmitForm({ turnstileSiteKey, signedIn }: { turnstileSiteKey: s
       if (res.status === 429) setError("أرسلت نداءات كثيرة خلال وقت قصير. حاول بعد 10 دقائق.");
       else if (!res.ok) setError(json.issues?.[0] ?? (json.error === "captcha_failed" ? "فشل التحقق من أنك لست روبوتاً." : "تعذّر الإرسال."));
       else setDone(true);
-    } catch { setError("لا يوجد اتصال. أعد المحاولة."); }
+    } catch {
+      // offline: keep it on this device and send when the connection returns (Turnstile token is re-required then if configured)
+      enqueue({ text, name: name || undefined, phone: phone || undefined, consent });
+      setQueued(true); setDone(true);
+    }
     setBusy(false);
   };
 
@@ -49,10 +55,10 @@ export function SubmitForm({ turnstileSiteKey, signedIn }: { turnstileSiteKey: s
     return (
       <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-8 text-center">
         <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" aria-hidden />
-        <h2 className="mt-3 text-xl font-black text-slate-900">وصلنا نداؤك</h2>
-        <p className="mt-1 text-sm text-slate-600">سيراجعه مشرف قبل نشره. {signedIn ? "يمكنك متابعة حالته من ملفك." : ""}</p>
+        <h2 className="mt-3 text-xl font-black text-slate-900">{queued ? "حُفظ على جهازك — لم يُرسل بعد" : "وصلنا نداؤك"}</h2>
+        <p className="mt-1 text-sm text-slate-600">{queued ? "لا يوجد اتصال. سيُرسل تلقائياً عند عودة الإنترنت وستظهر رسالة تأكيد." : `سيراجعه مشرف قبل نشره. ${signedIn ? "يمكنك متابعة حالته من ملفك." : ""}`}</p>
         <div className="mt-4 flex justify-center gap-2">
-          <Button variant="outline" onClick={() => { setDone(false); setText(""); setConsent(false); }}>نداء آخر</Button>
+          <Button variant="outline" onClick={() => { setDone(false); setQueued(false); setText(""); setConsent(false); }}>نداء آخر</Button>
           <Link href="/" className="inline-flex h-10 items-center rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white">الخريطة</Link>
         </div>
       </div>

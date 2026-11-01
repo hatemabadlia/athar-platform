@@ -18,6 +18,7 @@ import { RolesPanel } from "@/components/admin/roles-panel";
 import { ImportPanel } from "@/components/admin/import-panel";
 import { AuditPanel } from "@/components/admin/audit-panel";
 import { ForecastPanel } from "@/components/admin/forecast-panel";
+import { AssociationsPanel } from "@/components/admin/associations-panel";
 import { computeForecasts } from "@/lib/forecast";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +26,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "لوحة الإشراف" };
 
 const TABS = [
-  ["queue", "النداءات"], ["trees", "الأشجار"], ["reports", "التقارير"], ["crisis", "الطوارئ"], ["shelters", "مراكز الإيواء"],
+  ["queue", "النداءات"], ["associations", "الجمعيات"], ["trees", "الأشجار"], ["reports", "التقارير"], ["crisis", "الطوارئ"], ["shelters", "مراكز الإيواء"],
   ["forecast", "التوقعات"], ["roles", "الأدوار"], ["import", "استيراد"], ["audit", "السجل والذكاء الاصطناعي"],
 ] as const;
 
@@ -51,6 +52,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     if (uids.length) { const { data } = await supabase.from("public_profiles").select("id, display_name").in("id", uids); (data ?? []).forEach((n) => names.set(n.id as string, n.display_name as string)); }
     body = <ModerationQueue alerts={alerts} status={status} q={sp.q ?? ""} openId={sp.alert ?? null}
       participants={(parts ?? []).map((p) => ({ alertId: p.alert_id, userId: p.user_id, status: p.status, hours: p.hours, name: names.get(p.user_id) ?? "" }))} />;
+  } else if (tab === "associations") {
+    const { data } = await supabase.from("associations").select("id, name, approval_number, wilaya_code, description, status, created_at, document_paths").order("created_at", { ascending: false }).limit(100);
+    const paths = (data ?? []).flatMap((a) => a.document_paths);
+    const { data: signed } = paths.length ? await supabase.storage.from("association-docs").createSignedUrls(paths, 600) : { data: [] };
+    const urls = new Map((signed ?? []).map((x) => [x.path, x.signedUrl]));
+    body = <AssociationsPanel items={(data ?? []).map((a) => ({ ...a, docs: a.document_paths.map((p) => ({ path: p, url: urls.get(p) ?? null })) }))} />;
   } else if (tab === "trees") {
     body = <TreeReview trees={await listPendingTrees()} />;
   } else if (tab === "reports") {

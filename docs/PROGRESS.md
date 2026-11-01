@@ -21,10 +21,14 @@ Status labels: COMPLETE · PARTIAL · BLOCKED · NOT STARTED · UNVERIFIED.
 - `supabase/tests/database/001_rls_security.test.sql`: 44 pgTAP tests — PASS (`npx supabase test db`).
 - Types: `lib/supabase/database.types.ts` (`npx supabase gen types typescript --local`).
 
-### Phase 2/3 — Data layer, AI pipeline, intake · IN PROGRESS
-Done:
-- `lib/env.ts` zod validation; `lib/supabase/{server,client,admin}.ts`; `middleware.ts` session refresh.
-- Pipeline `lib/pipeline/*`: Claude structured output (`claude.ts`), rule-based fallback (`heuristic.ts`),
-  anti-hallucination sanitiser, keyed phone hashes, trigram/pgvector matching SQL, explainable scoring, `ai_runs` logging.
-- Intake: `/api/intake` (form + moderator paste, rate limit, Turnstile), Telegram + WhatsApp webhooks (signature checked).
-Next: rewrite pages off `lib/store.tsx`, auth pages, moderation UI.
+### Phase 2/3/4 — Data layer, AI pipeline, intake, core features · COMPLETE (local, tested)
+- Mock store and all mock datasets deleted. Server components + server actions + Realtime refresh.
+- Email OTP login (Mailpit locally; templates in supabase/templates). Phone OTP: BLOCKED on SMS provider.
+- Pipeline (`lib/pipeline/*`): Claude path UNVERIFIED (no key in this environment); rule-based path tested.
+- Intake: /submit (consent, rate limit, Turnstile), /api/webhooks/telegram|whatsapp (signature verified; UNVERIFIED against real platforms), moderator paste.
+- /admin tabs: queue (correct/approve/reject/merge/resolve, audited phone reveal, confirm volunteers, report), trees, reports, crisis (SMS console provider), shelters, forecast, roles, CSV import, audit + ai_runs + integrations.
+- QR check-in (signed/expiring/single-use), points from confirmed actions, certificates + /verify, /impact (+CSV, print), /privacy, data export, deletion request.
+- Tests: `npm run test` 39 unit PASS · `npx supabase test db` 44 pgTAP PASS · `npx playwright test` 3 e2e PASS (needs app on :3000 + fresh `supabase db reset`).
+
+### Next
+Phase 5 modules (blood donors, in-kind donations, associations, campaigns + beneficiary dedupe), PWA, hardening (headers, error boundaries, CI), docs.

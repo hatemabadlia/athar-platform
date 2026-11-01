@@ -71,3 +71,28 @@ describe("csv", () => {
 });
 
 describe("geo", () => it("Algiers–Oran ≈ 350 km", () => expect(Math.round(haversineKm(36.75, 3.06, 35.7, -0.64) / 10)).toBe(35)));
+
+describe("beneficiary identifiers", async () => {
+  const { normalizeBeneficiaryId } = await import("@/lib/beneficiary");
+  it("normalises NIN and phones (incl. Arabic digits)", () => {
+    expect(normalizeBeneficiaryId("1234 5678 9012 3456 78")).toBe("nin:123456789012345678");
+    expect(normalizeBeneficiaryId("٠٥٥٥ ١٢ ٣٤ ٥٦")).toBe("tel:0555123456");
+    expect(normalizeBeneficiaryId("+213 555 12 34 56")).toBe("tel:0555123456");
+    expect(normalizeBeneficiaryId("abc")).toBeNull();
+  });
+});
+
+describe("in-kind matching", async () => {
+  const { suggestMatches } = await import("@/lib/inkind");
+  const base = { status: "open", category: "clothes" } as const;
+  it("same category, prefers same wilaya, excludes own items", () => {
+    const need = { ...base, id: "n", kind: "need" as const, quantity: 10, wilayaCode: 31, ownerId: "u1" };
+    const pool = [
+      { ...base, id: "o1", kind: "offer" as const, quantity: 10, wilayaCode: 16, ownerId: "u2" },
+      { ...base, id: "o2", kind: "offer" as const, quantity: 5, wilayaCode: 31, ownerId: "u3" },
+      { ...base, id: "o3", kind: "offer" as const, quantity: 5, wilayaCode: 31, ownerId: "u1" },
+      { ...base, id: "o4", kind: "offer" as const, category: "food" as never, quantity: 5, wilayaCode: 31, ownerId: "u4" },
+    ];
+    expect(suggestMatches(need, pool).map((m) => m.item.id)).toEqual(["o2", "o1"]);
+  });
+});

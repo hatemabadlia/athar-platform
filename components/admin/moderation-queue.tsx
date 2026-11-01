@@ -11,6 +11,7 @@ import { Modal } from "@/components/ui/modal";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { reviewAlert, correctAlert, getAlertContact, confirmVolunteer } from "@/app/actions/alerts";
 import { submitReport } from "@/app/actions/clubs";
+import { notifyDonors, donorCount } from "@/app/actions/modules";
 import { formatPhone } from "@/lib/pipeline/text";
 import { cn, timeAgo } from "@/lib/utils";
 
@@ -128,6 +129,7 @@ function AlertDetail({ alert: a, participants, onClose }: { alert: ModerationAle
               <ul className="space-y-1.5">{participants.map((p) => <ParticipantRow key={p.userId} alertId={a.id} p={p} />)}</ul>
             </div>
           )}
+          {a.category === "blood" && a.status === "approved" && <DonorNotify alertId={a.id} />}
           {(a.status === "approved" || a.status === "resolved") && <AlertReport alertId={a.id} />}
         </div>
 
@@ -210,5 +212,21 @@ function AlertReport({ alertId }: { alertId: string }) {
         {msg && <p role="status">{msg}</p>}
       </div>
     </details>
+  );
+}
+
+function DonorNotify({ alertId }: { alertId: string }) {
+  const [n, setN] = useState<number | null>(null);
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <div className="rounded-2xl border border-rose-200 bg-rose-50 p-3 text-xs space-y-2">
+      <div className="font-bold text-rose-800">شبكة المتبرعين</div>
+      {n == null ? <button disabled={pending} onClick={() => start(async () => { const r = await donorCount(alertId); if (r.ok) setN(r.data!); else setMsg(r.error); })} className="font-bold underline">عدّ المتبرعين المتوافقين في الولاية</button>
+        : <div className="flex items-center gap-2"><span>{n} متبرع متوافق ومتاح</span>
+            <button disabled={pending || n === 0} onClick={() => start(async () => { const r = await notifyDonors(alertId); setMsg(r.ok ? `أُخطر ${r.data} متبرع (إشعار داخل المنصة)` : r.error); })} className="rounded bg-rose-600 px-2 py-0.5 font-bold text-white">إخطارهم</button></div>}
+      {msg && <p role="status">{msg}</p>}
+      <p className="text-[10px] text-slate-500">لا تُكشف هويات المتبرعين. الأهلية الطبية يقررها مركز حقن الدم.</p>
+    </div>
   );
 }
