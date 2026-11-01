@@ -1,0 +1,107 @@
+import type { Wilaya } from "./types";
+
+export const WILAYAS: Wilaya[] = [
+  { code: 1, name: "Adrar", nameAr: "أدرار", lat: 27.87, lng: -0.29 },
+  { code: 2, name: "Chlef", nameAr: "الشلف", lat: 36.17, lng: 1.33 },
+  { code: 3, name: "Laghouat", nameAr: "الأغواط", lat: 33.8, lng: 2.87 },
+  { code: 4, name: "Oum El Bouaghi", nameAr: "أم البواقي", lat: 35.88, lng: 7.11 },
+  { code: 5, name: "Batna", nameAr: "باتنة", lat: 35.56, lng: 6.17 },
+  { code: 6, name: "Béjaïa", nameAr: "بجاية", lat: 36.75, lng: 5.07 },
+  { code: 7, name: "Biskra", nameAr: "بسكرة", lat: 34.85, lng: 5.73 },
+  { code: 8, name: "Béchar", nameAr: "بشار", lat: 31.62, lng: -2.22 },
+  { code: 9, name: "Blida", nameAr: "البليدة", lat: 36.47, lng: 2.83 },
+  { code: 10, name: "Bouira", nameAr: "البويرة", lat: 36.37, lng: 3.9 },
+  { code: 11, name: "Tamanrasset", nameAr: "تمنراست", lat: 22.79, lng: 5.53 },
+  { code: 12, name: "Tébessa", nameAr: "تبسة", lat: 35.4, lng: 8.12 },
+  { code: 13, name: "Tlemcen", nameAr: "تلمسان", lat: 34.88, lng: -1.32 },
+  { code: 14, name: "Tiaret", nameAr: "تيارت", lat: 35.37, lng: 1.32 },
+  { code: 15, name: "Tizi Ouzou", nameAr: "تيزي وزو", lat: 36.71, lng: 4.05 },
+  { code: 16, name: "Alger", nameAr: "الجزائر", lat: 36.75, lng: 3.06 },
+  { code: 17, name: "Djelfa", nameAr: "الجلفة", lat: 34.67, lng: 3.26 },
+  { code: 18, name: "Jijel", nameAr: "جيجل", lat: 36.82, lng: 5.77 },
+  { code: 19, name: "Sétif", nameAr: "سطيف", lat: 36.19, lng: 5.41 },
+  { code: 20, name: "Saïda", nameAr: "سعيدة", lat: 34.83, lng: 0.15 },
+  { code: 21, name: "Skikda", nameAr: "سكيكدة", lat: 36.88, lng: 6.9 },
+  { code: 22, name: "Sidi Bel Abbès", nameAr: "سيدي بلعباس", lat: 35.19, lng: -0.63 },
+  { code: 23, name: "Annaba", nameAr: "عنابة", lat: 36.9, lng: 7.77 },
+  { code: 24, name: "Guelma", nameAr: "قالمة", lat: 36.46, lng: 7.43 },
+  { code: 25, name: "Constantine", nameAr: "قسنطينة", lat: 36.37, lng: 6.61 },
+  { code: 26, name: "Médéa", nameAr: "المدية", lat: 36.27, lng: 2.75 },
+  { code: 27, name: "Mostaganem", nameAr: "مستغانم", lat: 35.93, lng: 0.09 },
+  { code: 28, name: "M'Sila", nameAr: "المسيلة", lat: 35.7, lng: 4.54 },
+  { code: 29, name: "Mascara", nameAr: "معسكر", lat: 35.4, lng: 0.14 },
+  { code: 30, name: "Ouargla", nameAr: "ورقلة", lat: 31.95, lng: 5.33 },
+  { code: 31, name: "Oran", nameAr: "وهران", lat: 35.7, lng: -0.64 },
+  { code: 32, name: "El Bayadh", nameAr: "البيض", lat: 33.68, lng: 1.02 },
+  { code: 33, name: "Illizi", nameAr: "إليزي", lat: 26.5, lng: 8.48 },
+  { code: 34, name: "Bordj Bou Arréridj", nameAr: "برج بوعريريج", lat: 36.07, lng: 4.76 },
+  { code: 35, name: "Boumerdès", nameAr: "بومرداس", lat: 36.77, lng: 3.48 },
+  { code: 36, name: "El Tarf", nameAr: "الطارف", lat: 36.77, lng: 8.31 },
+  { code: 37, name: "Tindouf", nameAr: "تندوف", lat: 27.67, lng: -8.15 },
+  { code: 38, name: "Tissemsilt", nameAr: "تيسمسيلت", lat: 35.61, lng: 1.81 },
+  { code: 39, name: "El Oued", nameAr: "الوادي", lat: 33.37, lng: 6.86 },
+  { code: 40, name: "Khenchela", nameAr: "خنشلة", lat: 35.43, lng: 7.14 },
+  { code: 41, name: "Souk Ahras", nameAr: "سوق أهراس", lat: 36.29, lng: 7.95 },
+  { code: 42, name: "Tipaza", nameAr: "تيبازة", lat: 36.59, lng: 2.44 },
+  { code: 43, name: "Mila", nameAr: "ميلة", lat: 36.45, lng: 6.26 },
+  { code: 44, name: "Aïn Defla", nameAr: "عين الدفلى", lat: 36.26, lng: 1.97 },
+  { code: 45, name: "Naâma", nameAr: "النعامة", lat: 33.27, lng: -0.31 },
+  { code: 46, name: "Aïn Témouchent", nameAr: "عين تموشنت", lat: 35.3, lng: -1.14 },
+  { code: 47, name: "Ghardaïa", nameAr: "غرداية", lat: 32.49, lng: 3.67 },
+  { code: 48, name: "Relizane", nameAr: "غليزان", lat: 35.74, lng: 0.56 },
+];
+
+export const WILAYA_ALIASES: Record<string, number> = {
+  "العاصمة": 16,
+  "الجزائر العاصمة": 16,
+  "الجزائر": 16,
+  "مصطفى باشا": 16,
+  "باب الوادي": 16,
+  "حسين داي": 16,
+  "بئر مراد رايس": 16,
+  "البليدة": 9,
+  "بليدة": 9,
+  "بوفاريك": 9,
+  "الأربعاء": 9,
+  "تيبازة": 42,
+  "شرشال": 42,
+  "وهران": 31,
+  "قسنطينة": 25,
+  "عنابة": 23,
+  "سطيف": 19,
+  "تبسة": 12,
+  "باتنة": 5,
+  "بجاية": 6,
+  "تيزي وزو": 15,
+  "بومرداس": 35,
+  "ورقلة": 30,
+  "غرداية": 47,
+  "تلمسان": 13,
+  "المدية": 26,
+  "جيجل": 18,
+  "سكيكدة": 21,
+  "بسكرة": 7,
+  "الوادي": 39,
+  "مستغانم": 27,
+  "الشلف": 2,
+  "تمنراست": 11,
+  "أدرار": 1,
+  "بشار": 8,
+};
+
+export function findWilaya(code: number): Wilaya | undefined {
+  return WILAYAS.find((w) => w.code === code);
+}
+
+export function detectWilaya(text: string): Wilaya | null {
+  const normalized = text.replace(/[إأآ]/g, "ا");
+  // Longest alias first to prefer specific matches
+  const aliases = Object.entries(WILAYA_ALIASES).sort(
+    (a, b) => b[0].length - a[0].length
+  );
+  for (const [alias, code] of aliases) {
+    const a = alias.replace(/[إأآ]/g, "ا");
+    if (normalized.includes(a)) return findWilaya(code) ?? null;
+  }
+  return null;
+}

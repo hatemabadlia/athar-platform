@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  font-family: inherit;
+  direction: rtl;
+}
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.25);
+}
+.leaflet-popup-content {
+  margin: 0;
+  width: 280px !important;
+}
+.leaflet-popup-tip-container { direction: ltr; }
+.leaflet-control-zoom { direction: ltr; }
+
+.athar-marker { background: transparent; border: none; }
+.athar-marker .pin {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+.athar-marker .ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  opacity: 0.6;
+  animation: pulse-ring 1.6s cubic-bezier(0.2,0.6,0.4,1) infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
