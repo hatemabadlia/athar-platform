@@ -5,7 +5,8 @@ import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import type { PublicAlert, ShelterView } from "@/lib/types";
 import { CATEGORY_META, URGENCY_META } from "@/lib/reference/meta";
-import { timeAgo } from "@/lib/utils";
+import { useT, useLocale } from "@/lib/i18n/client";
+import { timeAgoIn, dirOf } from "@/lib/i18n/dict";
 import { Users, MapPin, Building2 } from "lucide-react";
 
 type Located = PublicAlert & { lat: number; lng: number };
@@ -60,6 +61,8 @@ function FitOnChange({ points }: { points: [number, number][] }) {
 export default function LiveMap({ alerts, onHelp, focusId, shelters = [] }: {
   alerts: PublicAlert[]; onHelp: (a: PublicAlert) => void; focusId?: string | null; shelters?: ShelterView[];
 }) {
+  const t = useT();
+  const dir = dirOf(useLocale());
   const icons = useMemo(() => ({ critical: makeIcon("critical"), medium: makeIcon("medium"), normal: makeIcon("normal") }), []);
   const located = useMemo(() => spread(alerts), [alerts]);
   const focusPoints = useMemo(
@@ -76,13 +79,13 @@ export default function LiveMap({ alerts, onHelp, focusId, shelters = [] }: {
       {shelters.filter((s) => s.lat != null && s.lng != null).map((sh) => (
         <Marker key={sh.id} position={[sh.lat!, sh.lng!]} icon={shelterIcon}>
           <Popup>
-            <div className="font-sans text-right" dir="rtl">
-              <div className="bg-red-50 p-3"><div className="text-[10px] font-black text-red-600">مركز إيواء/تجمع مفعّل</div><div className="font-bold text-slate-900 text-sm">{sh.name}</div></div>
+            <div className="font-sans text-start" dir={dir}>
+              <div className="bg-red-50 p-3"><div className="text-[10px] font-black text-red-600">{t.map.openShelter}</div><div className="font-bold text-slate-900 text-sm">{sh.name}</div></div>
               <div className="p-3 text-xs text-slate-600 space-y-1.5">
-                <div>الطاقة: <b>{sh.occupied}/{sh.capacity}</b>{sh.phone ? <> · <span dir="ltr">{sh.phone}</span></> : null}</div>
+                <div>{t.map.capacity}: <b>{sh.occupied}/{sh.capacity}</b>{sh.phone ? <> · <span dir="ltr">{sh.phone}</span></> : null}</div>
                 {sh.capacity > 0 && <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden"><div className="h-full bg-red-500" style={{ width: `${Math.round((sh.occupied / sh.capacity) * 100)}%` }} /></div>}
-                {sh.needs.length > 0 && <div>الاحتياجات: <b>{sh.needs.join("، ")}</b></div>}
-                <div className="text-[10px] text-slate-400">آخر تحديث {timeAgo(sh.updatedAt)}</div>
+                {sh.needs.length > 0 && <div>{t.map.needs}: <b>{sh.needs.join("، ")}</b></div>}
+                <div className="text-[10px] text-slate-400">{t.map.updated} {timeAgoIn(t.time, sh.updatedAt)}</div>
               </div>
             </div>
           </Popup>
@@ -95,22 +98,22 @@ export default function LiveMap({ alerts, onHelp, focusId, shelters = [] }: {
         return (
           <Marker key={a.id} position={[a.lat, a.lng]} icon={icons[a.urgency]} title={a.title}>
             <Popup>
-              <div className="font-sans text-right" dir="rtl">
+              <div className="font-sans text-start" dir={dir}>
                 <div className="p-3 pb-2" style={{ background: `${urg.hex}14` }}>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${cat.bg} ${cat.color}`}>{cat.emoji} {cat.labelAr}</span>
-                    <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: urg.hex }}>{urg.labelAr}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${cat.bg} ${cat.color}`}>{cat.emoji} {t.category[a.category]}</span>
+                    <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: urg.hex }}>{t.urgency[a.urgency]}</span>
                   </div>
                   <div className="font-bold text-slate-900 text-sm leading-snug">{a.title}</div>
                 </div>
                 <div className="p-3 space-y-2 text-xs text-slate-600">
                   {a.summary && <p className="leading-relaxed">{a.summary}</p>}
-                  <div className="flex items-center gap-1.5 text-slate-500"><MapPin className="h-3 w-3" aria-hidden /> {a.wilaya}{a.baladiya ? ` · ${a.baladiya}` : ""} · {timeAgo(a.createdAt)}</div>
-                  <div className="text-[10px] text-slate-400">الموقع تقريبي على مستوى الولاية</div>
+                  <div className="flex items-center gap-1.5 text-slate-500"><MapPin className="h-3 w-3" aria-hidden /> {a.wilaya}{a.baladiya ? ` · ${a.baladiya}` : ""} · {timeAgoIn(t.time, a.createdAt)}</div>
+                  <div className="text-[10px] text-slate-400">{t.map.approx}</div>
                   {a.institution && <div className="flex items-center gap-1.5 rounded-lg bg-indigo-50 px-2 py-1 font-semibold text-indigo-700"><Building2 className="h-3 w-3" aria-hidden /> {a.institution}</div>}
-                  <div className="flex items-center gap-1 font-semibold text-slate-700"><Users className="h-3 w-3" aria-hidden /> {a.volunteersJoined}{a.volunteersNeeded ? `/${a.volunteersNeeded}` : ""} متطوع{remaining ? ` · نحتاج ${remaining}` : ""}</div>
+                  <div className="flex items-center gap-1 font-semibold text-slate-700"><Users className="h-3 w-3" aria-hidden /> {t.card.volunteers(a.volunteersJoined, a.volunteersNeeded)}{remaining ? t.map.need(remaining) : ""}</div>
                   <button onClick={() => onHelp(a)} disabled={remaining === 0 && !a.joinedByMe} className="w-full rounded-xl bg-brand-600 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:bg-slate-300">
-                    {a.joinedByMe ? "✓ مسجّل" : "🙋 أستطيع المساعدة"}
+                    {a.joinedByMe ? t.map.joinedShort : t.map.help}
                   </button>
                 </div>
               </div>

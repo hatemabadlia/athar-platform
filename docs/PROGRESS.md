@@ -43,10 +43,10 @@ Manifest, icons, service worker (no private caching), offline outbox. Not tested
 /impact national + wilaya, period filter, CSV, print view.
 
 ### Phase 9 — Hardening · PARTIAL
-CSP + headers, error/not-found/loading, wilaya-scoped intake, masked AI logs, pg_cron maintenance, CI workflow (UNVERIFIED). French i18n NOT STARTED. Lighthouse not run (tiles/fonts blocked here).
+CSP + headers, error/not-found/loading, wilaya-scoped intake, masked AI logs, pg_cron maintenance, CI workflow (UNVERIFIED). French i18n PARTIAL (public core translated; see MORNING_REPORT). Lighthouse not run (tiles/fonts blocked here).
 
 ### Phase 10 — Review · DONE for this session
-Final run: tsc ✓ · eslint ✓ · vitest 41 ✓ · pgTAP 69 ✓ · build ✓ · playwright 6 ✓ (×3). See docs/MORNING_REPORT.md.
+Final run (session 2): tsc ✓ · eslint ✓ · vitest 42 ✓ · pgTAP 69 ✓ · build ✓ · playwright 7 ✓ (×5). See docs/MORNING_REPORT.md.
 
 ### Next (if resuming)
 1. Claude key → validate pipeline/chatbot. 2. Official wilayas 59–69 + communes. 3. French i18n. 4. Deployment (with Hatem's approval).

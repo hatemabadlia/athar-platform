@@ -8,18 +8,15 @@ import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
 import { CATEGORY_META, CRISIS_META } from "@/lib/reference/meta";
-import { cn, timeAgo } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/client";
+import { timeAgoIn } from "@/lib/i18n/dict";
 
 const LiveMap = dynamic(() => import("@/components/map/live-map"), { ssr: false, loading: () => <div className="h-full w-full rounded-3xl skeleton" /> });
 
-const FILTERS: { key: Category | "all"; label: string; icon: React.ElementType }[] = [
-  { key: "all", label: "الكل", icon: LayoutGrid },
-  { key: "blood", label: "تبرع بالدم", icon: Droplets },
-  { key: "relief", label: "إغاثة", icon: HandHeart },
-  { key: "cleanup", label: "بيئة", icon: Waves },
-  { key: "orphans", label: "أيتام ومسنون", icon: Baby },
-  { key: "medical", label: "طبي", icon: Stethoscope },
-  { key: "education", label: "تعليم", icon: GraduationCap },
+const FILTERS: { key: Category | "all"; icon: React.ElementType }[] = [
+  { key: "all", icon: LayoutGrid }, { key: "blood", icon: Droplets }, { key: "relief", icon: HandHeart }, { key: "cleanup", icon: Waves },
+  { key: "orphans", icon: Baby }, { key: "medical", icon: Stethoscope }, { key: "education", icon: GraduationCap },
 ];
 const ORDER = { critical: 0, medium: 1, normal: 2 } as const;
 
@@ -30,6 +27,7 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
   stats: { approved: number; critical: number; filtered: number };
   matches: { id: string; reasons: string[] }[]; signedIn: boolean; hasProfile: boolean; reports: ReportCard[];
 }) {
+  const t = useT();
   const [filter, setFilter] = useState<Category | "all">("all");
   const [helpTarget, setHelpTarget] = useState<PublicAlert | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
@@ -47,13 +45,13 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
         return (
           <section key={c.id} className="rounded-3xl border-2 border-red-500 bg-red-50 p-4 flex flex-wrap items-center justify-between gap-3 animate-fade-up">
             <div>
-              <div className="text-xs font-black text-red-600">🚨 وضع الطوارئ — {m?.emoji} {c.title} في {c.wilaya}</div>
+              <div className="text-xs font-black text-red-600">{t.portal.crisisMode(`${m?.emoji ?? ""} ${c.title}`, c.wilaya)}</div>
               <div className="text-sm text-slate-700">
-                {here.length ? <>مراكز الإيواء/التجمع المفعّلة تظهر على الخريطة (🏛️).</> : <>لم تُسجَّل بعد مراكز إيواء مفتوحة لهذه الحالة.</>}
-                {m && <> الاحتياجات المتوقعة: <b>{m.needs.join("، ")}</b>.</>}
+                {here.length ? t.portal.sheltersOnMap : t.portal.noShelters}
+                {m && <> {t.portal.expectedNeeds} <b>{m.needs.join("، ")}</b>.</>}
               </div>
             </div>
-            <Link href={`/crisis/${c.id}`} className="rounded-2xl bg-white px-4 py-2 text-center text-sm font-bold text-red-700">التفاصيل</Link>
+            <Link href={`/crisis/${c.id}`} className="rounded-2xl bg-white px-4 py-2 text-center text-sm font-bold text-red-700">{t.crisis.details}</Link>
           </section>
         );
       })}
@@ -63,25 +61,25 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
         <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold backdrop-blur">
-              <Activity className="h-3.5 w-3.5" aria-hidden /> نداءات راجعها مشرفون — تتحدث مباشرة
+              <Activity className="h-3.5 w-3.5" aria-hidden /> {t.portal.liveBadge}
             </div>
-            <h1 className="mt-3 text-2xl sm:text-4xl font-black leading-tight">الاحتياج الحقيقي، في وقته الحقيقي.</h1>
+            <h1 className="mt-3 text-2xl sm:text-4xl font-black leading-tight">{t.portal.heroTitle}</h1>
             <p className="mt-2 max-w-xl text-sm sm:text-base text-white/80">
-              تصل النداءات عبر الاستمارة وتيليغرام وواتساب والمشرفين، يحللها إيثار ليكشف المنشورات القديمة والمكررة،
-              ثم يراجعها مشرف قبل نشرها هنا.
+              {t.portal.heroText}
             </p>
-            <Link href="/submit" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-800"><Send className="h-4 w-4" aria-hidden /> أرسل نداءً</Link>
+            <Link href="/submit" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-800"><Send className="h-4 w-4" aria-hidden /> {t.nav.submit}</Link>
           </div>
           <div className="grid grid-cols-3 gap-3 text-center">
-            <Stat value={stats.approved} label="نداء معتمد نشط" icon={ShieldCheck} />
-            <Stat value={stats.critical} label="حالة حرجة" icon={Activity} accent />
-            <Stat value={stats.filtered} label="منشور قديم/مكرر صُفّي" icon={Recycle} />
+            <Stat value={stats.approved} label={t.portal.statApproved} icon={ShieldCheck} />
+            <Stat value={stats.critical} label={t.portal.statCritical} icon={Activity} accent />
+            <Stat value={stats.filtered} label={t.portal.statFiltered} icon={Recycle} />
           </div>
         </div>
       </section>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="toolbar" aria-label="تصفية حسب الفئة">
-        {FILTERS.map(({ key, label, icon: Icon }) => {
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="toolbar" aria-label={t.portal.filterLabel}>
+        {FILTERS.map(({ key, icon: Icon }) => {
+          const label = key === "all" ? t.portal.filterAll : t.category[key];
           const count = key === "all" ? alerts.length : alerts.filter((a) => a.category === key).length;
           return (
             <button key={key} onClick={() => { setFilter(key); setFocusId(null); }} aria-pressed={filter === key}
@@ -97,24 +95,24 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
         <div className="relative h-[420px] lg:h-[640px] rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
           <LiveMap alerts={visible} onHelp={setHelpTarget} focusId={focusId} shelters={shelters} />
-          <div className="absolute bottom-4 right-4 z-[500] flex gap-3 rounded-2xl bg-white/90 px-4 py-2 text-xs font-semibold shadow backdrop-blur">
-            <Legend color="#dc2626" label="حرج" /><Legend color="#ea580c" label="متوسط" /><Legend color="#16a34a" label="عادي" />
-            {shelters.length > 0 && <span className="flex items-center gap-1.5 text-red-700">🏛️ مركز إيواء</span>}
+          <div className="absolute bottom-4 end-4 z-[500] flex gap-3 rounded-2xl bg-white/90 px-4 py-2 text-xs font-semibold shadow backdrop-blur">
+            <Legend color="#dc2626" label={t.urgency.critical} /><Legend color="#ea580c" label={t.urgency.medium} /><Legend color="#16a34a" label={t.urgency.normal} />
+            {shelters.length > 0 && <span className="flex items-center gap-1.5 text-red-700">🏛️ {t.portal.shelter}</span>}
           </div>
         </div>
-        <aside className="space-y-3 lg:h-[640px] lg:overflow-y-auto pr-0.5" aria-label="قائمة النداءات">
+        <aside className="space-y-3 lg:h-[640px] lg:overflow-y-auto pr-0.5" aria-label={t.portal.listLabel}>
           <div className="flex items-center justify-between px-1">
-            <h2 className="font-black text-slate-900">النداءات النشطة ({visible.length})</h2>
-            <span className="text-xs text-slate-500">حسب الاستعجال</span>
+            <h2 className="font-black text-slate-900">{t.portal.listTitle(visible.length)}</h2>
+            <span className="text-xs text-slate-500">{t.portal.byUrgency}</span>
           </div>
           {signedIn && !hasProfile && (
             <Link href="/profile" className="block rounded-2xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 hover:bg-amber-100">
-              ⭐ <b>أكمل ملفك التطوعي</b> (الولاية، المهارات، الفصيلة) ليقترح عليك إيثار النداءات المناسبة.
+              ⭐ {t.portal.completeProfile}
             </Link>
           )}
           {!signedIn && (
             <Link href="/login" className="block rounded-2xl border border-slate-200 bg-white p-3 text-xs text-slate-700 hover:bg-slate-50">
-              سجّل الدخول للمشاركة في النداءات، تأكيد حضورك، وجمع ساعات تطوع موثّقة.
+              {t.portal.loginCta}
             </Link>
           )}
           {visible.length === 0 && (
@@ -122,18 +120,18 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
               {alerts.length === 0 ? (
                 <>
                   <div className="text-3xl mb-2" aria-hidden>🕊️</div>
-                  <div className="font-bold text-slate-700">لا توجد نداءات معتمدة حالياً</div>
-                  <p className="mt-1">تظهر هنا النداءات بعد مراجعة مشرف. هل تعرف حاجة حقيقية؟</p>
-                  <Link href="/submit" className="mt-3 inline-block rounded-xl bg-brand-600 px-4 py-2 font-bold text-white">أرسل نداءً</Link>
+                  <div className="font-bold text-slate-700">{t.portal.emptyTitle}</div>
+                  <p className="mt-1">{t.portal.emptyText}</p>
+                  <Link href="/submit" className="mt-3 inline-block rounded-xl bg-brand-600 px-4 py-2 font-bold text-white">{t.nav.submit}</Link>
                 </>
-              ) : "لا توجد نداءات نشطة في هذه الفئة حالياً."}
+              ) : t.portal.emptyCategory}
             </div>
           )}
           {visible.map((a) => (
             <div key={a.id}>
               <AlertCard alert={a} active={focusId === a.id} suggested={matchMap.has(a.id)}
                 onSelect={() => setFocusId(focusId === a.id ? null : a.id)} onHelp={() => setHelpTarget(a)} />
-              {matchMap.has(a.id) && <div className="px-3 pt-1 text-[10px] text-amber-700">لماذا مقترح: {matchMap.get(a.id)!.join(" · ")}</div>}
+              {matchMap.has(a.id) && <div className="px-3 pt-1 text-[10px] text-amber-700">{t.portal.whySuggested} {matchMap.get(a.id)!.join(" · ")}</div>}
             </div>
           ))}
         </aside>
@@ -141,21 +139,21 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
 
       {reports.length > 0 && (
         <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="flex items-center gap-2 font-black text-slate-900 mb-1"><CheckCircle2 className="h-5 w-5 text-sky-600" aria-hidden /> إغلاق الحلقة — تقارير ما بعد النشاط</h2>
-          <p className="text-xs text-slate-500 mb-4">يكتبها صاحب النداء أو مسؤول النادي ويعتمدها مشرف.</p>
+          <h2 className="flex items-center gap-2 font-black text-slate-900 mb-1"><CheckCircle2 className="h-5 w-5 text-sky-600" aria-hidden /> {t.portal.reportsTitle}</h2>
+          <p className="text-xs text-slate-500 mb-4">{t.portal.reportsText}</p>
           <div className="grid sm:grid-cols-3 gap-3">
             {reports.map((r) => {
               const cat = CATEGORY_META[r.category as Category] ?? CATEGORY_META.relief;
               return (
                 <div key={r.id} className="rounded-2xl border border-sky-100 bg-gradient-to-b from-sky-50 to-white p-4">
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${cat.bg} ${cat.color}`}>{cat.emoji} {cat.labelAr}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${cat.bg} ${cat.color}`}>{cat.emoji} {t.category[r.category as Category] ?? r.category}</span>
                   <div className="mt-2 font-bold text-slate-900 text-sm">{r.title}</div>
                   <div className="mt-1 text-xs text-sky-900 font-semibold">✅ {r.outcome}</div>
                   <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-500">
-                    <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {r.attended} حضر</span>
-                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {r.hours} ساعة</span>
+                    <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {t.portal.attended(r.attended)}</span>
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {t.portal.hours(r.hours)}</span>
                     {r.organization && <span>{r.organization}</span>}
-                    <span>{timeAgo(r.createdAt)}</span>
+                    <span>{timeAgoIn(t.time, r.createdAt)}</span>
                   </div>
                 </div>
               );

@@ -96,3 +96,12 @@ describe("in-kind matching", async () => {
     expect(suggestMatches(need, pool).map((m) => m.item.id)).toEqual(["o2", "o1"]);
   });
 });
+
+describe("chat language detection", async () => {
+  const { isFrench } = await import("@/lib/chat/lang");
+  it("detects French vs Arabic/Darija", () => {
+    expect(isFrench("Où donner mon sang à Oran ?")).toBe(true);
+    expect(isFrench("وين نتبرع بالدم في وهران؟")).toBe(false);
+    expect(isFrench("O+")).toBe(false);
+  });
+});

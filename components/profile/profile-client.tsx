@@ -162,14 +162,13 @@ export function ProfileClient(props: {
 }
 
 function CertificateButton({ hours }: { hours: number }) {
-  const router = useRouter();
   const [pending, start] = useTransition();
   const [err, setErr] = useState<string | null>(null);
   return (
     <div>
       <Button size="sm" className="bg-amber-400 text-slate-900 hover:bg-amber-300" disabled={hours <= 0 || pending}
         title={hours <= 0 ? "تحتاج ساعات تطوع مؤكدة" : undefined}
-        onClick={() => start(async () => { const r = await issueCertificate(); if (r.ok) router.push(`/certificates/${r.data}`); else setErr(r.error); })}>
+        onClick={() => start(async () => { const r = await issueCertificate(); if (r.ok) window.location.assign(`/certificates/${r.data}`); else setErr(r.error); })}>
         {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileBadge className="h-4 w-4" aria-hidden />} إصدار شهادة
       </Button>
       {err && <div role="alert" className="mt-1 text-[10px] text-amber-200">{err}</div>}

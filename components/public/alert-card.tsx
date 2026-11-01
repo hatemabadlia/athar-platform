@@ -3,7 +3,9 @@
 import { MapPin, Clock, Users, ShieldCheck, Building2, Sparkles } from "lucide-react";
 import type { PublicAlert } from "@/lib/types";
 import { CATEGORY_META, URGENCY_META } from "@/lib/reference/meta";
-import { timeAgo, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/client";
+import { timeAgoIn } from "@/lib/i18n/dict";
 
 export function AlertCard({
   alert,
@@ -18,6 +20,7 @@ export function AlertCard({
   onSelect: () => void;
   onHelp: () => void;
 }) {
+  const t = useT();
   const cat = CATEGORY_META[alert.category];
   const urg = URGENCY_META[alert.urgency];
   const needed = alert.volunteersNeeded;
@@ -37,27 +40,27 @@ export function AlertCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5 mb-1">
             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${cat.bg} ${cat.color}`}>
-              {cat.emoji} {cat.labelAr}
+              {cat.emoji} {t.category[alert.category]}
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${urg.bg} ${urg.color}`}>{urg.labelAr}</span>
-            <span className="flex items-center gap-0.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700" title="اعتمده مشرف بعد المراجعة">
-              <ShieldCheck className="h-3 w-3" aria-hidden /> راجعه مشرف
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${urg.bg} ${urg.color}`}>{t.urgency[alert.urgency]}</span>
+            <span className="flex items-center gap-0.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700" title={t.card.reviewedTitle}>
+              <ShieldCheck className="h-3 w-3" aria-hidden /> {t.card.reviewed}
             </span>
             {suggested && (
               <span className="flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                <Sparkles className="h-3 w-3" /> مقترح لك
+                <Sparkles className="h-3 w-3" /> {t.card.suggested}
               </span>
             )}
           </div>
           <h3 className="font-bold text-slate-900 leading-snug">
-            <button type="button" aria-pressed={active} onClick={(e) => { e.stopPropagation(); onSelect(); }} className="text-right hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 rounded">
-              {alert.title}<span className="sr-only"> — عرض على الخريطة</span>
+            <button type="button" aria-pressed={active} onClick={(e) => { e.stopPropagation(); onSelect(); }} className="text-start hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 rounded">
+              {alert.title}<span className="sr-only"> — {t.card.showOnMap}</span>
             </button>
           </h3>
           <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-500">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" aria-hidden /> {alert.wilaya}{alert.baladiya ? ` · ${alert.baladiya}` : ""}</span>
-            <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {timeAgo(alert.createdAt)}</span>
-            <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {alert.volunteersJoined}{needed > 0 ? `/${needed}` : ""} متطوع</span>
+            <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {timeAgoIn(t.time, alert.createdAt)}</span>
+            <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {t.card.volunteers(alert.volunteersJoined, needed)}</span>
             {alert.institution && <span className="flex items-center gap-1 text-indigo-600"><Building2 className="h-3 w-3" aria-hidden /> {alert.institution}</span>}
           </div>
           {needed > 0 && (
@@ -72,7 +75,7 @@ export function AlertCard({
         disabled={remaining === 0 && !alert.joinedByMe}
         className="mt-3 w-full rounded-xl border border-brand-600 py-1.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-600 hover:text-white disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-transparent"
       >
-        {alert.joinedByMe ? "✓ مسجّل — عرض الاتصال" : remaining === 0 ? "اكتمل العدد ✓" : remaining ? `🙋 أستطيع المساعدة (نحتاج ${remaining})` : "🙋 أستطيع المساعدة"}
+        {alert.joinedByMe ? t.card.joined : remaining === 0 ? t.card.full : t.card.help(remaining)}
       </button>
     </div>
   );

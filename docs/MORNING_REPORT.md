@@ -50,7 +50,7 @@ Labels: COMPLETE (implemented and tested here) · PARTIAL · BLOCKED · UNVERIFI
 | Impact page + CSV/print | COMPLETE (local) | e2e visits; CSV route |
 | Privacy: consent, export, deletion, retention jobs | COMPLETE (local) | RPCs + pg_cron job scheduled and run once manually |
 | Security headers / CSP | COMPLETE | e2e header test |
-| French i18n | NOT STARTED | Arabic RTL only |
+| French i18n | PARTIAL | Locale switch (cookie + Accept-Language), `lang`/`dir` switch, FR for shell, map, alerts, help flow, submit, login, chatbot (incl. rules-mode French replies), privacy, offline, errors; other pages stay Arabic/RTL with a French notice. e2e `i18n.spec` |
 | Branded auto-publishing (FB/IG/X) | NOT STARTED | fake version removed |
 | Darija voice notes (ASR) | BLOCKED | needs a speech-to-text provider |
 | CI (GitHub Actions) | UNVERIFIED | workflow written; can't run here |
@@ -59,10 +59,10 @@ Labels: COMPLETE (implemented and tested here) · PARTIAL · BLOCKED · UNVERIFI
 
 1. Verify the Claude path with a real key (pipeline + chatbot), and tune prompts on real Darija posts.
 2. Official data: wilayas 59–69 numbering (JO n° 40, 2026), commune list, institution lists (CSV import is ready).
-3. French i18n (next-intl), keeping Arabic as the default.
+3. Finish French translation of the remaining pages (clubs, trees, profile, campaigns, donations, donors, associations, impact, admin) using `lib/i18n/dict.ts`.
 4. Deployment: Supabase cloud plus host, SMTP, Turnstile, domain; then verify the Telegram/WhatsApp/SMS webhooks live.
 5. Legal review and ANPDP declaration; retention limit for raw intake text.
-6. Clean up the `router.refresh()`-inside-transition pattern in a few client components (it caused one stuck-button bug, fixed where found).
+6. Soft `router.refresh()` after server actions was intermittently dropped (stale lists). Fixed with full navigation/reload for campaign and club creation and certificate issue; other admin flows still use soft refresh — watch for stale views.
 7. Accessibility audit with a screen reader (keyboard and labels were improved, but no full audit yet); Lighthouse run (the network blocks tiles and fonts here, so scores would be misleading).
 8. Branded publishing with admin approval, if still wanted.
 
@@ -95,10 +95,10 @@ See [`docs/NEEDS_FROM_HATEM.md`](NEEDS_FROM_HATEM.md) for exact steps. In short:
 |---|---|
 | `npx tsc --noEmit` | pass |
 | `npx eslint .` | pass (0 warnings) |
-| `npx vitest run` | **41 passed**, 0 failed |
+| `npx vitest run` | **42 passed**, 0 failed |
 | `npx supabase test db` | **69 passed** (3 files), 0 failed |
 | `npm run build` | pass |
-| `npx playwright test` (after a fresh `supabase db reset`, app on :3000) | **6 passed**, 3 consecutive runs |
+| `npx playwright test` (after a fresh `supabase db reset`, app on :3000) | **7 passed**, 5 consecutive runs |
 | GitHub Actions CI | not run (UNVERIFIED) |
 | Claude / Voyage / Telegram / WhatsApp / Twilio / Turnstile live calls | not run (no credentials or network) |
 
@@ -147,6 +147,6 @@ Then open http://localhost:3000. Login codes arrive in Mailpit at http://127.0.0
 2. Get the official wilaya 59–69 numbering and commune list, then import them.
 3. Create the Supabase cloud project and deploy to a staging domain with Turnstile and SMTP.
 4. Run the first live intake channel (Telegram is the easiest).
-5. French i18n.
+5. Finish French translation.
 6. Pilot with one DJSL (one wilaya), one association and two clubs, following `docs/DEMO.md` with real users.
 7. Legal review and ANPDP declaration before handling real personal data at scale.

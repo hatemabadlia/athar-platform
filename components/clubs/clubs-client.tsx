@@ -13,6 +13,9 @@ import { Modal } from "@/components/ui/modal";
 import { createClub, joinClub, leaveClub, createActivity, checkIn, submitReport } from "@/app/actions/clubs";
 import { cn, formatDate } from "@/lib/utils";
 
+/** Soft router.refresh() after a server action was intermittently dropped (stale list); a reload is reliable. */
+const reloadPage = () => window.location.reload();
+
 const QrScanner = dynamic(() => import("./qr-scanner").then((m) => m.QrScanner), { ssr: false });
 const input = "w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200";
 
@@ -124,7 +127,6 @@ function ClubCard({ club, signedIn, activities }: { club: ClubView; signedIn: bo
 }
 
 function CreateClubModal({ onClose }: { onClose: () => void }) {
-  const router = useRouter();
   const [name, setName] = useState(""); const [desc, setDesc] = useState(""); const [inst, setInst] = useState("");
   const [w, setW] = useState(16); const [focus, setFocus] = useState<Category[]>([]);
   const [pending, start] = useTransition(); const [err, setErr] = useState<string | null>(null);
@@ -132,7 +134,7 @@ function CreateClubModal({ onClose }: { onClose: () => void }) {
     <Modal open onClose={onClose} title="تأسيس نادٍ تطوعي">
       <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); start(async () => {
         const r = await createClub({ name, description: desc, institutionName: inst || undefined, wilayaCode: w, focus });
-        if (!r.ok) setErr(r.error); else { router.refresh(); onClose(); } }); }}>
+        if (!r.ok) setErr(r.error); else { onClose(); reloadPage(); } }); }}>
         <div><label htmlFor="cn" className="text-xs font-bold">اسم النادي *</label><input id="cn" required minLength={3} maxLength={120} value={name} onChange={(e) => setName(e.target.value)} className={input} /></div>
         <div><label htmlFor="ci" className="text-xs font-bold">المؤسسة المضيفة (مثلاً: دار الشباب …)</label><input id="ci" maxLength={120} value={inst} onChange={(e) => setInst(e.target.value)} className={input} /></div>
         <div><label htmlFor="cwil" className="text-xs font-bold">الولاية *</label><select id="cwil" value={w} onChange={(e) => setW(+e.target.value)} className={input}>{WILAYAS.map((x) => <option key={x.code} value={x.code}>{x.code} - {x.nameAr}</option>)}</select></div>
@@ -148,14 +150,13 @@ function CreateClubModal({ onClose }: { onClose: () => void }) {
 }
 
 function NewActivityModal({ club, onClose }: { club: ClubView; onClose: () => void }) {
-  const router = useRouter();
   const [title, setTitle] = useState(""); const [loc, setLoc] = useState(""); const [when, setWhen] = useState("");
   const [pending, start] = useTransition(); const [err, setErr] = useState<string | null>(null);
   return (
     <Modal open onClose={onClose} title={`نشاط جديد — ${club.name}`}>
       <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); start(async () => {
         const r = await createActivity({ clubId: club.id, title, location: loc || undefined, startsAt: new Date(when).toISOString() });
-        if (!r.ok) setErr(r.error); else { router.refresh(); onClose(); } }); }}>
+        if (!r.ok) setErr(r.error); else { onClose(); reloadPage(); } }); }}>
         <div><label htmlFor="at" className="text-xs font-bold">العنوان *</label><input id="at" required minLength={3} value={title} onChange={(e) => setTitle(e.target.value)} className={input} /></div>
         <div><label htmlFor="al" className="text-xs font-bold">المكان</label><input id="al" value={loc} onChange={(e) => setLoc(e.target.value)} className={input} /></div>
         <div><label htmlFor="aw" className="text-xs font-bold">التاريخ والساعة *</label><input id="aw" type="datetime-local" required value={when} onChange={(e) => setWhen(e.target.value)} className={input} /></div>

@@ -4,7 +4,8 @@ import { z } from "zod";
 import { serverEnv } from "@/lib/env";
 import { clientIpKey, getViewer, rateLimit } from "@/lib/server/guards";
 import { TOOL_DEFS, runTool, searchAlerts, myPoints, listClubs, crisisInfo } from "@/lib/chat/tools";
-import { detectWilaya } from "@/lib/wilayas";
+import { detectWilaya, WILAYAS } from "@/lib/wilayas";
+import { isFrench } from "@/lib/chat/lang";
 import { extractBloodType } from "@/lib/pipeline/text";
 import { normalizeDarija } from "@/lib/pipeline/heuristic";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -27,28 +28,55 @@ const SYSTEM = `You are "إيثار بوت", the assistant of Athar, an Algerian
 
 type Reply = { text: string; alerts: PublicAlert[]; links: { href: string; label: string }[]; mode: "claude" | "rules" };
 
+const fold = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function detectWilayaFr(q: string) {
+  const f = fold(q);
+  return [...WILAYAS].sort((a, b) => b.name.length - a.name.length).find((w) => new RegExp(`\\b${fold(w.name).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(f)) ?? null;
+}
+
 async function rulesReply(q: string): Promise<Reply> {
-  const n = normalizeDarija(q).text;
-  const w = detectWilaya(n);
+  const fr = isFrench(q);
+  const n = fr ? fold(q) : normalizeDarija(q).text;
+  const w = fr ? detectWilayaFr(q) : detectWilaya(n);
+  const wName = w ? (fr ? w.name : w.nameAr) : null;
   const blood = extractBloodType(q);
-  if (/طوارئ|كارثة|فيضان|زلزال|حريق|ماوى|مأوى|إيواء/.test(n)) {
+  const L = fr ? {
+    noCrisis: "Aucune urgence n'est déclarée sur Athar pour le moment.",
+    crisis: (k: number, sh: string[]) => `${k} urgence(s) déclarée(s).${sh.length ? ` Centres ouverts : ${sh.join(", ")}.` : " Aucun centre d'hébergement ouvert n'est encore enregistré."}`,
+    loginForPoints: "Connectez-vous pour voir vos points.", points: (p: number, h: number) => `Vous avez ${p} points confirmés et ${h} h de bénévolat confirmées. Les points ne comptent qu'après confirmation de présence.`,
+    clubs: (k: number, names: string[]) => (k ? `${k} club(s)${wName ? ` à ${wName}` : ""} : ${names.join(", ")}.` : `Aucun club enregistré${wName ? ` à ${wName}` : ""} pour l'instant — vous pouvez en créer un.`),
+    none: (isB: boolean) => `Aucun appel vérifié${isB ? " de don de sang" : ""}${wName ? ` à ${wName}` : ""} pour le moment.`,
+    found: () => `Voici les appels vérifiés${wName ? ` à ${wName}` : ""}${blood ? ` compatibles avec votre groupe ${blood}` : ""} :`,
+    map: "Carte", login: "Connexion", profile: "Mon profil", clubsL: "Clubs",
+    reCrisis: /urgence|inondation|seisme|incendie|abri|hebergement/, rePoints: /points?|heures|certificat|badge/, reClubs: /club|maison de jeunes/, reBlood: /sang|donneur|don\b/,
+  } : {
+    noCrisis: "ما كاين حتى حالة طوارئ معلنة على إيثار دروك.",
+    crisis: (k: number, sh: string[]) => `كاين ${k} حالة طوارئ معلنة.${sh.length ? ` المراكز المفتوحة: ${sh.join("، ")}.` : " ما تسجلش حتى مركز إيواء مفتوح بعد."}`,
+    loginForPoints: "لازم تدخل لحسابك باش نشوفلك نقاطك.", points: (p: number, h: number) => `عندك ${p} نقطة مؤكدة و${h} ساعة تطوع مؤكدة. النقاط تتحسب غير بعد تأكيد الحضور.`,
+    clubs: (k: number, names: string[]) => (k ? `لقيت ${k} نادي${wName ? ` في ${wName}` : ""}: ${names.join("، ")}.` : `ما كاين حتى نادي مسجل${wName ? ` في ${wName}` : ""} بعد — تقدر تنشئ واحد.`),
+    none: (isB: boolean) => `ما كاين حتى نداء معتمد${isB ? " للتبرع بالدم" : ""}${wName ? ` في ${wName}` : ""} دروك. نخبروك كي يطلع واحد.`,
+    found: () => `هذو النداءات المعتمدة${wName ? ` في ${wName}` : ""}${blood ? ` المتوافقة مع فصيلتك ${blood}` : ""}:`,
+    map: "الخريطة", login: "دخول", profile: "ملفي", clubsL: "النوادي",
+    reCrisis: /طوارئ|كارثة|فيضان|زلزال|حريق|ماوى|مأوى|إيواء/, rePoints: /نقاط|نقطة|شارة|ساعات|شهادة/, reClubs: /نادي|نوادي|دار الشباب/, reBlood: /دم|فصيل|تبرع/,
+  };
+  if (L.reCrisis.test(n)) {
     const r = (await crisisInfo({ wilaya_code: w?.code })).json as { active_crises: unknown[]; open_shelters: { name: string }[] };
-    if (!r.active_crises.length) return { text: "ما كاين حتى حالة طوارئ معلنة على إيثار دروك.", alerts: [], links: [], mode: "rules" };
-    return { text: `كاين ${r.active_crises.length} حالة طوارئ معلنة.${r.open_shelters.length ? ` المراكز المفتوحة: ${r.open_shelters.map((s) => s.name).join("، ")}.` : " ما تسجلش حتى مركز إيواء مفتوح بعد."}`, alerts: [], links: [{ href: "/", label: "الخريطة" }], mode: "rules" };
+    if (!r.active_crises.length) return { text: L.noCrisis, alerts: [], links: [], mode: "rules" };
+    return { text: L.crisis(r.active_crises.length, r.open_shelters.map((x) => x.name)), alerts: [], links: [{ href: "/", label: L.map }], mode: "rules" };
   }
-  if (/نقاط|نقطة|شارة|ساعات|شهادة/.test(n)) {
+  if (L.rePoints.test(n)) {
     const r = (await myPoints()).json as { signed_in: boolean; points?: number; hours?: number };
-    if (!r.signed_in) return { text: "لازم تدخل لحسابك باش نشوفلك نقاطك.", alerts: [], links: [{ href: "/login", label: "دخول" }], mode: "rules" };
-    return { text: `عندك ${r.points ?? 0} نقطة مؤكدة و${r.hours ?? 0} ساعة تطوع مؤكدة. النقاط تتحسب غير بعد تأكيد الحضور.`, alerts: [], links: [{ href: "/profile", label: "ملفي" }], mode: "rules" };
+    if (!r.signed_in) return { text: L.loginForPoints, alerts: [], links: [{ href: "/login", label: L.login }], mode: "rules" };
+    return { text: L.points(r.points ?? 0, r.hours ?? 0), alerts: [], links: [{ href: "/profile", label: L.profile }], mode: "rules" };
   }
-  if (/نادي|نوادي|دار الشباب/.test(n)) {
+  if (L.reClubs.test(n)) {
     const r = (await listClubs({ wilaya_code: w?.code })).json as { count: number; clubs: { name: string }[] };
-    return { text: r.count ? `لقيت ${r.count} نادي${w ? ` في ${w.nameAr}` : ""}: ${r.clubs.map((c) => c.name).join("، ")}.` : `ما كاين حتى نادي مسجل${w ? ` في ${w.nameAr}` : ""} بعد — تقدر تنشئ واحد.`, alerts: [], links: [{ href: "/clubs", label: "النوادي" }], mode: "rules" };
+    return { text: L.clubs(r.count, r.clubs.map((c) => c.name)), alerts: [], links: [{ href: "/clubs", label: L.clubsL }], mode: "rules" };
   }
-  const isBlood = /دم|فصيل|تبرع/.test(n) || !!blood;
+  const isBlood = L.reBlood.test(n) || !!blood;
   const r = await searchAlerts({ wilaya_code: w?.code, category: isBlood ? "blood" : undefined, donor_blood_type: blood ?? undefined });
-  if (!r.alerts?.length) return { text: `ما كاين حتى نداء معتمد${isBlood ? " للتبرع بالدم" : ""}${w ? ` في ${w.nameAr}` : ""} دروك. نخبروك كي يطلع واحد.`, alerts: [], links: [{ href: "/", label: "الخريطة" }], mode: "rules" };
-  return { text: `هذو النداءات المعتمدة${w ? ` في ${w.nameAr}` : ""}${blood ? ` المتوافقة مع فصيلتك ${blood}` : ""}:`, alerts: r.alerts.slice(0, 3), links: [], mode: "rules" };
+  if (!r.alerts?.length) return { text: L.none(isBlood), alerts: [], links: [{ href: "/", label: L.map }], mode: "rules" };
+  return { text: L.found(), alerts: r.alerts.slice(0, 3), links: [], mode: "rules" };
 }
 
 export async function POST(req: Request) {

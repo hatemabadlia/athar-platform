@@ -67,7 +67,7 @@ That person then grants every other role from `/admin → الأدوار`.
 | Command | What |
 |---|---|
 | `npm test` | Unit tests (Vitest): pipeline, extraction, scoring, matching, blood compatibility, badges, forecasts, CSV, beneficiary IDs |
-| `npx supabase test db` | pgTAP: RLS, role scopes, RPC authorisation, QR replay/tamper, certificates, dedupe privacy |
+| `npx supabase db reset && npx supabase test db` | pgTAP (needs an empty DB; asserts exact counts): RLS, role scopes, RPC authorisation, QR replay/tamper, certificates, dedupe privacy |
 | `npm run test:e2e` | Playwright against a running app on :3000 and a fresh `npx supabase db reset` |
 | `npm run lint` · `npm run typecheck` · `npm run build` | Static checks |
 

@@ -10,12 +10,16 @@ export const metadata = { title: "نوادي التطوع" };
 export default async function ClubsPage() {
   const viewer = await getViewer();
   const supabase = await supabaseServer();
-  const [{ data: clubs }, { data: stats }, { data: mine }, { data: acts }] = await Promise.all([
+  const [clubsRes, statsRes, mineRes, actsRes] = await Promise.all([
     supabase.from("clubs").select("id,name,description,institution_name,wilaya_code,focus").eq("status", "approved").order("created_at", { ascending: false }).limit(200),
     supabase.from("club_stats").select("*"),
-    viewer ? supabase.from("club_members").select("club_id, role").eq("user_id", viewer.id) : Promise.resolve({ data: [] as { club_id: string; role: string }[] }),
+    viewer ? supabase.from("club_members").select("club_id, role").eq("user_id", viewer.id) : Promise.resolve({ data: [] as { club_id: string; role: string }[], error: null }),
     supabase.from("club_activities").select("id,club_id,alert_id,title,location,wilaya_code,starts_at,ends_at,status").gte("starts_at", new Date(Date.now() - 7 * 864e5).toISOString()).order("starts_at").limit(200),
   ]);
+  for (const [k, r] of Object.entries({ clubs: clubsRes, stats: statsRes, mine: mineRes, acts: actsRes })) {
+    if (r.error) throw new Error(`clubs page query failed (${k}): ${r.error.message}`);
+  }
+  const clubs = clubsRes.data, stats = statsRes.data, mine = mineRes.data, acts = actsRes.data;
   const s = new Map((stats ?? []).map((x) => [x.club_id as string, x]));
   const m = new Map((mine ?? []).map((x) => [x.club_id, x.role as "member" | "lead"]));
   const list: ClubView[] = (clubs ?? []).map((c) => {
