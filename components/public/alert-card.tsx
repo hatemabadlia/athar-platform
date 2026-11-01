@@ -27,10 +27,6 @@ export function AlertCard({
   return (
     <div
       onClick={onSelect}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(); } }}
-      role="button"
-      tabIndex={0}
-      aria-pressed={active}
       className={cn(
         "group cursor-pointer rounded-2xl border bg-white p-4 transition-all hover:shadow-md",
         active ? "border-brand-500 ring-2 ring-brand-200" : "border-slate-200"
@@ -53,7 +49,11 @@ export function AlertCard({
               </span>
             )}
           </div>
-          <h4 className="font-bold text-slate-900 leading-snug">{alert.title}</h4>
+          <h3 className="font-bold text-slate-900 leading-snug">
+            <button type="button" aria-pressed={active} onClick={(e) => { e.stopPropagation(); onSelect(); }} className="text-right hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 rounded">
+              {alert.title}<span className="sr-only"> — عرض على الخريطة</span>
+            </button>
+          </h3>
           <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-500">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" aria-hidden /> {alert.wilaya}{alert.baladiya ? ` · ${alert.baladiya}` : ""}</span>
             <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {timeAgo(alert.createdAt)}</span>

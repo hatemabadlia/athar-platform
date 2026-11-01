@@ -179,6 +179,7 @@ function CertificateButton({ hours }: { hours: number }) {
 
 function QrCard() {
   const [svg, setSvg] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [exp, setExp] = useState<Date | null>(null);
   const [left, setLeft] = useState(0);
   const [err, setErr] = useState<string | null>(null);
@@ -187,6 +188,7 @@ function QrCard() {
     const r = await issueQrToken();
     if (!r.ok) { setErr(r.error); return; }
     setSvg(await QRCode.toString(r.data!.token, { type: "svg", margin: 1, errorCorrectionLevel: "M" }));
+    setToken(r.data!.token);
     setExp(new Date(r.data!.expiresAt));
   };
   useEffect(() => { load(); }, []);
@@ -214,6 +216,12 @@ function QrCard() {
           {err && <div role="alert" className="text-red-600">{err}</div>}
         </div>
       </div>
+      {token && (
+        <details className="mt-3 text-[11px] text-slate-500">
+          <summary className="cursor-pointer">عرض الرمز كنص (بدون كاميرا)</summary>
+          <code data-testid="qr-token" dir="ltr" className="mt-1 block break-all rounded bg-slate-50 p-2 font-mono text-[10px] text-slate-700">{token}</code>
+        </details>
+      )}
     </div>
   );
 }

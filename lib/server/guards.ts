@@ -22,12 +22,16 @@ export async function rateLimit(key: string, max: number, windowSeconds: number)
 }
 
 /**
- * Cloudflare Turnstile verification. When not configured (development), returns
- * { ok: true, skipped: true } so the form works locally; production must configure it.
+ * Cloudflare Turnstile verification. Without keys it only passes in development or when
+ * ATHAR_DEV_ALLOW_NO_CAPTCHA=true on a non-production deployment; production must configure it.
  */
 export async function verifyTurnstile(token: string | null | undefined): Promise<{ ok: boolean; skipped?: boolean }> {
-  const secret = serverEnv().TURNSTILE_SECRET_KEY;
-  if (!secret) return { ok: process.env.NODE_ENV !== "production", skipped: true };
+  const env = serverEnv();
+  const secret = env.TURNSTILE_SECRET_KEY;
+  if (!secret) {
+    const devBypass = process.env.NODE_ENV !== "production" || (env.ATHAR_DEV_ALLOW_NO_CAPTCHA === "true" && process.env.VERCEL_ENV !== "production");
+    return { ok: devBypass, skipped: true };
+  }
   if (!token) return { ok: false };
   const body = new URLSearchParams({ secret, response: token });
   const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body, signal: AbortSignal.timeout(8000) });

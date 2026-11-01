@@ -40,13 +40,22 @@ const CATEGORY_KEYWORDS: Record<Category, string[]> = {
   relief: ["اغاثة", "عائلة", "فيضانات", "زلزال", "ماوي", "مواد غذائية", "اغطية", "مشردين", "حريق", "ملابس"],
 };
 
+/**
+ * Keyword present as a whole word (Arabic clitics و/ف/ب/ل/ال allowed in front), so that short keywords
+ * like "دم" (blood) do not match inside "القدم" (football).
+ */
+export function hasKeyword(normalized: string, keyword: string): boolean {
+  const kw = normalizeArabic(keyword).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|\\s)(?:و|ف|ب|ل|ك)?(?:ال|لل)?${kw}(?:ات|ين|ون|ه|ها|ي)?(?=$|\\s)`, "u").test(normalized);
+}
+
 export function classifyCategory(text: string): { category: Category | null; confidence: number } {
   const n = normalizeArabic(text);
   let best: Category | null = null;
   let bestScore = 0;
   (Object.keys(CATEGORY_KEYWORDS) as Category[]).forEach((cat) => {
     const score = CATEGORY_KEYWORDS[cat].reduce(
-      (acc, kw) => acc + (n.includes(normalizeArabic(kw)) ? (kw.length > 4 ? 2 : 1) : 0), 0);
+      (acc, kw) => acc + (hasKeyword(n, kw) ? (kw.length > 4 ? 2 : 1) : 0), 0);
     if (score > bestScore) { bestScore = score; best = cat; }
   });
   // rule-based confidence is deliberately capped low: it is keyword matching, not understanding
@@ -56,7 +65,7 @@ export function classifyCategory(text: string): { category: Category | null; con
 export function classifyUrgency(text: string, category: Category | null): Urgency {
   const n = normalizeArabic(text);
   const criticalKw = ["عاجل", "حرج", "خطر", "فورا", "الليله", "العنايه المركزه", "بدون ماوي", "فيضان", "زلزال", "حريق"];
-  const hits = criticalKw.filter((k) => n.includes(normalizeArabic(k))).length;
+  const hits = criticalKw.filter((k) => hasKeyword(n, k)).length;
   if (hits >= 2 || (category === "blood" && hits >= 1)) return "critical";
   if (hits === 1 || category === "blood" || category === "medical") return "medium";
   return "normal";

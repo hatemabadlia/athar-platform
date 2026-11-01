@@ -7,3 +7,5 @@ out
 next-env.d.ts
 !.env.example
 supabase/.temp
+test-results/
+playwright-report/

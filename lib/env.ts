@@ -23,6 +23,8 @@ const serverSchema = publicSchema.extend({
   ATHAR_AI_MODEL: z.preprocess(emptyToUndefined, z.string().default("claude-opus-5-5")),
   VOYAGE_API_KEY: optional(),
   TURNSTILE_SECRET_KEY: optional(),
+  // Local/staging only: accept public submissions without Turnstile. Ignored when VERCEL_ENV=production.
+  ATHAR_DEV_ALLOW_NO_CAPTCHA: z.preprocess(emptyToUndefined, z.enum(["true", "false"]).default("false")),
   TELEGRAM_BOT_TOKEN: optional(),
   TELEGRAM_WEBHOOK_SECRET: optional(),
   WHATSAPP_VERIFY_TOKEN: optional(),
