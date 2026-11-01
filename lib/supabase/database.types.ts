@@ -135,14 +135,14 @@ isOneToOne: false
                   ]
                 },"alerts": {
                   Row: {
-                    "ai_confidence": number | null,"ai_mode": string,"association_id": string | null,"baladiya_id": number | null,"baladiya_name": string | null,"blood_type": Database["public"]['Enums']["blood_type"] | null,"category": Database["public"]['Enums']["alert_category"],"contact_name": string | null,"created_at": string,"credibility_reasons": NonNullable<Json>,"credibility_score": number | null,"darija_terms": NonNullable<Json>,"deadline": string | null,"embedding": string | null,"first_seen_at": string | null,"id": string,"institution_name": string | null,"lat": number | null,"lng": number | null,"location_precision": string,"merged_into": string | null,"needs_review_reasons": (string)[],"normalized_text": string | null,"original_text": string,"owner_id": string | null,"quantity": number | null,"resolved_at": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"source_count": number,"status": Database["public"]['Enums']["alert_status"],"summary": string,"title": string,"updated_at": string,"urgency": Database["public"]['Enums']["urgency"],"verdict": Database["public"]['Enums']["ai_verdict"] | null,"volunteers_needed": number,"wilaya_code": number | null
+                    "ai_confidence": number | null,"ai_mode": string,"association_id": string | null,"baladiya_id": number | null,"baladiya_name": string | null,"blood_type": Database["public"]['Enums']["blood_type"] | null,"canonical_text": string | null,"category": Database["public"]['Enums']["alert_category"],"contact_name": string | null,"content_hash": string | null,"created_at": string,"credibility_reasons": NonNullable<Json>,"credibility_score": number | null,"darija_terms": NonNullable<Json>,"deadline": string | null,"embedding": string | null,"first_seen_at": string | null,"id": string,"institution_name": string | null,"lat": number | null,"lng": number | null,"location_precision": string,"merged_into": string | null,"needs_review_reasons": (string)[],"normalized_text": string | null,"original_text": string,"owner_id": string | null,"quantity": number | null,"resolved_at": string | null,"reviewed_at": string | null,"reviewed_by": string | null,"source_count": number,"status": Database["public"]['Enums']["alert_status"],"summary": string,"title": string,"updated_at": string,"urgency": Database["public"]['Enums']["urgency"],"verdict": Database["public"]['Enums']["ai_verdict"] | null,"volunteers_needed": number,"wilaya_code": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "ai_confidence"?: number | null,"ai_mode"?: string,"association_id"?: string | null,"baladiya_id"?: number | null,"baladiya_name"?: string | null,"blood_type"?: Database["public"]['Enums']["blood_type"] | null,"category": Database["public"]['Enums']["alert_category"],"contact_name"?: string | null,"created_at"?: string,"credibility_reasons"?: NonNullable<Json>,"credibility_score"?: number | null,"darija_terms"?: NonNullable<Json>,"deadline"?: string | null,"embedding"?: string | null,"first_seen_at"?: string | null,"id"?: string,"institution_name"?: string | null,"lat"?: number | null,"lng"?: number | null,"location_precision"?: string,"merged_into"?: string | null,"needs_review_reasons"?: (string)[],"normalized_text"?: string | null,"original_text": string,"owner_id"?: string | null,"quantity"?: number | null,"resolved_at"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_count"?: number,"status"?: Database["public"]['Enums']["alert_status"],"summary"?: string,"title": string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["urgency"],"verdict"?: Database["public"]['Enums']["ai_verdict"] | null,"volunteers_needed"?: number,"wilaya_code"?: number | null
+                    "ai_confidence"?: number | null,"ai_mode"?: string,"association_id"?: string | null,"baladiya_id"?: number | null,"baladiya_name"?: string | null,"blood_type"?: Database["public"]['Enums']["blood_type"] | null,"canonical_text"?: string | null,"category": Database["public"]['Enums']["alert_category"],"contact_name"?: string | null,"content_hash"?: string | null,"created_at"?: string,"credibility_reasons"?: NonNullable<Json>,"credibility_score"?: number | null,"darija_terms"?: NonNullable<Json>,"deadline"?: string | null,"embedding"?: string | null,"first_seen_at"?: string | null,"id"?: string,"institution_name"?: string | null,"lat"?: number | null,"lng"?: number | null,"location_precision"?: string,"merged_into"?: string | null,"needs_review_reasons"?: (string)[],"normalized_text"?: string | null,"original_text": string,"owner_id"?: string | null,"quantity"?: number | null,"resolved_at"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_count"?: number,"status"?: Database["public"]['Enums']["alert_status"],"summary"?: string,"title": string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["urgency"],"verdict"?: Database["public"]['Enums']["ai_verdict"] | null,"volunteers_needed"?: number,"wilaya_code"?: number | null
                   }
                   Update: {
-                    "ai_confidence"?: number | null,"ai_mode"?: string,"association_id"?: string | null,"baladiya_id"?: number | null,"baladiya_name"?: string | null,"blood_type"?: Database["public"]['Enums']["blood_type"] | null,"category"?: Database["public"]['Enums']["alert_category"],"contact_name"?: string | null,"created_at"?: string,"credibility_reasons"?: NonNullable<Json>,"credibility_score"?: number | null,"darija_terms"?: NonNullable<Json>,"deadline"?: string | null,"embedding"?: string | null,"first_seen_at"?: string | null,"id"?: string,"institution_name"?: string | null,"lat"?: number | null,"lng"?: number | null,"location_precision"?: string,"merged_into"?: string | null,"needs_review_reasons"?: (string)[],"normalized_text"?: string | null,"original_text"?: string,"owner_id"?: string | null,"quantity"?: number | null,"resolved_at"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_count"?: number,"status"?: Database["public"]['Enums']["alert_status"],"summary"?: string,"title"?: string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["urgency"],"verdict"?: Database["public"]['Enums']["ai_verdict"] | null,"volunteers_needed"?: number,"wilaya_code"?: number | null
+                    "ai_confidence"?: number | null,"ai_mode"?: string,"association_id"?: string | null,"baladiya_id"?: number | null,"baladiya_name"?: string | null,"blood_type"?: Database["public"]['Enums']["blood_type"] | null,"canonical_text"?: string | null,"category"?: Database["public"]['Enums']["alert_category"],"contact_name"?: string | null,"content_hash"?: string | null,"created_at"?: string,"credibility_reasons"?: NonNullable<Json>,"credibility_score"?: number | null,"darija_terms"?: NonNullable<Json>,"deadline"?: string | null,"embedding"?: string | null,"first_seen_at"?: string | null,"id"?: string,"institution_name"?: string | null,"lat"?: number | null,"lng"?: number | null,"location_precision"?: string,"merged_into"?: string | null,"needs_review_reasons"?: (string)[],"normalized_text"?: string | null,"original_text"?: string,"owner_id"?: string | null,"quantity"?: number | null,"resolved_at"?: string | null,"reviewed_at"?: string | null,"reviewed_by"?: string | null,"source_count"?: number,"status"?: Database["public"]['Enums']["alert_status"],"summary"?: string,"title"?: string,"updated_at"?: string,"urgency"?: Database["public"]['Enums']["urgency"],"verdict"?: Database["public"]['Enums']["ai_verdict"] | null,"volunteers_needed"?: number,"wilaya_code"?: number | null
                   }
                   Relationships: [
                     {
@@ -1257,6 +1257,9 @@ isOneToOne: false
 "has_role":
 { Args: { "r": Database["public"]['Enums']["app_role"] }; Returns: boolean
                            },
+"impact_stats":
+{ Args: { "p_from"?: string,"p_to"?: string,"p_wilaya"?: number }; Returns: Json
+                           },
 "is_club_lead":
 { Args: { "c": string }; Returns: boolean
                            },
@@ -1283,10 +1286,23 @@ isOneToOne: false
 "leave_alert":
 { Args: { "alert": string }; Returns: undefined
                            },
+"match_active_alerts":
+{ Args: { "p_category": Database["public"]['Enums']["alert_category"],"p_days"?: number,"p_embedding"?: string,"p_limit"?: number,"p_phone_hashes": (string)[],"p_text": string,"p_wilaya": number }; Returns: {
+              "category": Database["public"]['Enums']["alert_category"],"created_at": string,"id": string,"phone_match": boolean,"same_category": boolean,"same_place": boolean,"status": Database["public"]['Enums']["alert_status"],"text_similarity": number,"title": string,"vector_similarity": number,"wilaya_code": number
+            }[]
+                           },
+"match_historical":
+{ Args: { "p_embedding"?: string,"p_hash": string,"p_limit"?: number,"p_phone_hashes": (string)[],"p_text": string }; Returns: {
+              "category": Database["public"]['Enums']["alert_category"],"exact": boolean,"first_seen_at": string,"id": string,"normalized_text": string,"phone_match": boolean,"resolved_at": string,"text_similarity": number,"times_seen": number,"vector_similarity": number,"wilaya_code": number
+            }[]
+                           },
 "my_moderation_scope":
 { Args: Record<PropertyKey, never>; Returns: (number)[]
                            },
 "my_points":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"portal_stats":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
 "rate_limit_hit":
@@ -1308,7 +1324,7 @@ isOneToOne: false
 { Args: { "r": Database["public"]['Enums']["app_role"],"target": string }; Returns: undefined
                            },
 "submit_report":
-{ Args: { "activity": string,"alert": string,"attended_count": number,"hours_total": number,"organization"?: string,"outcome": string,"resources_used"?: string }; Returns: string
+{ Args: { "activity"?: string,"alert"?: string,"attended_count": number,"hours_total": number,"organization"?: string,"outcome": string,"resources_used"?: string }; Returns: string
                            },
 "verify_certificate":
 { Args: { "cert": string }; Returns: Json

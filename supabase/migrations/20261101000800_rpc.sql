@@ -201,8 +201,8 @@ begin
   if nxt in ('resolved', 'recycled') then
     insert into public.historical_posts (content_hash, normalized_text, phone_hashes, category, wilaya_code,
                                          first_seen_at, resolved_at, alert_id, source, embedding)
-    select encode(extensions.digest(coalesce(a.normalized_text, a.original_text), 'sha256'), 'hex'),
-           coalesce(a.normalized_text, a.original_text),
+    select coalesce(a.content_hash, encode(extensions.digest(a.original_text, 'sha256'), 'hex')),
+           coalesce(a.canonical_text, a.original_text),
            coalesce((select array[c.phone_hash] from public.alert_contacts c where c.alert_id = alert and c.phone_hash is not null), '{}'),
            a.category, a.wilaya_code, coalesce(a.first_seen_at, a.created_at),
            case when nxt = 'resolved' then now() end, alert, 'platform', a.embedding
@@ -246,9 +246,9 @@ begin
 end $$;
 
 -- ===================== after-action reports =====================
-create or replace function public.submit_report(alert uuid, activity uuid, outcome text, attended_count int,
-                                                hours_total numeric, resources_used text default null,
-                                                organization text default null)
+create or replace function public.submit_report(outcome text, attended_count int, hours_total numeric,
+                                                alert uuid default null, activity uuid default null,
+                                                resources_used text default null, organization text default null)
 returns uuid language plpgsql volatile security definer set search_path = '' as $$
 declare uid uuid := private.require_user(); allowed boolean := false; rid uuid; w smallint;
 begin

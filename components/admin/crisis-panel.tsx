@@ -1,132 +1,102 @@
 "use client";
 
-import { useState } from "react";
-import { Siren, Smartphone, Building2, Send, CheckCircle2, XCircle, Radio } from "lucide-react";
-import { useAthar } from "@/lib/store";
-import { CRISIS_META, SHELTERS } from "@/lib/mock-data";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Siren, Loader2, Send, XCircle } from "lucide-react";
+import type { CrisisType, CrisisView, ShelterView } from "@/lib/types";
+import { CRISIS_META } from "@/lib/reference/meta";
 import { WILAYAS } from "@/lib/wilayas";
-import type { CrisisType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { cn, sleep } from "@/lib/utils";
+import { activateCrisis, closeCrisis, crisisAudience } from "@/app/actions/admin";
+import { timeAgo } from "@/lib/utils";
 
-type Sms = { to: string; text: string; status: "sending" | "sent" | "confirmed" };
+export function CrisisPanel({ crises, shelters, adminWilayas, smsProvider, smsReal, counts }: {
+  crises: CrisisView[]; shelters: ShelterView[]; adminWilayas: number[] | null; smsProvider: string; smsReal: boolean;
+  counts: Record<string, { confirmed: number; sent: number; failed: number }>;
+}) {
+  const router = useRouter();
+  const allowed = adminWilayas === null ? WILAYAS : WILAYAS.filter((w) => adminWilayas.includes(w.code));
+  const [type, setType] = useState<Exclude<CrisisType, "other">>("flood");
+  const [w, setW] = useState(allowed[0]?.code ?? 16);
+  const [title, setTitle] = useState("");
+  const [tpl, setTpl] = useState(CRISIS_META.flood.sms);
+  const [hub, setHub] = useState("");
+  const [sendSms, setSendSms] = useState(false);
+  const [audience, setAudience] = useState<number | null>(null);
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
+  const [closing, setClosing] = useState<Record<string, string>>({});
+  const openShelters = shelters.filter((s) => s.wilayaCode === w);
 
-export function CrisisPanel() {
-  const { crisis, activateCrisis, deactivateCrisis, clubs } = useAthar();
-  const [type, setType] = useState<CrisisType>("flood");
-  const [wilayaCode, setWilayaCode] = useState(35);
-  const [sms, setSms] = useState<Sms[]>([]);
-  const [stage, setStage] = useState<"idle" | "activating" | "broadcasting" | "done">("idle");
-  const [stats, setStats] = useState({ shelters: 0, volunteers: 0, confirmed: 0 });
-
-  const activate = async () => {
-    setStage("activating");
-    const c = activateCrisis(type, wilayaCode);
-    const shelters = SHELTERS.filter((s) => s.wilayaCode === wilayaCode);
-    const hub = shelters[0]?.name ?? "دار الشباب المركزية";
-    const members = clubs.filter((x) => x.wilayaCode === wilayaCode).reduce((s, x) => s + x.members, 0) || 120;
-    setStats({ shelters: shelters.length, volunteers: members, confirmed: 0 });
-    await sleep(900);
-    setStage("broadcasting");
-    const text = CRISIS_META[type].sms.replace("{w}", c.wilaya).replace("{hub}", hub);
-    const numbers = ["0551 22 33 44", "0661 55 66 77", "0770 88 99 00", "0555 12 98 76", "0698 44 21 07", "0779 63 18 52"];
-    for (const n of numbers) {
-      setSms((l) => [{ to: n, text, status: "sending" as const }, ...l].slice(0, 6));
-      await sleep(420);
-      setSms((l) => l.map((m) => (m.to === n ? { ...m, status: "sent" as const } : m)));
-      setStats((s) => ({ ...s, volunteers: s.volunteers }));
-    }
-    await sleep(600);
-    // confirmations trickle in
-    for (let i = 0; i < 4; i++) {
-      await sleep(500);
-      setSms((l) => l.map((m, idx) => (idx === l.length - 1 - i ? { ...m, status: "confirmed" as const } : m)));
-      setStats((s) => ({ ...s, confirmed: Math.round(members * (0.12 + i * 0.09)) }));
-    }
-    setStage("done");
-  };
-
-  const stop = () => { deactivateCrisis(); setSms([]); setStage("idle"); };
-  const meta = CRISIS_META[type];
+  if (!allowed.length) return <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-600">تفعيل الطوارئ متاح لمدير المديرية الولائية (djsl_admin) أو الوزارة فقط.</div>;
 
   return (
-    <div className={cn("rounded-3xl border-2 p-5 shadow-sm transition-colors", crisis ? "border-red-500 bg-red-50" : "border-slate-200 bg-white")}>
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3">
-          <div className={cn("flex h-10 w-10 items-center justify-center rounded-2xl", crisis ? "bg-red-600 text-white animate-pulse" : "bg-slate-100 text-slate-600")}><Siren className="h-5 w-5" /></div>
-          <div>
-            <h3 className="font-black text-slate-900">وضع الطوارئ — تفعيل شبكة دور الشباب</h3>
-            <p className="text-xs text-slate-500">عند كارثة، المديرية تحوّل دور الشباب إلى مراكز إيواء وتجمع، وتُبلّغ المتطوعين عبر SMS حتى بدون إنترنت.</p>
+    <div className="grid lg:grid-cols-2 gap-5">
+      <section className="rounded-3xl border-2 border-red-200 bg-white p-5">
+        <h2 className="flex items-center gap-2 font-black text-slate-900"><Siren className="h-5 w-5 text-red-600" aria-hidden /> إعلان حالة طوارئ</h2>
+        <p className="text-xs text-slate-500 mt-1">يظهر شريط تنبيه على الموقع لكل الزوار. الرسائل القصيرة اختيارية وتتطلب تأكيداً.</p>
+        <div className="mt-4 space-y-3 text-sm">
+          <div className="grid grid-cols-2 gap-2">
+            <div><label htmlFor="ct" className="text-xs font-bold">النوع</label>
+              <select id="ct" value={type} onChange={(e) => { const t = e.target.value as Exclude<CrisisType, "other">; setType(t); setTpl(CRISIS_META[t].sms); }} className="w-full rounded-lg border border-slate-300 px-2 py-1.5">
+                {(Object.keys(CRISIS_META) as Exclude<CrisisType, "other">[]).map((k) => <option key={k} value={k}>{CRISIS_META[k].emoji} {CRISIS_META[k].label}</option>)}
+              </select></div>
+            <div><label htmlFor="cw2" className="text-xs font-bold">الولاية</label>
+              <select id="cw2" value={w} onChange={(e) => { setW(+e.target.value); setAudience(null); setHub(""); }} className="w-full rounded-lg border border-slate-300 px-2 py-1.5">{allowed.map((x) => <option key={x.code} value={x.code}>{x.code} - {x.nameAr}</option>)}</select></div>
           </div>
+          <div><label htmlFor="ctt" className="text-xs font-bold">العنوان *</label><input id="ctt" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={`${CRISIS_META[type].label} — …`} className="w-full rounded-lg border border-slate-300 px-2 py-1.5" /></div>
+          <div><label htmlFor="ch" className="text-xs font-bold">نقطة التجمع (مركز مسجّل)</label>
+            <select id="ch" value={hub} onChange={(e) => setHub(e.target.value)} className="w-full rounded-lg border border-slate-300 px-2 py-1.5">
+              <option value="">— لا شيء بعد —</option>{openShelters.map((s) => <option key={s.id} value={s.id}>{s.name}{s.isOpen ? "" : " (مغلق)"}</option>)}
+            </select>
+            {!openShelters.length && <p className="mt-1 text-[11px] text-amber-700">لا توجد مراكز مسجلة لهذه الولاية. أضفها من تبويب «مراكز الإيواء».</p>}
+          </div>
+          <div><label htmlFor="cs" className="text-xs font-bold">نص الرسالة ({tpl.length}/320)</label><textarea id="cs" rows={3} maxLength={320} value={tpl} onChange={(e) => setTpl(e.target.value)} className="w-full rounded-lg border border-slate-300 px-2 py-1.5" /></div>
+          <label className="flex items-start gap-2 text-xs">
+            <input type="checkbox" checked={sendSms} onChange={(e) => { setSendSms(e.target.checked); if (e.target.checked) start(async () => { const r = await crisisAudience(w); setAudience(r.ok ? r.data! : null); }); }} className="mt-0.5" />
+            <span>إرسال SMS للمتطوعين الموافقين في الولاية {audience != null && <b>({audience} مستلم)</b>} — المزوّد: <b>{smsProvider}</b>{!smsReal && " (وضع التطوير: لا تُرسل رسائل حقيقية)"}</span>
+          </label>
+          {msg && <p role="status" className="rounded-lg bg-slate-50 px-2 py-1 text-xs font-bold">{msg}</p>}
+          <Button variant="danger" className="w-full" disabled={pending || title.trim().length < 3}
+            onClick={() => {
+              if (sendSms && smsReal && !window.confirm(`سيتم إرسال ${audience ?? "?"} رسالة SMS حقيقية. تأكيد؟`)) return;
+              start(async () => {
+                const r = await activateCrisis({ type, wilayaCode: w, title, smsTemplate: tpl, hubShelterId: hub || undefined, sendSms, confirmCount: audience ?? undefined });
+                setMsg(r.ok ? `فُعّل. ${sendSms ? `رسائل: ${r.data!.sent} مُرسلة، ${r.data!.failed} فاشلة (${r.data!.provider}).` : ""}` : r.error);
+                if (r.ok) router.refresh();
+              });
+            }}>
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" aria-hidden />} تفعيل
+          </Button>
         </div>
-        {crisis && <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs font-black text-white"><Radio className="h-3.5 w-3.5 animate-pulse" /> مفعّل: {CRISIS_META[crisis.type].emoji} {CRISIS_META[crisis.type].label} — {crisis.wilaya}</span>}
-      </div>
-
-      <div className="grid lg:grid-cols-[1fr_260px] gap-5">
-        <div className="space-y-3">
-          {!crisis ? (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {(Object.keys(CRISIS_META) as CrisisType[]).map((k) => (
-                  <button key={k} onClick={() => setType(k)} className={cn("rounded-2xl border p-3 text-center text-sm font-bold transition-all", type === k ? "border-red-500 bg-red-50 text-red-800" : "border-slate-200 text-slate-700 hover:border-slate-400")}>
-                    <div className="text-2xl">{CRISIS_META[k].emoji}</div>{CRISIS_META[k].label}
-                  </button>
-                ))}
+      </section>
+      <section className="rounded-3xl border border-slate-200 bg-white p-5">
+        <h2 className="font-black text-slate-900 mb-3">الحالات النشطة</h2>
+        {crises.length === 0 ? <p className="text-sm text-slate-500">لا توجد حالة طوارئ نشطة.</p> : crises.map((c) => {
+          const k = counts[c.id] ?? { confirmed: 0, sent: 0, failed: 0 };
+          return (
+            <div key={c.id} className="mb-3 rounded-2xl border border-red-200 bg-red-50 p-4">
+              <div className="font-bold text-slate-900">{c.title} — {c.wilaya}</div>
+              <div className="text-[11px] text-slate-500">منذ {timeAgo(c.startedAt)}</div>
+              <div className="mt-2 grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="rounded-xl bg-white p-2"><div className="font-black">{k.sent}</div>SMS مُرسل</div>
+                <div className="rounded-xl bg-white p-2"><div className="font-black">{k.failed}</div>فاشل</div>
+                <div className="rounded-xl bg-white p-2"><div className="font-black text-emerald-700">{k.confirmed}</div>أكّدوا التوفر</div>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <select value={wilayaCode} onChange={(e) => setWilayaCode(+e.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
-                  {WILAYAS.map((w) => <option key={w.code} value={w.code}>{w.code} - {w.nameAr}</option>)}
-                </select>
-                <span className="text-xs text-slate-500 flex items-center gap-1"><Building2 className="h-3.5 w-3.5" /> {SHELTERS.filter((s) => s.wilayaCode === wilayaCode).length || "—"} مؤسسة شباب جاهزة · احتياجات: {meta.needs.join("، ")}</span>
-                <Button variant="danger" onClick={activate} disabled={stage !== "idle"} className="mr-auto"><Siren className="h-4 w-4" /> تفعيل وضع الطوارئ</Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="grid grid-cols-3 gap-2">
-                <Kpi v={stats.shelters} l="مركز إيواء مفعّل" c="text-red-700" />
-                <Kpi v={stats.volunteers} l="متطوع أُبلغ عبر SMS" c="text-slate-900" />
-                <Kpi v={stats.confirmed} l="أكّدوا الحضور (رد 1)" c="text-emerald-700" />
-              </div>
-              <div className="rounded-2xl bg-white border border-red-200 p-3 text-xs text-slate-700 space-y-1">
-                {SHELTERS.filter((s) => s.wilayaCode === crisis.wilayaCode).map((s) => (
-                  <div key={s.id} className="flex items-center justify-between"><span className="font-bold flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-red-600" /> {s.name}</span><span className="text-slate-500">{s.occupied}/{s.capacity} · {s.needs.join("، ") || "لا احتياجات"}</span></div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={stop}><XCircle className="h-4 w-4" /> إنهاء حالة الطوارئ</Button>
-                <span className="text-[11px] text-slate-500 self-center">الخريطة العامة تعرض الآن مراكز الإيواء والبانر الأحمر على كل الصفحات.</span>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* phone mockup */}
-        <div className="mx-auto w-[240px] rounded-[2rem] border-[6px] border-slate-900 bg-slate-900 p-1 shadow-2xl">
-          <div className="rounded-[1.5rem] bg-slate-100 h-[330px] overflow-hidden flex flex-col">
-            <div className="bg-slate-900 text-white text-[10px] flex items-center justify-between px-4 py-1"><span>Mobilis</span><span>📶 SMS · بدون إنترنت</span></div>
-            <div className="flex items-center gap-2 bg-white px-3 py-2 border-b border-slate-200"><Smartphone className="h-4 w-4 text-slate-500" /><span className="text-xs font-bold">إيثار (رسائل قصيرة)</span></div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-2" dir="rtl">
-              {sms.length === 0 && <div className="text-center text-[11px] text-slate-400 pt-16">{stage === "activating" ? "⏳ تفعيل الشبكة…" : "لا رسائل بعد — فعّل وضع الطوارئ"}</div>}
-              {[...sms].reverse().map((m, i) => (
-                <div key={i} className="animate-slide-in">
-                  <div className="text-[9px] text-slate-400 mb-0.5" dir="ltr">→ {m.to}</div>
-                  <div className={cn("rounded-2xl rounded-tr-sm px-2.5 py-1.5 text-[10.5px] leading-snug shadow-sm", m.status === "sending" ? "bg-slate-200 text-slate-500" : "bg-emerald-600 text-white")}>{m.text}</div>
-                  <div className="text-[9px] mt-0.5 flex items-center gap-1 text-slate-500">
-                    {m.status === "sending" && <><Send className="h-2.5 w-2.5 animate-pulse" /> إرسال…</>}
-                    {m.status === "sent" && <><CheckCircle2 className="h-2.5 w-2.5" /> تم التسليم</>}
-                    {m.status === "confirmed" && <span className="text-emerald-700 font-bold">✓✓ رد المتطوع: 1 (مؤكد)</span>}
-                  </div>
+              {(adminWilayas === null || adminWilayas.includes(c.wilayaCode)) && (
+                <div className="mt-3 space-y-2">
+                  <label htmlFor={`cr-${c.id}`} className="text-xs font-bold">تقرير الإغلاق</label>
+                  <textarea id={`cr-${c.id}`} rows={2} value={closing[c.id] ?? ""} onChange={(e) => setClosing({ ...closing, [c.id]: e.target.value })} className="w-full rounded-lg border border-slate-300 px-2 py-1 text-sm" />
+                  <Button size="sm" variant="outline" disabled={pending || (closing[c.id] ?? "").length < 5}
+                    onClick={() => start(async () => { const r = await closeCrisis(c.id, closing[c.id] ?? ""); setMsg(r.ok ? "أُغلقت الحالة" : r.error); if (r.ok) router.refresh(); })}>
+                    <XCircle className="h-4 w-4" aria-hidden /> إغلاق الحالة
+                  </Button>
                 </div>
-              ))}
+              )}
             </div>
-          </div>
-        </div>
-      </div>
+          );
+        })}
+      </section>
     </div>
   );
-}
-
-function Kpi({ v, l, c }: { v: number; l: string; c: string }) {
-  return <div className="rounded-2xl bg-white border border-red-100 p-3 text-center"><div className={cn("text-2xl font-black tabular-nums", c)}>{v}</div><div className="text-[10px] text-slate-500">{l}</div></div>;
 }

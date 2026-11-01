@@ -34,7 +34,9 @@ create table public.alerts (
   title              text not null check (char_length(title) between 3 and 160),
   summary            text not null default '',
   original_text      text not null,
-  normalized_text    text,
+  normalized_text    text,            -- MSA rewrite (display)
+  canonical_text     text,            -- normalised original, used for similarity
+  content_hash       text,            -- sha256(canonical_text)
   darija_terms       jsonb not null default '[]',
   category           public.alert_category not null,
   urgency            public.urgency not null default 'normal',
@@ -75,7 +77,8 @@ create index alerts_public_idx on public.alerts (status, urgency, created_at des
 create index alerts_wilaya_status_idx on public.alerts (wilaya_code, status);
 create index alerts_category_idx on public.alerts (category, wilaya_code) where status = 'approved';
 create index alerts_owner_idx on public.alerts (owner_id);
-create index alerts_text_trgm on public.alerts using gin (original_text extensions.gin_trgm_ops);
+create index alerts_text_trgm on public.alerts using gin (canonical_text extensions.gin_trgm_ops);
+create index alerts_hash_idx on public.alerts (content_hash);
 create index alerts_embedding_idx on public.alerts using hnsw (embedding extensions.vector_cosine_ops);
 
 alter table public.intake_items
