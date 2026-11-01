@@ -1037,14 +1037,14 @@ isOneToOne: true
                   ]
                 },"intake_items": {
                   Row: {
-                    "alert_id": string | null,"channel": Database["public"]['Enums']["intake_channel"],"content_hash": string,"error": string | null,"external_id": string | null,"id": string,"pipeline": Json | null,"processed_at": string | null,"raw_text": string,"received_at": string,"source_label": string | null,"source_url": string | null,"status": Database["public"]['Enums']["intake_status"],"submitter_id": string | null
+                    "alert_id": string | null,"channel": Database["public"]['Enums']["intake_channel"],"content_hash": string,"error": string | null,"external_id": string | null,"id": string,"pipeline": Json | null,"processed_at": string | null,"raw_text": string,"received_at": string,"source_label": string | null,"source_url": string | null,"status": Database["public"]['Enums']["intake_status"],"submitter_id": string | null,"wilaya_code": number | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "alert_id"?: string | null,"channel": Database["public"]['Enums']["intake_channel"],"content_hash": string,"error"?: string | null,"external_id"?: string | null,"id"?: string,"pipeline"?: Json | null,"processed_at"?: string | null,"raw_text": string,"received_at"?: string,"source_label"?: string | null,"source_url"?: string | null,"status"?: Database["public"]['Enums']["intake_status"],"submitter_id"?: string | null
+                    "alert_id"?: string | null,"channel": Database["public"]['Enums']["intake_channel"],"content_hash": string,"error"?: string | null,"external_id"?: string | null,"id"?: string,"pipeline"?: Json | null,"processed_at"?: string | null,"raw_text": string,"received_at"?: string,"source_label"?: string | null,"source_url"?: string | null,"status"?: Database["public"]['Enums']["intake_status"],"submitter_id"?: string | null,"wilaya_code"?: number | null
                   }
                   Update: {
-                    "alert_id"?: string | null,"channel"?: Database["public"]['Enums']["intake_channel"],"content_hash"?: string,"error"?: string | null,"external_id"?: string | null,"id"?: string,"pipeline"?: Json | null,"processed_at"?: string | null,"raw_text"?: string,"received_at"?: string,"source_label"?: string | null,"source_url"?: string | null,"status"?: Database["public"]['Enums']["intake_status"],"submitter_id"?: string | null
+                    "alert_id"?: string | null,"channel"?: Database["public"]['Enums']["intake_channel"],"content_hash"?: string,"error"?: string | null,"external_id"?: string | null,"id"?: string,"pipeline"?: Json | null,"processed_at"?: string | null,"raw_text"?: string,"received_at"?: string,"source_label"?: string | null,"source_url"?: string | null,"status"?: Database["public"]['Enums']["intake_status"],"submitter_id"?: string | null,"wilaya_code"?: number | null
                   }
                   Relationships: [
                     {
@@ -1065,6 +1065,12 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "public_profiles"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "intake_items_wilaya_code_fkey"
+      columns: ["wilaya_code"]
+isOneToOne: false
+      referencedRelation: "wilayas"
+      referencedColumns: ["code"]
     }
                   ]
                 },"notifications": {

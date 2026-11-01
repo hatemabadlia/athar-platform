@@ -151,7 +151,7 @@ export async function createCampaign(input: z.input<typeof Campaign>): Promise<A
   const { data, error } = await supabase.from("campaigns").insert({ kind: d.kind, season, title: d.title, description: d.description, wilaya_code: d.wilayaCode,
     goal_units: d.goalUnits, unit_label: d.unitLabel, starts_on: d.startsOn, ends_on: d.endsOn, association_id: d.associationId, created_by: id }).select("id").single();
   if (error) return toActionError(error);
-  revalidatePath("/campaigns");
+  // no revalidatePath: /campaigns is dynamic, and revalidating here races the client's router.push
   return { ok: true, data: data.id };
 }
 

@@ -52,6 +52,7 @@ test("association verification → campaign → beneficiary dedupe", async ({ br
   await a.getByLabel("البداية *").fill("2027-02-01");
   await a.getByLabel("النهاية *").fill("2027-03-15");
   await a.getByRole("button", { name: "إنشاء" }).click();
+  await expect(a.getByRole("alert").filter({ hasText: /./ })).toHaveCount(0, { timeout: 5000 }).catch(async () => { throw new Error("campaign form error: " + (await a.getByRole("alert").allTextContents()).join(" | ")); });
   await expect(a).toHaveURL(/\/campaigns\/[0-9a-f-]{36}/, { timeout: 20_000 });
   await a.getByLabel("المعرّف").fill("0555 12 34 99");
   await a.getByRole("button", { name: "فحص وتسجيل" }).click();

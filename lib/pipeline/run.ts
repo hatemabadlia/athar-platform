@@ -36,8 +36,12 @@ async function logRun(row: {
   input_hash: string; output?: unknown; latency_ms: number; input_tokens?: number | null; output_tokens?: number | null;
   cost_usd?: number | null; success: boolean; error?: string | null;
 }) {
-  // Output stored is the structured result only (no raw message); input is referenced by hash.
-  await supabaseAdmin().from("ai_runs").insert({ ...row, output: (row.output ?? null) as never });
+  // Output stored is the structured result only (no raw message, phone numbers masked); input is referenced by hash.
+  const out = row.output && typeof row.output === "object" && "phone_numbers" in (row.output as object)
+    ? { ...(row.output as Record<string, unknown>), phone_numbers: ((row.output as { phone_numbers: string[] }).phone_numbers ?? []).map(() => "•••"),
+        normalized_text: "[redacted]" }
+    : row.output;
+  await supabaseAdmin().from("ai_runs").insert({ ...row, output: (out ?? null) as never });
 }
 
 /** Runs the 7-stage pipeline on one queued intake item and persists the result. Idempotent per item. */
@@ -219,6 +223,7 @@ export async function processIntake(intakeId: string): Promise<PipelineOutcome> 
     const stored = { ...outcome, analysis: { ...analysis, phone_numbers: analysis.phone_numbers.map(() => "•••") } };
     await db.from("intake_items").update({
       status: "processed", processed_at: new Date().toISOString(), alert_id: alertId ?? linkedTo, pipeline: stored as never,
+      wilaya_code: wilaya?.code ?? null,
     }).eq("id", intakeId);
     return outcome;
   } catch (e) {

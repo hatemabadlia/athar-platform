@@ -93,6 +93,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     const counts = await Promise.all((["institutions", "shelters", "baladiyas", "historical_posts"] as const).map(async (t) => [t, (await supabase.from(t).select("*", { count: "exact", head: true })).count ?? 0] as const));
     body = <ImportPanel counts={Object.fromEntries(counts)} />;
   } else if (tab === "audit") {
+    // ai_runs are readable by the ministry only (RLS); other staff see an empty list.
     const [{ data: audit }, { data: runs }] = await Promise.all([
       supabase.from("audit_log").select("id, actor_id, action, entity, entity_id, wilaya_code, details, created_at").order("created_at", { ascending: false }).limit(100),
       supabase.from("ai_runs").select("id, stage, mode, model, latency_ms, input_tokens, output_tokens, cost_usd, success, error, created_at").order("created_at", { ascending: false }).limit(100),

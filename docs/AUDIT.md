@@ -205,3 +205,28 @@ Also in the store:
 3. **SMS adapter:** Twilio (works now, international pricing) or a specific Algerian gateway you have an account with?
 4. **New wilayas 59–69:** OK to ship 1–58 first and add 59–69 once you (or I, with network access to joradp.dz) confirm the JO n° 40 numbering?
 5. **`hr.key`:** move to `docs/`, or remove from git?
+
+---
+
+## 9. Status after implementation (2026-11-01)
+
+| Finding (section) | Severity | Production blocker? | Status |
+|---|---|---|---|
+| localStorage store, mock datasets (§2, §3) | Critical | yes | **Resolved**: deleted; Supabase data layer under RLS |
+| Fake archive count and stats offsets (§4.1, §2) | High | yes | **Resolved**: all numbers come from real rows (`portal_stats`, `impact_stats`) |
+| Heuristic "AI" (§4.1) | High | yes | **Resolved in code**: Claude structured output + labelled fallback; Claude path UNVERIFIED (no key) |
+| Fake live monitor (§4.2) | High | yes | **Resolved**: real intake queue over Realtime |
+| Fake publishing and reach (§4.3) | High | yes | **Removed**; real publishing NOT STARTED |
+| Fake ASR (§4.4) | Medium | yes | **Removed**; needs a speech-to-text provider |
+| Fake SMS (§4.5) | High | yes | **Resolved**: SmsProvider (console/Twilio), real rows, inbound webhook |
+| Fake QR / self check-in (§4.6) | Critical | yes | **Resolved**: signed, expiring, single-use, scanned by someone else |
+| Points on click (§4.7) | High | yes | **Resolved**: confirmed actions only |
+| Unverifiable certificate (§4.8) | High | yes | **Resolved**: HMAC + `/verify` |
+| Chatbot invented claims (§4.9) | Medium | no | **Resolved**: tool-based; rules fallback queries the DB |
+| Trees in localStorage, open review (§4.10) | Medium | yes | **Resolved**: private storage, EXIF stripped, scoped review |
+| Admin open to all, dead export (§4.11) | Critical | yes | **Resolved**: role-scoped, CSV/print export |
+| Public phone numbers, no consent (§4.12, §5) | Critical | yes | **Resolved**: RLS + consent + privacy page + deletion |
+| 48 wilayas (§6) | High | yes | **Partially resolved**: 58 seeded (unverified flag); 59–69 BLOCKED on official numbering |
+| No lint config / tests | Medium | yes | **Resolved**: ESLint, 41 unit, 69 pgTAP, 6 e2e |
+| Accessibility (nested interactive card, unlabeled controls) | Medium | no | **Improved**: labels, roles, skip link, focus states; no full screen-reader audit yet |
+| `hr.key` in repo root | Low | no | Moved to `docs/presentation/` |

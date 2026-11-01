@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Plus, Loader2 } from "lucide-react";
 import { WILAYAS } from "@/lib/wilayas";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { createCampaign } from "@/app/actions/modules";
 const KINDS = [["ramadan", "قفة رمضان"], ["school", "الدخول المدرسي"], ["winter", "حملة الشتاء"], ["environment", "بيئة"], ["blood", "تبرع بالدم"], ["other", "أخرى"]] as const;
 
 export function NewCampaign({ associations }: { associations: { id: string; name: string }[] }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ kind: "ramadan", title: "", description: "", wilaya: "", goal: "100", unit: "قفة", starts: "", ends: "", assoc: associations[0]?.id ?? "" });
   const [pending, start] = useTransition(); const [err, setErr] = useState<string | null>(null);
@@ -20,7 +18,8 @@ export function NewCampaign({ associations }: { associations: { id: string; name
     <form className="grid sm:grid-cols-3 gap-2 rounded-3xl border border-slate-200 bg-white p-4" onSubmit={(e) => { e.preventDefault(); start(async () => {
       const r = await createCampaign({ kind: f.kind as never, title: f.title, description: f.description, wilayaCode: f.wilaya ? +f.wilaya : null, goalUnits: +f.goal, unitLabel: f.unit,
         startsOn: f.starts, endsOn: f.ends, associationId: f.assoc || null });
-      if (r.ok) router.push(`/campaigns/${r.data}`); else setErr(r.error); }); }}>
+      // full navigation: a soft router.push right after a server action was intermittently dropped
+      if (r.ok) window.location.assign(`/campaigns/${r.data}`); else setErr(r.error); }); }}>
       <div><label htmlFor="ck" className="text-xs font-bold">النوع</label><select id="ck" className={input} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{KINDS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
       <div className="sm:col-span-2"><label htmlFor="ctt" className="text-xs font-bold">العنوان *</label><input id="ctt" required minLength={3} className={input} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} /></div>
       <div><label htmlFor="cwi" className="text-xs font-bold">الولاية</label><select id="cwi" className={input} value={f.wilaya} onChange={(e) => setF({ ...f, wilaya: e.target.value })}><option value="">وطنية</option>{WILAYAS.map((x) => <option key={x.code} value={x.code}>{x.nameAr}</option>)}</select></div>

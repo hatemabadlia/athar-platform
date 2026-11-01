@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addContribution, addShift, toggleShift, registerBeneficiary } from "@/app/actions/modules";
@@ -13,14 +12,14 @@ const REG: Record<string, string> = { registered: "✓ سُجّلت الأسرة
 export function CampaignClient({ campaignId, canManage, signedIn, unitLabel, shifts, contributions }: {
   campaignId: string; canManage: boolean; signedIn: boolean; unitLabel: string; shifts: Shift[]; contributions: { id: number; units: number; note: string | null; created_at: string }[];
 }) {
-  const router = useRouter();
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
   const [units, setUnits] = useState(""); const [note, setNote] = useState("");
   const [sh, setSh] = useState({ s: "", e: "", loc: "", cap: "10" });
   const [ident, setIdent] = useState("");
   const run = (fn: () => Promise<{ ok: boolean; error?: string; data?: unknown }>, ok?: (d: unknown) => string) =>
-    start(async () => { const r = await fn(); setMsg(r.ok ? (ok ? ok(r.data) : "تم") : r.error ?? "خطأ"); if (r.ok) router.refresh(); });
+    // server actions revalidate this page themselves; an extra router.refresh() inside the transition could leave it pending
+    start(async () => { const r = await fn(); setMsg(r.ok ? (ok ? ok(r.data) : "تم") : r.error ?? "خطأ"); });
   const input = "rounded-lg border border-slate-300 px-2 py-1.5 text-sm";
   return (
     <div className="space-y-5">
