@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <OfflineSync />
         <main id="main" className="flex-1">{children}</main>
         <footer className="border-t border-slate-200 bg-white">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-slate-500">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 pb-24 sm:pb-5 text-xs text-slate-500">
             <span>إيثار — منصة تطوعية. درجات المصداقية أداة فرز وليست دليلاً على صحة أي نداء.</span>
             <nav className="flex gap-4">
               <Link href="/privacy" className="hover:text-slate-900">الخصوصية</Link>

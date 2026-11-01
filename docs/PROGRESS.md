@@ -30,5 +30,23 @@ Status labels: COMPLETE · PARTIAL · BLOCKED · NOT STARTED · UNVERIFIED.
 - QR check-in (signed/expiring/single-use), points from confirmed actions, certificates + /verify, /impact (+CSV, print), /privacy, data export, deletion request.
 - Tests: `npm run test` 39 unit PASS · `npx supabase test db` 44 pgTAP PASS · `npx playwright test` 3 e2e PASS (needs app on :3000 + fresh `supabase db reset`).
 
-### Next
-Phase 5 modules (blood donors, in-kind donations, associations, campaigns + beneficiary dedupe), PWA, hardening (headers, error boundaries, CI), docs.
+### Phase 5 — Humanitarian modules · COMPLETE (local)
+Blood donors, in-kind offers/needs, associations + verification, campaigns + HMAC beneficiary dedupe. pgTAP 002 (20 tests), e2e modules.spec.
+
+### Phase 6 — Intelligence · PARTIAL
+Seasonal-naive forecasts from own history with "not enough data" state (unit-tested). External signals NOT STARTED.
+
+### Phase 7 — PWA · PARTIAL
+Manifest, icons, service worker (no private caching), offline outbox. Not tested on a physical device.
+
+### Phase 8 — Impact · COMPLETE (local)
+/impact national + wilaya, period filter, CSV, print view.
+
+### Phase 9 — Hardening · PARTIAL
+CSP + headers, error/not-found/loading, wilaya-scoped intake, masked AI logs, pg_cron maintenance, CI workflow (UNVERIFIED). French i18n NOT STARTED. Lighthouse not run (tiles/fonts blocked here).
+
+### Phase 10 — Review · DONE for this session
+Final run: tsc ✓ · eslint ✓ · vitest 41 ✓ · pgTAP 69 ✓ · build ✓ · playwright 6 ✓ (×3). See docs/MORNING_REPORT.md.
+
+### Next (if resuming)
+1. Claude key → validate pipeline/chatbot. 2. Official wilayas 59–69 + communes. 3. French i18n. 4. Deployment (with Hatem's approval).
