@@ -33,3 +33,18 @@ describe("years and canonical text", () => {
     expect(canonicalText("إغاثةٌ  عاجلة!")).toBe(canonicalText("اغاثه عاجله"));
   });
 });
+
+describe("maskPhones (before sending text to a free AI tier)", () => {
+  it("removes every Algerian number and keeps them locally", async () => {
+    const { maskPhones } = await import("@/lib/pipeline/text");
+    const r = maskPhones("اتصلوا 0555 00 01 01 أو +213 661 23 45 67 قبل الخامسة");
+    expect(r.masked).not.toMatch(/\d{2}\s?\d{2}\s?\d{2}/);
+    expect(r.masked).toContain("[هاتف-1]");
+    expect(r.masked).toContain("[هاتف-2]");
+    expect(r.phones).toEqual(["0555000101", "0661234567"]);
+  });
+  it("leaves text without numbers unchanged", async () => {
+    const { maskPhones } = await import("@/lib/pipeline/text");
+    expect(maskPhones("نحتاجو دم فصيلة O+").masked).toBe("نحتاجو دم فصيلة O+");
+  });
+});

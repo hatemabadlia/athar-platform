@@ -1,4 +1,5 @@
 "use client";
+import { modeLabel } from "@/lib/pipeline/types";
 
 import Link from "next/link";
 import { ShieldCheck, Recycle, GitMerge, AlertTriangle, MapPin, Tag, History, CalendarClock, ExternalLink, Info } from "lucide-react";
@@ -29,7 +30,7 @@ export function ResultCard({ result }: { result: PipelineOutcome }) {
         <div className="relative flex items-center gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/20"><Icon className="h-7 w-7" aria-hidden /></div>
           <div className="flex-1 min-w-0">
-            <div className="text-[11px] font-black tracking-[0.2em] opacity-80">{v.label} · {result.mode === "claude" ? "Claude" : "وضع القواعد"}</div>
+            <div className="text-[11px] font-black tracking-[0.2em] opacity-80">{v.label} · {result.mode === "heuristic" ? "وضع القواعد" : modeLabel(result.mode)}</div>
             <div className="text-xl font-black">{v.labelAr}</div>
             <div className="text-sm opacity-90 mt-0.5">{a.summary}</div>
           </div>

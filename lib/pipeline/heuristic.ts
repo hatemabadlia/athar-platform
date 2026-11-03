@@ -86,7 +86,7 @@ export function heuristicAnalyze(raw: string): Analysis {
   const time = extractTime(raw);
   const institution = text.match(/((?:مستشفى|دار الشباب|مركز الشباب|جمعية|الهلال الأحمر)(?:\s[ؠ-ي]+){0,3})/)?.[1]?.trim() ?? null;
   const money = /ccp|bna|baridimob|بريدي ?موب|تحويل|حساب (?:بريدي|بنكي)|rip/i.test(raw);
-  const attention: string[] = ["تحليل آلي بالقواعد فقط (لا يوجد مفتاح Claude) — تحقّق من كل الحقول."];
+  const attention: string[] = ["تحليل آلي بالقواعد فقط (بدون نموذج ذكاء اصطناعي) — تحقّق من كل الحقول."];
   if (!wilaya) attention.push("لم تُحدَّد الولاية.");
   if (!category) attention.push("لم تُحدَّد الفئة.");
   if (money) attention.push("يطلب تحويلاً مالياً.");

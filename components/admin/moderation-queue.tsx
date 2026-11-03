@@ -1,4 +1,5 @@
 "use client";
+import { modeLabel } from "@/lib/pipeline/types";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -57,7 +58,7 @@ export function ModerationQueue({ alerts, status, q, openId, participants }: { a
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${urg.bg} ${urg.color}`}>{urg.labelAr}</span>
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${st.bg} ${st.color}`}>{st.labelAr}</span>
                       {a.verdict && a.verdict !== "fresh" && <span className="rounded-full bg-fuchsia-100 px-2 py-0.5 text-[10px] font-bold text-fuchsia-800">{VERDICT_AR[a.verdict]}</span>}
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500">{a.aiMode === "claude" ? "Claude" : a.aiMode === "heuristic" ? "قواعد" : "يدوي"}</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500">{a.aiMode === "manual" ? "يدوي" : modeLabel(a.aiMode)}</span>
                       {a.sourceCount > 1 && <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">{a.sourceCount} مصادر</span>}
                     </div>
                     <div className="mt-1 font-bold text-slate-900 truncate">{a.title}</div>
@@ -107,7 +108,7 @@ function AlertDetail({ alert: a, participants, onClose }: { alert: ModerationAle
           </div>
           {a.normalizedText && a.normalizedText !== a.originalText && (
             <div className="rounded-2xl bg-emerald-50 p-3">
-              <div className="text-[10px] font-bold text-emerald-600 mb-1">بالعربية الفصحى ({a.aiMode === "claude" ? "Claude" : "قواعد"})</div>
+              <div className="text-[10px] font-bold text-emerald-600 mb-1">بالعربية الفصحى ({modeLabel(a.aiMode)})</div>
               <p className="text-sm text-slate-800">{a.normalizedText}</p>
             </div>
           )}

@@ -23,10 +23,11 @@ export function canonicalText(text: string): string {
  * with optional +213 / 00213 prefix and separators.
  * Returns numbers in national format "0XXXXXXXXX".
  */
+export const PHONE_RE = /(?:\+|00)?213[\s.-]?0?([5-7](?:[\s.-]?\d){8})|(?<!\d)0([5-7](?:[\s.-]?\d){8}|[2-4](?:[\s.-]?\d){7})(?!\d)/g;
+
 export function extractPhones(text: string): string[] {
   const found = new Set<string>();
-  const re = /(?:\+|00)?213[\s.-]?0?([5-7](?:[\s.-]?\d){8})|(?<!\d)0([5-7](?:[\s.-]?\d){8}|[2-4](?:[\s.-]?\d){7})(?!\d)/g;
-  for (const m of text.matchAll(re)) {
+  for (const m of text.matchAll(PHONE_RE)) {
     const digits = (m[1] ?? m[2]).replace(/\D/g, "");
     found.add("0" + digits);
   }
@@ -67,4 +68,14 @@ export function phoneAppearsIn(phone: string, source: string): boolean {
   const n = normalizePhone(phone);
   if (!n) return false;
   return extractPhones(source).includes(n);
+}
+
+/**
+ * Replaces Algerian phone numbers with neutral placeholders ([هاتف-1], …) before text leaves the server
+ * (used for the free Gemini tier). The numbers themselves are returned for local use.
+ */
+export function maskPhones(text: string): { masked: string; phones: string[] } {
+  let masked = text;
+  [...text.matchAll(PHONE_RE)].map((m) => m[0]).forEach((p, i) => { masked = masked.split(p).join(`[هاتف-${i + 1}]`); });
+  return { masked, phones: extractPhones(text) };
 }

@@ -2,7 +2,10 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { serverEnv } from "@/lib/env";
-import { AnalysisSchema, type Analysis } from "./types";
+import { AnalysisSchema } from "./types";
+import { SYSTEM_PROMPT, type AnalysisProvider, type ProviderResult } from "./provider-types";
+
+export type { AnalysisProvider, ProviderResult };
 
 /** USD per 1M tokens (input, output) for cost logging. Unknown models log cost as null. */
 const PRICING: Record<string, [number, number]> = {
@@ -11,32 +14,7 @@ const PRICING: Record<string, [number, number]> = {
   "claude-haiku-5-5": [0.1, 0.5],
 };
 
-export interface ProviderResult {
-  analysis: Analysis;
-  model: string;
-  inputTokens: number | null;
-  outputTokens: number | null;
-  costUsd: number | null;
-}
 
-export interface AnalysisProvider {
-  readonly name: "claude";
-  analyze(text: string): Promise<ProviderResult>;
-}
-
-const SYSTEM = `You analyse public messages posted in Algeria asking for volunteers, blood donors or humanitarian help.
-Messages are often in Algerian Darija (Arabic script or Latin "Arabizi"), MSA, French or a mix.
-
-Rules:
-- Only report what the message states. If a field is not explicitly present, return null (or an empty list). Never guess a wilaya, phone number, blood type, date or quantity.
-- normalized_text: rewrite the message in clear Modern Standard Arabic with the same meaning. Keep names, places, numbers and phone numbers exactly as written.
-- darija_terms: list dialect words/expressions you translated, with their MSA meaning.
-- wilaya_code: the official Algerian wilaya code (1–69) only when the wilaya or a well-known city in it is named.
-- phone_numbers: copy them exactly as they appear.
-- urgency: critical = life-threatening or within hours (blood for surgery today, people without shelter tonight); medium = days; normal = planned activity.
-- mentioned_dates: every explicit year or date, so stale reposts can be detected.
-- attention: short Arabic notes for a human moderator (e.g. money transfer request, old date, vague location). Do not judge whether the request is genuine — that is the moderator's job.
-- title and summary in Arabic.`;
 
 let client: Anthropic | null = null;
 
@@ -51,7 +29,7 @@ export function claudeProvider(): AnalysisProvider | null {
       const response = await client!.messages.parse({
         model,
         max_tokens: 4096,
-        system: SYSTEM,
+        system: SYSTEM_PROMPT,
         output_config: { effort: "low", format: zodOutputFormat(AnalysisSchema) },
         messages: [{ role: "user", content: `<message>\n${text}\n</message>` }],
       });

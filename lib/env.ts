@@ -21,6 +21,9 @@ const serverSchema = publicSchema.extend({
   ATHAR_HMAC_SECRET: z.string().min(32),
   ANTHROPIC_API_KEY: optional(),
   ATHAR_AI_MODEL: z.preprocess(emptyToUndefined, z.string().default("claude-opus-5-5")),
+  // Free alternative to Claude (Google AI Studio). Used only when ANTHROPIC_API_KEY is not set.
+  GEMINI_API_KEY: optional(),
+  ATHAR_GEMINI_MODEL: z.preprocess(emptyToUndefined, z.string().default("gemini-3.5-flash")),
   VOYAGE_API_KEY: optional(),
   TURNSTILE_SECRET_KEY: optional(),
   // Local/staging only: accept public submissions without Turnstile. Ignored when VERCEL_ENV=production.
@@ -70,12 +73,13 @@ export function integrationStatus() {
   const e = serverEnv();
   return {
     claude: !!e.ANTHROPIC_API_KEY,
+    ai: (e.ANTHROPIC_API_KEY ? "claude" : e.GEMINI_API_KEY ? "gemini" : null) as "claude" | "gemini" | null,
     embeddings: !!e.VOYAGE_API_KEY,
     turnstile: !!(e.TURNSTILE_SECRET_KEY && e.NEXT_PUBLIC_TURNSTILE_SITE_KEY),
     telegram: !!(e.TELEGRAM_BOT_TOKEN && e.TELEGRAM_WEBHOOK_SECRET),
     whatsapp: !!(e.WHATSAPP_VERIFY_TOKEN && e.WHATSAPP_APP_SECRET),
     sms: e.SMS_PROVIDER === "twilio" && !!(e.TWILIO_ACCOUNT_SID && e.TWILIO_AUTH_TOKEN && e.TWILIO_FROM_NUMBER),
     smsProvider: e.SMS_PROVIDER,
-    model: e.ATHAR_AI_MODEL,
+    model: e.ANTHROPIC_API_KEY ? e.ATHAR_AI_MODEL : e.GEMINI_API_KEY ? e.ATHAR_GEMINI_MODEL : "",
   };
 }

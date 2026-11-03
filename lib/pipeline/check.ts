@@ -1,7 +1,7 @@
 import "server-only";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { findWilaya } from "@/lib/wilayas";
-import { claudeProvider } from "./claude";
+import { aiProvider } from "./provider";
 import { embeddingProvider, toPgVector } from "./embeddings";
 import { contentHash, keyedHash, sha256 } from "./hash";
 import { heuristicAnalyze } from "./heuristic";
@@ -38,16 +38,16 @@ export async function checkPost(raw: string): Promise<CheckOutcome> {
   let mode: AnalysisMode = "heuristic";
   let model: string | null = null;
   let analysis: Analysis;
-  const provider = claudeProvider();
+  const provider = aiProvider();
   if (provider) {
     try {
       const r = await provider.analyze(raw);
-      analysis = r.analysis; mode = "claude"; model = r.model;
-      await db.from("ai_runs").insert({ stage: "verify", mode: "claude", model: r.model, input_hash: inputHash,
+      analysis = r.analysis; mode = provider.name; model = r.model;
+      await db.from("ai_runs").insert({ stage: "verify", mode: provider.name, model: r.model, input_hash: inputHash,
         latency_ms: Math.round(performance.now() - started), input_tokens: r.inputTokens, output_tokens: r.outputTokens,
         cost_usd: r.costUsd, success: true });
     } catch (e) {
-      await db.from("ai_runs").insert({ stage: "verify", mode: "claude", input_hash: inputHash,
+      await db.from("ai_runs").insert({ stage: "verify", mode: provider.name, input_hash: inputHash,
         latency_ms: Math.round(performance.now() - started), success: false, error: String(e).slice(0, 300) });
       analysis = heuristicAnalyze(raw);
     }

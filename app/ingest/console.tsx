@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { retryIntake } from "@/app/actions/alerts";
 import { cn, timeAgo } from "@/lib/utils";
 import { VoiceInput } from "@/components/voice-input";
+import { modeLabel } from "@/lib/pipeline/types";
 
 export interface IntakeRow {
   id: string; channel: string; sourceLabel: string | null; preview: string; status: string; error: string | null;
@@ -29,7 +30,7 @@ const SAMPLES = [
   { label: "منشور قديم معاد", text: "عاجل ونداء لكل الخاوة: عائلة في بوفاريك ولاية البليدة دارهم طاحت وما عندهمش وين يباتو، يحتاجو أفرشة وأغطية وماكلة. شاركو المنشور ربي يجازيكم. للتواصل 0555 00 09 01" },
 ];
 
-type Integrations = { claude: boolean; embeddings: boolean; turnstile: boolean; telegram: boolean; whatsapp: boolean; sms: boolean; smsProvider: string; model: string };
+type Integrations = { claude: boolean; ai: "claude" | "gemini" | null; embeddings: boolean; turnstile: boolean; telegram: boolean; whatsapp: boolean; sms: boolean; smsProvider: string; model: string };
 
 export function IngestConsole({ initial, integrations, archiveSize }: { initial: IntakeRow[]; integrations: Integrations; archiveSize: number }) {
   const [rows, setRows] = useState(initial);
@@ -83,7 +84,7 @@ export function IngestConsole({ initial, integrations, archiveSize }: { initial:
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-bold text-brand-800">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden /> {integrations.claude ? `Claude · ${integrations.model}` : "وضع القواعد — لا يوجد مفتاح Claude"}
+            <Sparkles className="h-3.5 w-3.5" aria-hidden /> {integrations.ai ? `${integrations.ai === "claude" ? "Claude" : "Gemini"} · ${integrations.model}` : "وضع القواعد — لا يوجد مزوّد ذكاء اصطناعي"}
           </div>
           <h1 className="mt-2 text-2xl sm:text-3xl font-black text-slate-900">محرك معالجة النداءات</h1>
           <p className="mt-1 text-sm text-slate-600 max-w-2xl">كل ما يصل عبر القنوات المسموح بها يمر بالمراحل السبع ثم ينتظر قرار مشرف. لا نجمع من فيسبوك/إنستغرام/تيك توك آلياً.</p>
@@ -110,7 +111,7 @@ export function IngestConsole({ initial, integrations, archiveSize }: { initial:
                 <span className="mt-0.5 shrink-0 rounded-md bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-300">{CHANNEL[r.channel] ?? r.channel}</span>
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold text-slate-100 truncate">{r.title ?? r.preview}</div>
-                  <div className="text-[11px] text-slate-500 truncate">{r.sourceLabel ? `${r.sourceLabel} · ` : ""}{timeAgo(r.receivedAt)}{r.mode ? ` · ${r.mode === "claude" ? "Claude" : "قواعد"}` : ""}{r.error ? ` · ${r.error}` : ""}</div>
+                  <div className="text-[11px] text-slate-500 truncate">{r.sourceLabel ? `${r.sourceLabel} · ` : ""}{timeAgo(r.receivedAt)}{r.mode ? ` · ${modeLabel(r.mode)}` : ""}{r.error ? ` · ${r.error}` : ""}</div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   {r.status === "failed" && (

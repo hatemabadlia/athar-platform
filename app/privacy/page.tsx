@@ -29,7 +29,7 @@ export default async function PrivacyPage() {
         </ul>
       </Section>
       <Section t="الذكاء الاصطناعي">
-        <p>عند تفعيله، يُرسل نص النداء إلى مزوّد النموذج (Anthropic Claude) لتحليله وتصنيفه. لا نرسل حسابك أو هاتفك المخزن أو فصيلة دمك. نحتفظ ببصمة (hash) للنص في سجل القرارات وليس النص نفسه. كل قرار آلي يراجعه إنسان قبل النشر.</p>
+        <p>عند تفعيله، يُرسل نص النداء إلى مزوّد النموذج (Anthropic Claude، أو Google Gemini في نسخته المجانية) لتحليله وتصنيفه. مع Gemini تُحذف أرقام الهواتف من النص قبل إرساله، لأن Google قد تستعمل محتوى النسخة المجانية لتحسين خدماتها. لا نرسل حسابك أو هاتفك المخزن أو فصيلة دمك. نحتفظ ببصمة (hash) للنص في سجل القرارات وليس النص نفسه. كل قرار آلي يراجعه إنسان قبل النشر.</p>
       </Section>
       <Section t="المدة والحذف">
         <ul className="list-disc ps-5 space-y-1">
@@ -73,7 +73,7 @@ function PrivacyFr() {
         </ul>
       </Section>
       <Section t="Intelligence artificielle">
-        <p>Lorsqu&apos;elle est activée, le texte de l&apos;appel est envoyé au fournisseur du modèle (Anthropic Claude) pour analyse. Nous n&apos;envoyons ni votre compte, ni votre téléphone enregistré, ni votre groupe sanguin. Le journal des décisions conserve une empreinte (hash) du texte, pas le texte lui-même. Chaque décision automatique est vérifiée par un humain avant publication.</p>
+        <p>Lorsqu&apos;elle est activée, le texte de l&apos;appel est envoyé au fournisseur du modèle (Anthropic Claude, ou Google Gemini dans sa version gratuite) pour analyse. Avec Gemini, les numéros de téléphone sont retirés du texte avant l&apos;envoi, car Google peut utiliser le contenu de la version gratuite pour améliorer ses services. Nous n&apos;envoyons ni votre compte, ni votre téléphone enregistré, ni votre groupe sanguin. Le journal des décisions conserve une empreinte (hash) du texte, pas le texte lui-même. Chaque décision automatique est vérifiée par un humain avant publication.</p>
       </Section>
       <Section t="Durée de conservation et suppression">
         <ul className="list-disc ps-5 space-y-1">

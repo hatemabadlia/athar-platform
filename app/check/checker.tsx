@@ -157,7 +157,7 @@ function Result({ r, text, onReset, onReview }: { r: CheckOutcome; text: string;
               </div>
             )}
             <div className="mt-3 text-[11px] text-slate-400">
-              {r.mode === "claude" ? `تحليل Claude (${r.model})` : "تحليل بالقواعد (بدون نموذج ذكاء اصطناعي)"} · {(r.durationMs / 1000).toFixed(1)} ث
+              {r.mode === "heuristic" ? "تحليل بالقواعد (بدون نموذج ذكاء اصطناعي)" : `تحليل ${r.mode === "claude" ? "Claude" : "Gemini"} (${r.model})`} · {(r.durationMs / 1000).toFixed(1)} ث
             </div>
           </section>
 

@@ -2,12 +2,12 @@ import { formatDate } from "@/lib/utils";
 
 type Audit = { id: number; actor_id: string | null; action: string; entity: string; entity_id: string | null; wilaya_code: number | null; details: unknown; created_at: string };
 type Run = { id: number; stage: string; mode: string; model: string | null; latency_ms: number | null; input_tokens: number | null; output_tokens: number | null; cost_usd: number | null; success: boolean; error: string | null; created_at: string };
-type Integrations = { claude: boolean; embeddings: boolean; turnstile: boolean; telegram: boolean; whatsapp: boolean; sms: boolean; smsProvider: string; model: string };
+type Integrations = { claude: boolean; ai: "claude" | "gemini" | null; embeddings: boolean; turnstile: boolean; telegram: boolean; whatsapp: boolean; sms: boolean; smsProvider: string; model: string };
 
 export function AuditPanel({ audit, runs, integrations }: { audit: Audit[]; runs: Run[]; integrations: Integrations }) {
   const cost = runs.reduce((s, r) => s + Number(r.cost_usd ?? 0), 0);
   const items: [string, boolean, string][] = [
-    ["Claude API", integrations.claude, integrations.claude ? integrations.model : "وضع القواعد"],
+    [integrations.ai === "gemini" ? "Gemini API (مجاني)" : "Claude API", !!integrations.ai, integrations.ai ? integrations.model : "وضع القواعد"],
     ["Embeddings (Voyage)", integrations.embeddings, "تشابه نصي فقط"],
     ["Turnstile", integrations.turnstile, "غير مفعّل"],
     ["Telegram", integrations.telegram, "غير مربوط"],

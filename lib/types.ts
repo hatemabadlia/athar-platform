@@ -40,7 +40,7 @@ export interface PublicAlert {
   locationPrecision: "wilaya" | "baladiya" | "institution";
   credibilityScore: number | null;
   credibilityReasons: CredibilityReason[];
-  aiMode: "claude" | "heuristic" | "manual";
+  aiMode: "claude" | "gemini" | "heuristic" | "manual";
   volunteersNeeded: number;
   volunteersJoined: number;
   bloodType: BloodType | null;

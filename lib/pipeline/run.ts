@@ -1,7 +1,7 @@
 import "server-only";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { findWilaya } from "@/lib/wilayas";
-import { claudeProvider } from "./claude";
+import { aiProvider } from "./provider";
 import { embeddingProvider, toPgVector } from "./embeddings";
 import { contentHash, keyedHash, sha256 } from "./hash";
 import { heuristicAnalyze } from "./heuristic";
@@ -32,7 +32,7 @@ export interface PipelineOutcome {
 const now = () => performance.now();
 
 async function logRun(row: {
-  intake_item_id: string; stage: string; mode: "claude" | "heuristic" | "embedding"; model?: string | null;
+  intake_item_id: string; stage: string; mode: "claude" | "gemini" | "heuristic" | "embedding"; model?: string | null;
   input_hash: string; output?: unknown; latency_ms: number; input_tokens?: number | null; output_tokens?: number | null;
   cost_usd?: number | null; success: boolean; error?: string | null;
 }) {
@@ -65,23 +65,23 @@ export async function processIntake(intakeId: string): Promise<PipelineOutcome> 
     let mode: AnalysisMode = "heuristic";
     let analysis: Analysis;
     const t0 = now();
-    const provider = claudeProvider();
-    let providerNote = "لا يوجد مفتاح Claude — تحليل بالقواعد";
+    const provider = aiProvider();
+    let providerNote = "لا يوجد مزوّد ذكاء اصطناعي — تحليل بالقواعد";
     if (provider) {
       try {
         const r = await provider.analyze(raw);
         analysis = r.analysis;
-        mode = "claude";
-        providerNote = `Claude (${r.model})`;
-        await logRun({ intake_item_id: intakeId, stage: "analyze", mode: "claude", model: r.model, input_hash: inputHash,
+        mode = provider.name;
+        providerNote = `${provider.name === "claude" ? "Claude" : "Gemini"} (${r.model})`;
+        await logRun({ intake_item_id: intakeId, stage: "analyze", mode: provider.name, model: r.model, input_hash: inputHash,
           output: r.analysis, latency_ms: Math.round(now() - t0), input_tokens: r.inputTokens, output_tokens: r.outputTokens,
           cost_usd: r.costUsd, success: true });
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        await logRun({ intake_item_id: intakeId, stage: "analyze", mode: "claude", model: null, input_hash: inputHash,
+        await logRun({ intake_item_id: intakeId, stage: "analyze", mode: provider.name, model: null, input_hash: inputHash,
           latency_ms: Math.round(now() - t0), success: false, error: msg.slice(0, 500) });
         analysis = heuristicAnalyze(raw);
-        providerNote = `فشل Claude (${msg.slice(0, 80)}) — تحليل بالقواعد`;
+        providerNote = `فشل ${provider.name === "claude" ? "Claude" : "Gemini"} (${msg.slice(0, 80)}) — تحليل بالقواعد`;
       }
     } else {
       analysis = heuristicAnalyze(raw);

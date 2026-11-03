@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n/client";
 import { timeAgoIn } from "@/lib/i18n/dict";
 
-type Msg = { role: "bot" | "user"; text: string; alerts?: PublicAlert[]; links?: { href: string; label: string }[]; mode?: "claude" | "rules" };
+type Msg = { role: "bot" | "user"; text: string; alerts?: PublicAlert[]; links?: { href: string; label: string }[]; mode?: "claude" | "gemini" | "rules" };
 
 
 export function Chatbot({ signedIn }: { signedIn: boolean }) {

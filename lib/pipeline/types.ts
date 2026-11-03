@@ -7,7 +7,10 @@ export type Category = (typeof CATEGORIES)[number];
 export type Urgency = (typeof URGENCIES)[number];
 export type BloodType = (typeof BLOOD_TYPES)[number];
 export type Verdict = "fresh" | "recycled" | "duplicate" | "low-confidence";
-export type AnalysisMode = "claude" | "heuristic";
+export type AnalysisMode = "claude" | "gemini" | "heuristic";
+
+/** Human label for the analysis mode, shown wherever a result is displayed. */
+export const modeLabel = (m: string | null | undefined) => (m === "claude" ? "Claude" : m === "gemini" ? "Gemini" : "قواعد");
 
 /**
  * What stages 2–4 produce. The same shape comes from Claude (structured output) and from the

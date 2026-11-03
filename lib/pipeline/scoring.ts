@@ -2,7 +2,7 @@
  * Stages 5–7 decision logic (pure, unit-tested).
  * The credibility score is an explainable triage aid for moderators — never proof that a request is genuine.
  */
-import type { ActiveCandidate, Analysis, AnalysisMode, CredibilityReason, HistoricalCandidate, Verdict } from "./types";
+import { modeLabel, type ActiveCandidate, type Analysis, type AnalysisMode, type CredibilityReason, type HistoricalCandidate, type Verdict } from "./types";
 
 export const THRESHOLDS = {
   recycledText: 0.6,
@@ -85,7 +85,7 @@ export function scoreCredibility(i: ScoreInput): { score: number; reasons: Credi
   if (i.duplicate) add(`مكرر محتمل لنداء نشط: «${i.duplicate.title}»`, 0);
 
   const confDelta = Math.round((i.analysis.confidence - 0.5) * 10);
-  if (confDelta !== 0) add(`ثقة التحليل ${i.mode === "claude" ? "(Claude)" : "(قواعد)"} ${Math.round(i.analysis.confidence * 100)}%`, confDelta);
+  if (confDelta !== 0) add(`ثقة التحليل (${modeLabel(i.mode)}) ${Math.round(i.analysis.confidence * 100)}%`, confDelta);
 
   for (const r of reasons) s += r.delta;
   const score = Math.max(0, Math.min(100, s));

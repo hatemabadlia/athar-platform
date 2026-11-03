@@ -10,6 +10,7 @@ import { extractBloodType } from "@/lib/pipeline/text";
 import { normalizeDarija } from "@/lib/pipeline/heuristic";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sha256 } from "@/lib/pipeline/hash";
+import { geminiJson } from "@/lib/pipeline/gemini";
 import type { PublicAlert } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -26,7 +27,7 @@ const SYSTEM = `You are "إيثار بوت", the assistant of Athar, an Algerian
 - Blood eligibility and transfusion decisions belong to blood centres and doctors; say so if asked.
 - Wilaya codes: use the official Algerian code (e.g. Alger 16, Oran 31, Constantine 25, Blida 9).`;
 
-type Reply = { text: string; alerts: PublicAlert[]; links: { href: string; label: string }[]; mode: "claude" | "rules" };
+type Reply = { text: string; alerts: PublicAlert[]; links: { href: string; label: string }[]; mode: "claude" | "gemini" | "rules" };
 
 const fold = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 function detectWilayaFr(q: string) {
@@ -79,6 +80,37 @@ async function rulesReply(q: string): Promise<Reply> {
   return { text: L.found(), alerts: r.alerts.slice(0, 3), links: [], mode: "rules" };
 }
 
+/**
+ * Gemini (free tier) path: retrieval first, generation second. The database is queried by the same tools as
+ * the rules path; Gemini only rewrites those facts as a natural reply in the user's dialect, so it cannot
+ * introduce alerts, places or numbers that the database did not return. Any failure → the rules reply.
+ */
+async function geminiReply(msgs: { role: "user" | "assistant"; content: string }[], question: string): Promise<Reply> {
+  const base = await rulesReply(question);
+  const started = performance.now();
+  const facts = {
+    answer_from_database: base.text,
+    alerts: base.alerts.map((a) => ({ title: a.title, wilaya: a.wilaya, urgency: a.urgency, blood_type: a.bloodType })),
+    links: base.links.map((l) => l.label),
+  };
+  try {
+    const r = await geminiJson({
+      system: `${SYSTEM}\n\nYou do not call tools here. FACTS below were already retrieved from the database. Write the reply using ONLY these facts — no other alerts, places, numbers or promises. If FACTS say nothing is available, say so kindly. Keep it under 60 words. Alerts are shown to the user as cards after your text.`,
+      user: `Conversation so far:\n${msgs.slice(-6).map((m) => `${m.role}: ${m.content}`).join("\n")}\n\nFACTS (JSON):\n${JSON.stringify(facts)}`,
+      schema: { type: "object", properties: { reply: { type: "string" } }, required: ["reply"] },
+      timeoutMs: 25_000,
+    });
+    const reply = String((JSON.parse(r.text) as { reply?: string }).reply ?? "").trim();
+    await supabaseAdmin().from("ai_runs").insert({ stage: "chat", mode: "chatbot", model: r.model, input_hash: sha256(question),
+      latency_ms: Math.round(performance.now() - started), input_tokens: r.inputTokens, output_tokens: r.outputTokens, cost_usd: 0, success: true });
+    return reply ? { ...base, text: reply, mode: "gemini" } : base;
+  } catch (e) {
+    await supabaseAdmin().from("ai_runs").insert({ stage: "chat", mode: "chatbot", model: serverEnv().ATHAR_GEMINI_MODEL, input_hash: sha256(question),
+      latency_ms: Math.round(performance.now() - started), success: false, error: String(e).slice(0, 300) });
+    return base;
+  }
+}
+
 export async function POST(req: Request) {
   const parsed = Body.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "invalid" }, { status: 400 });
@@ -91,6 +123,7 @@ export async function POST(req: Request) {
   if (last.role !== "user") return NextResponse.json({ error: "invalid" }, { status: 400 });
 
   const env = serverEnv();
+  if (!env.ANTHROPIC_API_KEY && env.GEMINI_API_KEY) return NextResponse.json(await geminiReply(msgs, last.content));
   if (!env.ANTHROPIC_API_KEY) return NextResponse.json(await rulesReply(last.content));
 
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 45_000 });

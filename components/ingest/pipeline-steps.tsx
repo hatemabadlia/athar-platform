@@ -10,7 +10,7 @@ export type StepView = { id: StageResult["id"]; labelAr: string; status: StageRe
 export const idleSteps = (status: "idle" | "running" = "idle"): StepView[] =>
   (Object.keys(STAGE_LABELS) as StageResult["id"][]).map((id) => ({ id, labelAr: STAGE_LABELS[id], status }));
 
-const MODE_LABEL: Record<string, string> = { claude: "Claude", heuristic: "قواعد", sql: "SQL", embedding: "تضمين" };
+const MODE_LABEL: Record<string, string> = { claude: "Claude", gemini: "Gemini", heuristic: "قواعد", sql: "SQL", embedding: "تضمين" };
 
 export function PipelineSteps({ steps }: { steps: StepView[] }) {
   return (
