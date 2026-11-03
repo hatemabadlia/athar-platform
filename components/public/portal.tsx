@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, Send, Users, Clock, CheckCircle2 } from "lucide-react";
+import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Clock, CheckCircle2 } from "lucide-react";
 import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types";
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
@@ -66,28 +66,39 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
         );
       })}
 
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-brand-700 via-emerald-700 to-slate-900 p-6 sm:p-8 text-white">
-        <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" aria-hidden />
-        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.35),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(6,95,70,0.5),transparent_60%)]" aria-hidden />
+        <svg className="absolute -left-24 -bottom-24 h-96 w-96 text-emerald-400/10" viewBox="0 0 48 48" aria-hidden>
+          <rect x="8.5" y="8.5" width="31" height="31" rx="5" fill="currentColor" /><rect x="8.5" y="8.5" width="31" height="31" rx="5" fill="currentColor" transform="rotate(45 24 24)" />
+        </svg>
+        <div className="relative grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold backdrop-blur">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-white/15">
               <Activity className="h-3.5 w-3.5" aria-hidden /> {t.portal.liveBadge}
             </div>
-            <h1 className="mt-3 text-2xl sm:text-4xl font-black leading-tight">{t.portal.heroTitle}</h1>
-            <p className="mt-2 max-w-xl text-sm sm:text-base text-white/80">
-              {t.portal.heroText}
-            </p>
-            <Link href="/submit" className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-bold text-brand-800"><Send className="h-4 w-4" aria-hidden /> {t.nav.submit}</Link>
+            <h1 className="mt-4 text-3xl sm:text-5xl font-black leading-[1.15] tracking-tight">{t.portal.heroTitle}</h1>
+            <p className="mt-4 max-w-2xl text-sm sm:text-lg leading-relaxed text-slate-300">{t.portal.heroText}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/check" className="inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm sm:text-base font-black text-slate-950 shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-400"><ScanSearch className="h-5 w-5" aria-hidden /> {t.portal.ctaCheck}</Link>
+              <a href="#alerts" className="inline-flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm sm:text-base font-bold text-white ring-1 ring-white/20 transition hover:bg-white/15"><ShieldCheck className="h-5 w-5" aria-hidden /> {t.portal.ctaAlerts}</a>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="grid grid-cols-3 gap-3 text-center lg:grid-cols-1 lg:text-start">
+            <Stat value={stats.filtered} label={t.portal.statFiltered} icon={Recycle} accent />
             <Stat value={stats.approved} label={t.portal.statApproved} icon={ShieldCheck} />
-            <Stat value={stats.critical} label={t.portal.statCritical} icon={Activity} accent />
-            <Stat value={stats.filtered} label={t.portal.statFiltered} icon={Recycle} />
+            <Stat value={stats.critical} label={t.portal.statCritical} icon={Activity} />
           </div>
         </div>
+        <ol className="relative grid grid-cols-2 gap-px border-t border-white/10 bg-white/10 sm:grid-cols-4">
+          {t.portal.steps.map((step, i) => (
+            <li key={step} className="flex items-center gap-3 bg-slate-950/80 px-4 py-3 text-xs sm:text-sm text-slate-300">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 font-black text-emerald-300">{i + 1}</span>{step}
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="toolbar" aria-label={t.portal.filterLabel}>
+      <div id="alerts" className="scroll-mt-24 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="toolbar" aria-label={t.portal.filterLabel}>
         {FILTERS.map(({ key, icon: Icon }) => {
           const label = key === "all" ? t.portal.filterAll : t.category[key];
           const count = key === "all" ? alerts.length : alerts.filter((a) => a.category === key).length;
@@ -180,10 +191,12 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
 
 function Stat({ value, label, icon: Icon, accent }: { value: number; label: string; icon: React.ElementType; accent?: boolean }) {
   return (
-    <div className={cn("rounded-2xl px-3 py-3 backdrop-blur", accent ? "bg-red-500/30 ring-1 ring-red-300/50" : "bg-white/10")}>
-      <Icon className="mx-auto h-4 w-4 mb-1 opacity-80" aria-hidden />
-      <div className="text-2xl font-black tabular-nums">{value}</div>
-      <div className="text-[10px] font-semibold text-white/75 leading-tight">{label}</div>
+    <div className={cn("rounded-2xl px-3 py-3 lg:flex lg:items-center lg:gap-4 lg:px-5", accent ? "bg-emerald-500/15 ring-1 ring-emerald-400/30" : "bg-white/5 ring-1 ring-white/10")}>
+      <Icon className={cn("mx-auto mb-1 h-4 w-4 lg:mx-0 lg:mb-0 lg:h-6 lg:w-6", accent ? "text-emerald-300" : "text-slate-400")} aria-hidden />
+      <div>
+        <div className="text-2xl lg:text-3xl font-black tabular-nums">{value}</div>
+        <div className="text-[10px] lg:text-xs font-semibold leading-tight text-slate-400">{label}</div>
+      </div>
     </div>
   );
 }

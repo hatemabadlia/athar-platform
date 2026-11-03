@@ -45,11 +45,11 @@ export function Chatbot({ signedIn }: { signedIn: boolean }) {
   return (
     <>
       <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? t.chat.close : t.chat.open}
-        className="fixed bottom-5 end-5 z-[950] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-emerald-700 text-white shadow-2xl shadow-brand-600/40 hover:scale-105 transition-transform">
+        className="fixed bottom-20 md:bottom-5 end-5 z-[950] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-emerald-700 text-white shadow-2xl shadow-brand-600/40 hover:scale-105 transition-transform">
         {open ? <X className="h-6 w-6" /> : <MessageSquareHeart className="h-6 w-6" />}
       </button>
       {open && (
-        <div role="dialog" aria-label={t.chat.title} className="fixed bottom-24 end-5 z-[950] w-[92vw] max-w-sm overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl animate-fade-up">
+        <div role="dialog" aria-label={t.chat.title} className="fixed bottom-36 md:bottom-24 end-5 z-[950] w-[92vw] max-w-sm overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl animate-fade-up">
           <div className="flex items-center gap-3 bg-gradient-to-l from-brand-600 to-emerald-800 p-4 text-white">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 text-xl font-black" aria-hidden>إ</div>
             <div className="flex-1">
