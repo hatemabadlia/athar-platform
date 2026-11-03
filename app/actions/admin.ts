@@ -18,7 +18,7 @@ const ROLES = ["club_lead", "association", "moderator", "djsl_admin", "ministry_
 // ---------------- crisis ----------------
 const Crisis = z.object({
   type: z.enum(["flood", "earthquake", "fire", "cold", "other"]),
-  wilayaCode: z.number().int().min(1).max(58),
+  wilayaCode: z.number().int().min(1).max(69),
   title: z.string().trim().min(3).max(120),
   smsTemplate: z.string().trim().min(10).max(320),
   hubShelterId: z.string().uuid().optional(),
@@ -97,7 +97,7 @@ export async function postCrisisUpdate(crisisId: string, body: string): Promise<
 const Shelter = z.object({
   id: z.string().uuid().optional(),
   name: z.string().trim().min(3).max(160),
-  wilayaCode: z.number().int().min(1).max(58),
+  wilayaCode: z.number().int().min(1).max(69),
   lat: z.number().min(18).max(38).nullable(),
   lng: z.number().min(-9).max(12).nullable(),
   capacity: z.number().int().min(0).max(100000),

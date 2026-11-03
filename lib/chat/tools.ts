@@ -66,7 +66,7 @@ export async function crisisInfo(args: { wilaya_code?: number }): Promise<ToolOu
 export const TOOL_DEFS = [
   { name: "search_alerts", description: "Search APPROVED volunteer/donation alerts on Athar. Use for any question about current needs. donor_blood_type returns blood alerts this donor is compatible with.",
     input_schema: { type: "object" as const, properties: {
-      wilaya_code: { type: "integer", description: "Algerian wilaya code 1-58" },
+      wilaya_code: { type: "integer", description: "Algerian wilaya code 1-69" },
       category: { type: "string", enum: [...CATEGORIES] },
       donor_blood_type: { type: "string", enum: [...BLOOD_TYPES] },
       limit: { type: "integer" } }, additionalProperties: false } },

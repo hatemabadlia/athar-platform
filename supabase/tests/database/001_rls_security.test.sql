@@ -49,7 +49,7 @@ select is((select count(*)::int from public.user_roles where role = 'volunteer')
 
 -- ---------- anon ----------
 select pg_temp.as_anon();
-select is((select count(*)::int from public.wilayas), 58, 'anon reads 58 seeded wilayas');
+select is((select count(*)::int from public.wilayas), 69, 'anon reads 69 seeded wilayas');
 select is((select count(*)::int from public.alerts), 1, 'anon sees only approved alerts');
 select is((select count(*)::int from public.alert_contacts), 0, 'anon cannot read alert phones');
 select is((select count(*)::int from public.profiles), 0, 'anon cannot read profiles');

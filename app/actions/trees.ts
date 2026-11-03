@@ -7,7 +7,7 @@ import { toActionError, type ActionResult } from "@/lib/server/result";
 import { haversineKm } from "@/lib/geo";
 
 const NewTree = z.object({
-  wilayaCode: z.number().int().min(1).max(58),
+  wilayaCode: z.number().int().min(1).max(69),
   place: z.string().trim().min(2).max(160),
   species: z.string().trim().min(2).max(60),
   note: z.string().trim().max(500).default(""),

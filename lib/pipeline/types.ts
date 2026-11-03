@@ -20,7 +20,7 @@ export const AnalysisSchema = z.object({
   is_help_request: z.boolean().describe("true only if the message asks for volunteers, donations, blood or humanitarian help"),
   category: z.enum(CATEGORIES).nullable(),
   urgency: z.enum(URGENCIES),
-  wilaya_code: z.number().int().nullable().describe("Algerian wilaya code 1-58 if the place is clearly stated, else null"),
+  wilaya_code: z.number().int().nullable().describe("Algerian wilaya code 1-69 if the place is clearly stated, else null"),
   baladiya: z.string().nullable().describe("Commune/neighbourhood as written, else null"),
   institution: z.string().nullable().describe("Hospital, youth house, school or association named, else null"),
   phone_numbers: z.array(z.string()).describe("Phone numbers exactly as they appear in the text"),

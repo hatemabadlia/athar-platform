@@ -7,6 +7,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { enqueue } from "@/lib/outbox";
 import { useT } from "@/lib/i18n/client";
+import { VoiceInput } from "@/components/voice-input";
 
 declare global {
   interface Window { turnstile?: { render: (el: HTMLElement, o: { sitekey: string; callback: (t: string) => void; "expired-callback": () => void }) => string } }
@@ -76,7 +77,10 @@ export function SubmitForm({ turnstileSiteKey, signedIn }: { turnstileSiteKey: s
         <textarea id="text" required minLength={20} maxLength={5000} rows={7} value={text} onChange={(e) => setText(e.target.value)}
           placeholder={t.submit.placeholder}
           className={`${input} resize-y leading-relaxed`} />
-        <div className="mt-1 text-[11px] text-slate-400">{text.length}/5000</div>
+        <div className="mt-1 flex items-start justify-between gap-2">
+          <VoiceInput onText={(c) => setText((p) => (p ? `${p} ${c}` : c).slice(0, 5000))} />
+          <div className="text-[11px] text-slate-400">{text.length}/5000</div>
+        </div>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <div>

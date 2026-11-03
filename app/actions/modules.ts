@@ -15,7 +15,7 @@ async function uid() {
 
 // ---------------- blood donors ----------------
 export async function saveDonor(input: { wilayaCode: number; available: boolean; lastDonationOn: string | null; consent: boolean }): Promise<ActionResult> {
-  const p = z.object({ wilayaCode: z.number().int().min(1).max(58), available: z.boolean(), lastDonationOn: z.string().date().nullable(), consent: z.literal(true, { message: "الموافقة مطلوبة" }) }).safeParse(input);
+  const p = z.object({ wilayaCode: z.number().int().min(1).max(69), available: z.boolean(), lastDonationOn: z.string().date().nullable(), consent: z.literal(true, { message: "الموافقة مطلوبة" }) }).safeParse(input);
   if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? "بيانات غير صالحة" };
   if (p.data.lastDonationOn && new Date(p.data.lastDonationOn) > new Date()) return { ok: false, error: "تاريخ في المستقبل" };
   const { supabase, id } = await uid();
@@ -69,7 +69,7 @@ const ITEM_CATS = ["clothes", "food", "school", "medical", "furniture", "transpo
 const Item = z.object({
   kind: z.enum(["offer", "need"]), category: z.enum(ITEM_CATS), title: z.string().trim().min(3).max(120),
   description: z.string().trim().max(1000).default(""), quantity: z.number().int().min(1).max(100000), unit: z.string().trim().min(1).max(30),
-  wilayaCode: z.number().int().min(1).max(58), baladiyaName: z.string().trim().max(80).optional(),
+  wilayaCode: z.number().int().min(1).max(69), baladiyaName: z.string().trim().max(80).optional(),
 });
 export async function postItem(input: z.input<typeof Item>): Promise<ActionResult> {
   const p = Item.safeParse(input);
@@ -112,7 +112,7 @@ export async function updateMatch(matchId: string, status: "accepted" | "picked_
 
 // ---------------- associations ----------------
 export async function applyAssociation(input: { name: string; approvalNumber: string; wilayaCode: number; description: string; email?: string; phone?: string; documentPaths: string[] }): Promise<ActionResult> {
-  const p = z.object({ name: z.string().trim().min(3).max(160), approvalNumber: z.string().trim().min(3).max(60), wilayaCode: z.number().int().min(1).max(58),
+  const p = z.object({ name: z.string().trim().min(3).max(160), approvalNumber: z.string().trim().min(3).max(60), wilayaCode: z.number().int().min(1).max(69),
     description: z.string().trim().max(2000), email: z.string().email().optional().or(z.literal("")), phone: z.string().max(20).optional(),
     documentPaths: z.array(z.string().regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|jpg|jpeg|png)$/)).min(1, "أرفق وثيقة الاعتماد").max(5) }).safeParse(input);
   if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? "بيانات غير صالحة" };
@@ -137,7 +137,7 @@ export async function reviewAssociation(id: string, approve: boolean, note?: str
 // ---------------- campaigns ----------------
 const Campaign = z.object({
   kind: z.enum(["ramadan", "school", "winter", "environment", "blood", "other"]), title: z.string().trim().min(3).max(160),
-  description: z.string().trim().max(2000).default(""), wilayaCode: z.number().int().min(1).max(58).nullable(), goalUnits: z.number().int().min(1).max(10_000_000),
+  description: z.string().trim().max(2000).default(""), wilayaCode: z.number().int().min(1).max(69).nullable(), goalUnits: z.number().int().min(1).max(10_000_000),
   unitLabel: z.string().trim().min(1).max(30), startsOn: z.string().date(), endsOn: z.string().date(), associationId: z.string().uuid().nullable(),
 });
 export async function createCampaign(input: z.input<typeof Campaign>): Promise<ActionResult<string>> {

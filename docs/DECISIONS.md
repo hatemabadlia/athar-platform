@@ -18,7 +18,7 @@ Each entry: decision → why → trade-off.
 14. **SMS behind `SmsProvider` with a console default.** Nothing real is sent without explicit configuration. Real sends ask for a confirmation showing the recipient count.
 15. **Email OTP as the only enabled login.** Phone OTP depends on an SMS provider and credentials. Email works locally (Mailpit) and in production with SMTP.
 16. **Turnstile only for anonymous submissions.** Signed-in users passed OTP and are rate-limited per account, which also lets offline-queued submissions sync.
-17. **Wilayas 59–69 not seeded.** Their official numbering couldn't be verified, and inventing it would corrupt every alert's location.
+17. **Wilayas 59–69 seeded on 2026-11-03** from two independent press/reference sources that agree on the numbering (Algerie360 citing JO n° 40; Wikipedia citing TSA). Kept `verified=false` until checked against the JORADP text.
 18. **Mock data removed rather than hidden behind a flag.** The brief is "no fake data in production code paths". Demo content is created through the UI (`docs/DEMO.md`).
 19. **Branded auto-publishing (Facebook/Instagram/X) not built.** The fake version was removed. Real posting needs Meta/X apps, review and admin approval. It's lower priority than core safety.
 20. **French i18n not implemented.** Arabic RTL is complete. Retrofitting next-intl across every component was deferred so it could be done properly rather than half-done (see the morning report).

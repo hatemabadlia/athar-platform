@@ -1,10 +1,10 @@
 import type { Wilaya } from "./types";
 
 /**
- * Wilayas 1–58 (Law 84-09 + Law 19-12 of 2019). Mirrors the `wilayas` table seed
+ * Wilayas 1–58 (Law 84-09 + Law 19-12 of 2019) and 59–69 (2026). Mirrors the `wilayas` table seed
  * (supabase/migrations/*_reference_seed.sql); the database is the source of truth.
- * Wilayas 59–69 created by the 2026 reform are NOT listed until their official numbering is
- * verified — see docs/DATA_SOURCES.md. Coordinates are approximate chef-lieu positions.
+ * Wilayas 59–69 (2025–2026 reform, JO n° 40 of 2026 as reported by the press; see
+ * supabase/migrations/20261103000100_wilayas_2026.sql) — not yet checked against the JORADP text. Coordinates are approximate chef-lieu positions.
  */
 
 export const WILAYAS: Wilaya[] = [
@@ -66,6 +66,17 @@ export const WILAYAS: Wilaya[] = [
   { code: 56, name: "Djanet", nameAr: "جانت", lat: 24.55, lng: 9.48 },
   { code: 57, name: "El M'Ghair", nameAr: "المغير", lat: 33.95, lng: 5.92 },
   { code: 58, name: "El Meniaa", nameAr: "المنيعة", lat: 30.58, lng: 2.88 },
+  { code: 59, name: "Aflou", nameAr: "آفلو", lat: 34.11, lng: 2.1 },
+  { code: 60, name: "Barika", nameAr: "بريكة", lat: 35.39, lng: 5.37 },
+  { code: 61, name: "El Kantara", nameAr: "القنطرة", lat: 35.22, lng: 5.71 },
+  { code: 62, name: "Bir El Ater", nameAr: "بئر العاتر", lat: 34.74, lng: 8.06 },
+  { code: 63, name: "El Aricha", nameAr: "العريشة", lat: 34.22, lng: -1.27 },
+  { code: 64, name: "Ksar Chellala", nameAr: "قصر الشلالة", lat: 35.21, lng: 2.32 },
+  { code: 65, name: "Aïn Oussera", nameAr: "عين وسارة", lat: 35.45, lng: 2.91 },
+  { code: 66, name: "Messaad", nameAr: "مسعد", lat: 34.15, lng: 3.5 },
+  { code: 67, name: "Ksar El Boukhari", nameAr: "قصر البخاري", lat: 35.89, lng: 2.75 },
+  { code: 68, name: "Bou Saâda", nameAr: "بوسعادة", lat: 35.21, lng: 4.17 },
+  { code: 69, name: "El Abiodh Sidi Cheikh", nameAr: "الأبيض سيدي الشيخ", lat: 32.9, lng: 0.55 },
 ];
 
 export const WILAYA_ALIASES: Record<string, number> = {
@@ -109,6 +120,7 @@ export const WILAYA_ALIASES: Record<string, number> = {
   "سوق أهراس": 41, "ميلة": 43, "عين الدفلى": 44, "النعامة": 45, "عين تموشنت": 46, "غليزان": 48, "البويرة": 10,
   "أم البواقي": 4, "الأغواط": 3, "تيميمون": 49, "برج باجي مختار": 50, "أولاد جلال": 51, "بني عباس": 52,
   "عين صالح": 53, "عين قزام": 54, "تقرت": 55, "جانت": 56, "المغير": 57, "المنيعة": 58,
+  "آفلو": 59, "بريكة": 60, "القنطرة": 61, "بئر العاتر": 62, "العريشة": 63, "قصر الشلالة": 64, "عين وسارة": 65, "مسعد": 66, "قصر البخاري": 67, "بوسعادة": 68, "الأبيض سيدي الشيخ": 69, "بو سعادة": 68,
 };
 
 export function findWilaya(code: number): Wilaya | undefined {

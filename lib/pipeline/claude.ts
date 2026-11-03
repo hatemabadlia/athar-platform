@@ -31,7 +31,7 @@ Rules:
 - Only report what the message states. If a field is not explicitly present, return null (or an empty list). Never guess a wilaya, phone number, blood type, date or quantity.
 - normalized_text: rewrite the message in clear Modern Standard Arabic with the same meaning. Keep names, places, numbers and phone numbers exactly as written.
 - darija_terms: list dialect words/expressions you translated, with their MSA meaning.
-- wilaya_code: the official Algerian wilaya code (1–58) only when the wilaya or a well-known city in it is named.
+- wilaya_code: the official Algerian wilaya code (1–69) only when the wilaya or a well-known city in it is named.
 - phone_numbers: copy them exactly as they appear.
 - urgency: critical = life-threatening or within hours (blood for surgery today, people without shelter tonight); medium = days; normal = planned activity.
 - mentioned_dates: every explicit year or date, so stale reposts can be detected.

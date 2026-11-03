@@ -2,11 +2,12 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, Send, Users, Clock, CheckCircle2 } from "lucide-react";
 import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types";
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
+import { ShareCard } from "@/components/public/share-card";
 import { CATEGORY_META, CRISIS_META } from "@/lib/reference/meta";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n/client";
@@ -31,6 +32,15 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
   const [filter, setFilter] = useState<Category | "all">("all");
   const [helpTarget, setHelpTarget] = useState<PublicAlert | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
+  const [shareTarget, setShareTarget] = useState<PublicAlert | null>(null);
+  // Shared links open as /?alert=<id>: focus that alert on the map and in the list.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("alert");
+    if (id && alerts.some((a) => a.id === id)) {
+      setFocusId(id);
+      requestAnimationFrame(() => document.getElementById(`alert-${id}`)?.scrollIntoView({ block: "center", behavior: "smooth" }));
+    }
+  }, [alerts]);
   const matchMap = useMemo(() => new Map(matches.map((m) => [m.id, m.reasons])), [matches]);
 
   const visible = useMemo(() => alerts
@@ -128,9 +138,9 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
             </div>
           )}
           {visible.map((a) => (
-            <div key={a.id}>
+            <div key={a.id} id={`alert-${a.id}`}>
               <AlertCard alert={a} active={focusId === a.id} suggested={matchMap.has(a.id)}
-                onSelect={() => setFocusId(focusId === a.id ? null : a.id)} onHelp={() => setHelpTarget(a)} />
+                onSelect={() => setFocusId(focusId === a.id ? null : a.id)} onHelp={() => setHelpTarget(a)} onShare={() => setShareTarget(a)} />
               {matchMap.has(a.id) && <div className="px-3 pt-1 text-[10px] text-amber-700">{t.portal.whySuggested} {matchMap.get(a.id)!.join(" · ")}</div>}
             </div>
           ))}
@@ -163,6 +173,7 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
       )}
 
       <HelpModal alert={helpTarget} onClose={() => setHelpTarget(null)} signedIn={signedIn} />
+      <ShareCard alert={shareTarget} onClose={() => setShareTarget(null)} />
     </div>
   );
 }

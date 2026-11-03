@@ -9,7 +9,7 @@ import { CATEGORIES } from "@/lib/pipeline/types";
 const NewClub = z.object({
   name: z.string().trim().min(3).max(120),
   description: z.string().trim().max(1000).default(""),
-  wilayaCode: z.number().int().min(1).max(58),
+  wilayaCode: z.number().int().min(1).max(69),
   institutionName: z.string().trim().max(120).optional(),
   focus: z.array(z.enum(CATEGORIES)).max(6),
 });

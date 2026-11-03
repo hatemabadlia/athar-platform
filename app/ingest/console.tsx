@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { Sparkles, Play, Trash2, Radar, Database, Link2, RotateCcw, Mic } from "lucide-react";
+import { Sparkles, Play, Trash2, Radar, Database, Link2, RotateCcw, FlaskConical } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import type { PipelineOutcome } from "@/lib/pipeline/run";
 import { PipelineSteps, idleSteps, type StepView } from "@/components/ingest/pipeline-steps";
@@ -9,6 +9,7 @@ import { ResultCard } from "@/components/ingest/result-card";
 import { Button } from "@/components/ui/button";
 import { retryIntake } from "@/app/actions/alerts";
 import { cn, timeAgo } from "@/lib/utils";
+import { VoiceInput } from "@/components/voice-input";
 
 export interface IntakeRow {
   id: string; channel: string; sourceLabel: string | null; preview: string; status: string; error: string | null;
@@ -20,6 +21,13 @@ const VERDICT: Record<string, { label: string; cls: string }> = {
   fresh: { label: "جديد", cls: "bg-emerald-600" }, recycled: { label: "قديم محتمل", cls: "bg-fuchsia-600" },
   duplicate: { label: "مكرر محتمل", cls: "bg-indigo-600" }, "low-confidence": { label: "مصداقية منخفضة", cls: "bg-amber-600" },
 };
+
+// Sample inputs for live demos (fictional people and 0555 00 0x xx numbers). They go through the real pipeline.
+const SAMPLES = [
+  { label: "نداء دم جديد", text: "خاوتي عاجل نحتاجو 4 متبرعين بالدم فصيلة O- فسبيطار مصطفى باشا بالعاصمة، عملية جراحية غدوة الصباح. اللي يقدر يجي يتصل 0555 00 02 01" },
+  { label: "نداء مكرر", text: "حملة تنظيف غابة كانستال وهران نهار السبت الصباح، جيبو معاكم القفازات. نحتاجو 40 متطوع. 0555 00 01 04" },
+  { label: "منشور قديم معاد", text: "عاجل ونداء لكل الخاوة: عائلة في بوفاريك ولاية البليدة دارهم طاحت وما عندهمش وين يباتو، يحتاجو أفرشة وأغطية وماكلة. شاركو المنشور ربي يجازيكم. للتواصل 0555 00 09 01" },
+];
 
 type Integrations = { claude: boolean; embeddings: boolean; turnstile: boolean; telegram: boolean; whatsapp: boolean; sms: boolean; smsProvider: string; model: string };
 
@@ -124,6 +132,7 @@ export function IngestConsole({ initial, integrations, archiveSize }: { initial:
             <label htmlFor="paste" className="text-xs font-bold text-slate-500 mb-2 block">لصق منشور اطّلعت عليه (مع رابطه إن وجد)</label>
             <textarea id="paste" value={text} onChange={(e) => setText(e.target.value)} rows={8} maxLength={5000} placeholder="الصق نص المنشور هنا…"
               className="w-full resize-none rounded-2xl border border-slate-300 bg-slate-50 p-3 text-sm leading-relaxed focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-200" />
+            <VoiceInput className="mt-2" onText={(c) => setText((p) => (p ? `${p} ${c}` : c).slice(0, 5000))} />
             <input value={url} onChange={(e) => setUrl(e.target.value)} dir="ltr" placeholder="https://… (رابط المصدر، اختياري)" aria-label="رابط المصدر"
               className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-xs focus:border-brand-500 focus:outline-none" />
             <div className="mt-3 flex gap-2">
@@ -133,8 +142,14 @@ export function IngestConsole({ initial, integrations, archiveSize }: { initial:
             <p className="mt-2 text-[11px] text-slate-500">يُنشئ نداءً «قيد المراجعة» في لوحة الإشراف. لا شيء يُنشر قبل موافقة مشرف.</p>
           </div>
           <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-4 text-xs text-slate-500">
-            <div className="flex items-center gap-2 font-bold text-slate-700"><Mic className="h-4 w-4" aria-hidden /> الرسائل الصوتية (دارجة)</div>
-            <p className="mt-1">غير مفعّلة: تحتاج مزوّد تحويل الصوت إلى نص (Claude لا يحوّل الصوت). انظر docs/NEEDS_FROM_HATEM.md.</p>
+            <div className="flex items-center gap-2 font-bold text-slate-700"><FlaskConical className="h-4 w-4" aria-hidden /> أمثلة للتجربة</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {SAMPLES.map((s) => (
+                <button key={s.label} type="button" onClick={() => { setText(s.text); setResult(null); setSteps(idleSteps()); }}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 font-bold text-slate-700 hover:border-brand-500 hover:text-brand-700">{s.label}</button>
+              ))}
+            </div>
+            <p className="mt-2">أسماء وأرقام وهمية (0555 00 0x xx). تمر عبر المعالجة الحقيقية نفسها.</p>
           </div>
         </div>
         <div className="space-y-4">

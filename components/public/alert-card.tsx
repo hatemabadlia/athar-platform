@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Clock, Users, ShieldCheck, Building2, Sparkles } from "lucide-react";
+import { MapPin, Clock, Users, ShieldCheck, Building2, Sparkles, Share2 } from "lucide-react";
 import type { PublicAlert } from "@/lib/types";
 import { CATEGORY_META, URGENCY_META } from "@/lib/reference/meta";
 import { cn } from "@/lib/utils";
@@ -13,12 +13,14 @@ export function AlertCard({
   suggested,
   onSelect,
   onHelp,
+  onShare,
 }: {
   alert: PublicAlert;
   active?: boolean;
   suggested?: boolean;
   onSelect: () => void;
   onHelp: () => void;
+  onShare?: () => void;
 }) {
   const t = useT();
   const cat = CATEGORY_META[alert.category];
@@ -70,13 +72,21 @@ export function AlertCard({
           )}
         </div>
       </div>
+      <div className="mt-3 flex gap-2">
       <button
         onClick={(e) => { e.stopPropagation(); onHelp(); }}
         disabled={remaining === 0 && !alert.joinedByMe}
-        className="mt-3 w-full rounded-xl border border-brand-600 py-1.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-600 hover:text-white disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-transparent"
+        className="flex-1 rounded-xl border border-brand-600 py-1.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-600 hover:text-white disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-transparent"
       >
         {alert.joinedByMe ? t.card.joined : remaining === 0 ? t.card.full : t.card.help(remaining)}
       </button>
+      {onShare && (
+        <button onClick={(e) => { e.stopPropagation(); onShare(); }} aria-label="مشاركة النداء" title="مشاركة النداء"
+          className="rounded-xl border border-slate-200 px-3 text-slate-600 transition-colors hover:border-brand-600 hover:text-brand-700">
+          <Share2 className="h-4 w-4" aria-hidden />
+        </button>
+      )}
+      </div>
     </div>
   );
 }

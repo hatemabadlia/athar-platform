@@ -11,7 +11,7 @@ import { PRIVACY_POLICY_VERSION } from "@/lib/consent";
 
 const Profile = z.object({
   displayName: z.string().trim().min(2, "الاسم قصير").max(80),
-  wilayaCode: z.number().int().min(1).max(58),
+  wilayaCode: z.number().int().min(1).max(69),
   skills: z.array(z.enum(SKILLS as unknown as [string, ...string[]])).max(10),
   availability: z.enum(["weekends", "evenings", "anytime"]),
   phone: z.string().trim().max(20).optional(),
