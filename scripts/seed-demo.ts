@@ -61,6 +61,7 @@ async function reset() {
   const { data: demoIntake } = await db.from("intake_items").select("id, alert_id").like("source_label", "DEMO%");
   const alertIds = (demoIntake ?? []).map((i) => i.alert_id).filter(Boolean) as string[];
   if (alertIds.length) {
+    await db.from("historical_posts").delete().in("alert_id", alertIds);
     await db.from("alerts").update({ merged_into: null, status: "rejected" }).in("merged_into", alertIds);
     await db.from("intake_items").update({ alert_id: null }).in("alert_id", alertIds);
     await db.from("alerts").delete().in("id", alertIds);
@@ -179,6 +180,18 @@ async function seedAlerts(ids: Record<string, string>) {
     if (post.outcome === "approve" || post.outcome === "resolve") Object.assign(patch, { status: "approved", reviewed_at: created, reviewed_by: ids.djsl16 });
     if (post.outcome === "resolve") Object.assign(patch, { status: "resolved", resolved_at: ago(Math.max(0, post.daysAgo - 2)) });
     must(await db.from("alerts").update(patch as never).eq("id", r.alertId), "alert patch");
+    if (post.outcome === "resolve") {
+      // Same archive write as the moderation RPC (alert_decide → resolved): closed requests feed recycled detection.
+      const { data: row } = await db.from("alerts").select("content_hash, canonical_text, original_text, category, wilaya_code, embedding").eq("id", r.alertId).single();
+      const a = row as { content_hash: string | null; canonical_text: string | null; original_text: string; category: "blood"; wilaya_code: number | null; embedding: string | null } | null;
+      if (!a) throw new Error("resolved alert not found");
+      const { data: c } = await db.from("alert_contacts").select("phone_hash").eq("alert_id", r.alertId).maybeSingle();
+      await db.from("historical_posts").upsert({
+        content_hash: a.content_hash ?? contentHash(a.original_text), normalized_text: a.canonical_text ?? canonicalText(a.original_text),
+        phone_hashes: c?.phone_hash ? [c.phone_hash] : [], category: a.category, wilaya_code: a.wilaya_code,
+        first_seen_at: created, resolved_at: patch.resolved_at as string, alert_id: r.alertId, source: "platform", embedding: a.embedding,
+      }, { onConflict: "content_hash" });
+    }
     out.push({ id: r.alertId, post });
   }
   // Volunteers: resolved alerts are confirmed (points), open ones are joined.
