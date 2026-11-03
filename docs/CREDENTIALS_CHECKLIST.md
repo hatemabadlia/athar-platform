@@ -2,7 +2,7 @@
 
 Never paste a key into chat, an issue, a commit, a screenshot or a document. Local values go in `.env.local`, which is git-ignored (checked with `git check-ignore .env.local`). Deployed values go in the hosting provider's encrypted environment settings.
 
-_Status as of 2026-11-03: every required item below is still **missing**._
+_Status as of 2026-11-03: AI is configured (Gemini, free). Everything Supabase- and Vercel-related is still **missing**._
 
 ## Required for the hackathon demo
 
@@ -14,7 +14,8 @@ _Status as of 2026-11-03: every required item below is still **missing**._
 | `SUPABASE_SERVICE_ROLE_KEY` | **Secret.** Server-only key for the pipeline, webhooks and seed | same page, "service_role / secret" | `.env.local` + Vercel (server only) | intake, check, seed |
 | `SUPABASE_DB_PASSWORD` | **Secret.** Pushes migrations (`supabase db push`) | chosen when creating the project | `.env.local` only (never Vercel) | creating the tables |
 | `ATHAR_HMAC_SECRET` | **Secret.** Keyed hash of phone numbers and beneficiary IDs. Never rotate it casually | already generated locally (`openssl rand -hex 32`) | `.env.local` + Vercel (same value) | recycled-phone matching, dedupe |
-| `ANTHROPIC_API_KEY` | **Secret.** Real Claude analysis + chatbot | console.anthropic.com → API keys | `.env.local` + Vercel | real AI, evaluation |
+| `GEMINI_API_KEY` | **Secret.** Free AI provider (Gemini free tier): analysis, checker, chatbot. **Set and verified 2026-11-03** (live smoke test) | aistudio.google.com → Get API key | `.env.local` ✅ + Vercel | — |
+| `ANTHROPIC_API_KEY` (optional, paid) | Claude instead of Gemini when set | console.anthropic.com → API keys | `.env.local` + Vercel | — |
 | `NEXT_PUBLIC_SITE_URL` | Links in QR codes, certificates and share cards | the Vercel URL after the first deploy | Vercel (and `.env.local` = `http://localhost:3000`) | correct share links |
 | Supabase Auth → URL configuration | Login emails must return to the right site | Supabase → Authentication → URL Configuration: Site URL + redirect `https://<site>/auth/callback` | Supabase dashboard | login on the public site |
 | Vercel account + `vercel login` | Public deployment | vercel.com (sign in with GitHub) | terminal: `! npx vercel login` | public link |
@@ -37,6 +38,6 @@ _Status as of 2026-11-03: every required item below is still **missing**._
 |---|---|
 | Push migrations, run database security tests, seed demo data | Supabase project + the 4 Supabase values above |
 | Browser test of every journey | Same |
-| Real Claude run + 30-post evaluation (`npm run eval:ai`) | Supabase + `ANTHROPIC_API_KEY` |
+| 30-post evaluation (`npm run eval:ai`) | Supabase (AI is ready) |
 | Two-session blood-alert test | Supabase (+ login emails) |
 | Public deployment | Vercel login + the same variables in Vercel |
