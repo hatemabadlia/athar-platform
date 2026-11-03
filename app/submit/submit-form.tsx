@@ -33,6 +33,13 @@ export function SubmitForm({ turnstileSiteKey, signedIn }: { turnstileSiteKey: s
     window.turnstile.render(widget.current, { sitekey: turnstileSiteKey, callback: setToken, "expired-callback": () => setToken(null) });
   };
   useEffect(renderWidget);
+  // Text handed over from the "Is this post real?" page.
+  useEffect(() => {
+    try {
+      const pre = sessionStorage.getItem("athar:prefill");
+      if (pre) { setText(pre.slice(0, 5000)); sessionStorage.removeItem("athar:prefill"); }
+    } catch { /* storage unavailable */ }
+  }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
