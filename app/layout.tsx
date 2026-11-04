@@ -4,6 +4,8 @@ import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Chatbot } from "@/components/chatbot";
+import { LiveNotifications } from "@/components/live-notifications";
+import { supabaseServer } from "@/lib/supabase/server";
 import { CrisisBanner } from "@/components/crisis-banner";
 import { OfflineSync } from "@/components/offline-sync";
 import { LocaleScope } from "@/components/locale-scope";
@@ -37,12 +39,16 @@ export const viewport: Viewport = { themeColor: "#0f766e", width: "device-width"
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [viewer, crises, { t, locale }] = await Promise.all([getViewer(), activeCrises().catch(() => []), getT()]);
+  const unread = viewer
+    ? (await (await supabaseServer()).from("notifications").select("id", { count: "exact", head: true }).is("read_at", null)).count ?? 0
+    : 0;
   return (
     <html lang={locale} dir={dirOf(locale)} className={tajawal.variable}>
       <body className="font-sans min-h-screen flex flex-col">
         <I18nProvider locale={locale}>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-[2000] focus:rounded-lg focus:bg-white focus:px-3 focus:py-2 focus:shadow">{t.skip}</a>
-        <Navbar viewer={viewer ? { email: viewer.email, isStaff: viewer.isStaff, isMinistry: viewer.isMinistry } : null} />
+        <Navbar viewer={viewer ? { email: viewer.email, isStaff: viewer.isStaff, isMinistry: viewer.isMinistry } : null} unread={unread} />
+        {viewer && <LiveNotifications userId={viewer.id} />}
         <CrisisBanner crises={crises} />
         <OfflineSync />
         <main id="main" className="flex-1"><LocaleScope>{children}</LocaleScope></main>

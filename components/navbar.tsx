@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, ScanSearch, HandHeart, UserCircle2, ShieldCheck, LogIn, LogOut, Send, Languages } from "lucide-react";
+import { Map, ScanSearch, HandHeart, UserCircle2, ShieldCheck, LogIn, LogOut, Send, Languages, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/actions/auth";
 import { setLocale } from "@/app/actions/locale";
+import { useEffect, useState } from "react";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { Logo } from "@/components/logo";
 
@@ -19,8 +20,15 @@ const MINE_PATHS = ["/profile", "/notifications", "/login", "/certificates"];
  * Four primary sections — Alerts, Check, Act, My space — plus a role-based staff entry.
  * Everything else lives one tap deeper in the Act hub, so the bar never wraps.
  */
-export function Navbar({ viewer }: { viewer: NavViewer }) {
+export function Navbar({ viewer, unread = 0 }: { viewer: NavViewer; unread?: number }) {
   const pathname = usePathname();
+  const [count, setCount] = useState(unread);
+  useEffect(() => setCount(unread), [unread]);
+  useEffect(() => {
+    const on = (e: Event) => setCount((c) => c + Number((e as CustomEvent).detail ?? 1));
+    window.addEventListener("athar:unread", on);
+    return () => window.removeEventListener("athar:unread", on);
+  }, []);
   const t = useT();
   const locale = useLocale();
   const sections = [
@@ -58,6 +66,12 @@ export function Navbar({ viewer }: { viewer: NavViewer }) {
             <Link href="/submit" className="hidden lg:flex items-center gap-1.5 whitespace-nowrap rounded-full bg-slate-900 px-3.5 py-1.5 text-xs font-bold text-white hover:bg-slate-800">
               <Send className="h-3.5 w-3.5" aria-hidden /> {t.nav.submit}
             </Link>
+            {viewer && (
+              <Link href="/notifications" aria-label={`${t.nav.notifications}${count ? ` (${count})` : ""}`} className="relative flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50">
+                <Bell className="h-4 w-4" aria-hidden />
+                {count > 0 && <span className="absolute -top-1 -end-1 min-w-[18px] rounded-full bg-rose-600 px-1 text-center text-[10px] font-black leading-[18px] text-white">{count > 9 ? "9+" : count}</span>}
+              </Link>
+            )}
             <form action={setLocale.bind(null, locale === "ar" ? "fr" : "ar")}>
               <button className="flex items-center gap-1 rounded-full border border-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50" lang={locale === "ar" ? "fr" : "ar"} aria-label={t.nav.language}>
                 <Languages className="h-3.5 w-3.5" aria-hidden /><span className="hidden sm:inline">{t.nav.language}</span>
