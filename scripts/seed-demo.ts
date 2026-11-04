@@ -37,6 +37,11 @@ async function createUser(attrs: Parameters<typeof db.auth.admin.createUser>[0])
   return data.user;
 }
 
+/** For writes that return no rows (update/upsert/delete): fail only on a real error. */
+function ok(r: { error: { message: string } | null }, what: string) {
+  if (r.error) throw new Error(`${what}: ${r.error.message}`);
+}
+
 function must<T>(r: { data: T | null; error: { message: string } | null }, what: string): NonNullable<T> {
   if (r.error || r.data === null) throw new Error(`${what}: ${r.error?.message ?? "no data"}`);
   return r.data as NonNullable<T>;
@@ -103,10 +108,10 @@ async function createPeople() {
     const email = `${p.key}@${DOMAIN}`;
     const id = (await createUser({ email, email_confirm: true, user_metadata: { display_name: p.name } })).id;
     ids[p.key] = id;
-    must(await db.from("profiles").update({ display_name: p.name, wilaya_code: p.wilaya, skills: p.skills, onboarded: true }).eq("id", id), "profile");
+    ok(await db.from("profiles").update({ display_name: p.name, wilaya_code: p.wilaya, skills: p.skills, onboarded: true }).eq("id", id), "profile");
     if (p.blood) await db.from("profile_private").update({ blood_type: p.blood } as never).eq("user_id", id);
     for (const r of p.roles ?? []) {
-      must(await db.from("user_roles").upsert({ user_id: id, role: r.role as never, wilaya_code: r.wilaya ?? null }), "role");
+      ok(await db.from("user_roles").upsert({ user_id: id, role: r.role as never, wilaya_code: r.wilaya ?? null }), "role");
     }
     await db.from("consents").insert(["terms", ...(p.blood ? ["blood_data", "donor_registry"] : [])]
       .map((purpose) => ({ user_id: id, purpose, version: "demo" })) as never);
@@ -115,7 +120,7 @@ async function createPeople() {
     const { data } = await db.auth.admin.listUsers({ perPage: 1000 });
     let user = data?.users.find((u) => u.email?.toLowerCase() === adminEmail.toLowerCase());
     if (!user) user = await createUser({ email: adminEmail, email_confirm: true });
-    must(await db.from("user_roles").upsert({ user_id: user.id, role: "ministry_admin" as never, wilaya_code: null }), "admin role");
+    ok(await db.from("user_roles").upsert({ user_id: user.id, role: "ministry_admin" as never, wilaya_code: null }), "admin role");
     console.log(`ministry_admin granted to ${adminEmail}`);
   }
   return ids;
@@ -132,7 +137,7 @@ const ARCHIVE = [
 async function seedArchive() {
   for (const a of ARCHIVE) {
     const phones = (a.text.match(/0[5-7](?:[\s.-]?\d{2}){4}/g) ?? []).map((p) => normalizePhone(p)).filter(Boolean) as string[];
-    must(await db.from("historical_posts").upsert({
+    ok(await db.from("historical_posts").upsert({
       content_hash: contentHash(a.text), normalized_text: canonicalText(a.text), phone_hashes: phones.map(keyedHash),
       category: a.cat as never, wilaya_code: a.wilaya, first_seen_at: a.seen, last_seen_at: a.resolved ?? a.seen,
       times_seen: a.times, resolved_at: a.resolved, source: "import",
@@ -179,7 +184,7 @@ async function seedAlerts(ids: Record<string, string>) {
     const patch: Record<string, unknown> = { created_at: created, owner_id: post.by ? ids[post.by] : null };
     if (post.outcome === "approve" || post.outcome === "resolve") Object.assign(patch, { status: "approved", reviewed_at: created, reviewed_by: ids.djsl16 });
     if (post.outcome === "resolve") Object.assign(patch, { status: "resolved", resolved_at: ago(Math.max(0, post.daysAgo - 2)) });
-    must(await db.from("alerts").update(patch as never).eq("id", r.alertId), "alert patch");
+    ok(await db.from("alerts").update(patch as never).eq("id", r.alertId), "alert patch");
     if (post.outcome === "resolve") {
       // Same archive write as the moderation RPC (alert_decide → resolved): closed requests feed recycled detection.
       const { data: row } = await db.from("alerts").select("content_hash, canonical_text, original_text, category, wilaya_code, embedding").eq("id", r.alertId).single();

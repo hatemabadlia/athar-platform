@@ -7,7 +7,8 @@ import { SYSTEM_PROMPT, type AnalysisProvider, type ProviderResult } from "./pro
 
 const BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 /** Tried in order when the configured model is overloaded or rate-limited (free tier: HTTP 429/503 happen). */
-const FALLBACK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.8-flash"];
+// Free-tier quotas are per model and per day (gemini-3.5-flash: only 20 requests/day), so several are tried.
+const FALLBACK_MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-3.5-flash"];
 
 type GeminiResponse = {
   candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];
@@ -23,7 +24,9 @@ export async function geminiJson(opts: { system: string; user: string; schema: o
   const errors: string[] = [];
   for (const model of models) {
     for (let attempt = 0; attempt < 3; attempt++) {
-      const res = await fetch(`${BASE}/${model}:generateContent`, {
+      let res: Response;
+      try {
+        res = await fetch(`${BASE}/${model}:generateContent`, {
         method: "POST",
         headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify({
@@ -31,8 +34,13 @@ export async function geminiJson(opts: { system: string; user: string; schema: o
           contents: [{ role: "user", parts: [{ text: opts.user }] }],
           generationConfig: { responseMimeType: "application/json", responseJsonSchema: opts.schema, temperature: 0.2 },
         }),
-        signal: AbortSignal.timeout(opts.timeoutMs ?? 45_000),
+        signal: AbortSignal.timeout(opts.timeoutMs ?? 20_000),
       });
+      } catch (e) {
+        // Timeout or network error: try the next model rather than failing the whole analysis.
+        errors.push(`${model} ${e instanceof Error ? e.name : "error"}`);
+        break;
+      }
       const json = (await res.json().catch(() => ({}))) as GeminiResponse;
       if (res.ok) {
         const c = json.candidates?.[0];
@@ -45,6 +53,7 @@ export async function geminiJson(opts: { system: string; user: string; schema: o
       errors.push(err);
       const retryable = res.status === 429 || res.status >= 500;
       if (!retryable) throw new Error(`Gemini ${err}`);
+      if (res.status === 429) break; // daily/minute quota for this model: move to the next one
       if (attempt < 2) await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
     }
   }

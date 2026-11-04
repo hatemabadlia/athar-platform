@@ -23,7 +23,7 @@ const serverSchema = publicSchema.extend({
   ATHAR_AI_MODEL: z.preprocess(emptyToUndefined, z.string().default("claude-opus-5-5")),
   // Free alternative to Claude (Google AI Studio). Used only when ANTHROPIC_API_KEY is not set.
   GEMINI_API_KEY: optional(),
-  ATHAR_GEMINI_MODEL: z.preprocess(emptyToUndefined, z.string().default("gemini-3.5-flash")),
+  ATHAR_GEMINI_MODEL: z.preprocess(emptyToUndefined, z.string().default("gemini-3.5-flash-lite")),
   VOYAGE_API_KEY: optional(),
   TURNSTILE_SECRET_KEY: optional(),
   // Local/staging only: accept public submissions without Turnstile. Ignored when VERCEL_ENV=production.
