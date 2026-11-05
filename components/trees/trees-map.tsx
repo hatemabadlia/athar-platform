@@ -1,5 +1,6 @@
 "use client";
 
+import { TILE_URL, TILE_ATTRIBUTION } from "@/lib/map-tiles";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useEffect } from "react";
@@ -30,7 +31,7 @@ function Fly({ focus, trees }: { focus: TreeView | null; trees: TreeView[] }) {
 export default function TreesMap({ trees, focus }: { trees: TreeView[]; focus: TreeView | null }) {
   return (
     <MapContainer center={[33.5, 2.5]} zoom={5.4} zoomSnap={0.2} minZoom={4.5} scrollWheelZoom className="h-full w-full" zoomControl={false}>
-      <TileLayer attribution='&copy; OpenStreetMap &copy; CARTO' url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} maxZoom={19} />
       <Fly focus={focus} trees={trees} />
       {trees.filter((t) => t.lat != null && t.lng != null).map((t) => (
         <Marker key={t.id} position={[t.lat!, t.lng!]} icon={icon(t.status, t.mine)}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { TILE_URL, TILE_ATTRIBUTION } from "@/lib/map-tiles";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useEffect, useMemo } from "react";
@@ -71,10 +72,7 @@ export default function LiveMap({ alerts, onHelp, focusId, shelters = [] }: {
 
   return (
     <MapContainer center={[33.5, 2.5]} zoom={5.4} zoomSnap={0.2} minZoom={4.5} scrollWheelZoom className="h-full w-full rounded-3xl" zoomControl={false}>
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-      />
+      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} maxZoom={19} />
       <FitOnChange points={focusPoints} />
       {shelters.filter((s) => s.lat != null && s.lng != null).map((sh) => (
         <Marker key={sh.id} position={[sh.lat!, sh.lng!]} icon={shelterIcon}>
