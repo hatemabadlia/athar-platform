@@ -1,22 +1,17 @@
-export type Category =
-  | "blood"
-  | "relief"
-  | "cleanup"
-  | "orphans"
-  | "medical"
-  | "education";
+/**
+ * UI-facing domain types. Database row types are generated in lib/supabase/database.types.ts;
+ * these are the shapes server code maps rows into before handing them to components.
+ */
+import type { Database } from "@/lib/supabase/database.types";
 
-export type Urgency = "critical" | "medium" | "normal";
-
-export type AlertStatus =
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "resolved"
-  | "recycled"
-  | "merged";
-
-export type Platform = "facebook" | "twitter" | "instagram" | "tiktok" | "whatsapp";
+type Enums = Database["public"]["Enums"];
+export type Category = Enums["alert_category"];
+export type Urgency = Enums["urgency"];
+export type AlertStatus = Enums["alert_status"];
+export type CrisisType = Enums["crisis_type"];
+export type BloodType = Enums["blood_type"];
+export type AppRole = Enums["app_role"];
+export type Availability = Enums["availability"];
 
 export interface Wilaya {
   code: number;
@@ -26,185 +21,138 @@ export interface Wilaya {
   lng: number;
 }
 
-export interface Alert {
+export interface CredibilityReason { label: string; delta: number }
+
+/** An alert as shown publicly (no phone number, no owner). */
+export interface PublicAlert {
   id: string;
   title: string;
-  originalText: string;
+  summary: string;
   category: Category;
   urgency: Urgency;
   status: AlertStatus;
-  wilayaCode: number;
+  wilayaCode: number | null;
   wilaya: string;
-  baladiya: string;
-  lat: number;
-  lng: number;
-  credibilityScore: number; // 0-100
+  baladiya: string | null;
+  institution: string | null;
+  lat: number | null;
+  lng: number | null;
+  locationPrecision: "wilaya" | "baladiya" | "institution";
+  credibilityScore: number | null;
+  credibilityReasons: CredibilityReason[];
+  aiMode: "claude" | "gemini" | "heuristic" | "manual";
   volunteersNeeded: number;
   volunteersJoined: number;
-  contactPhone: string;
-  contactName: string;
-  source: Platform;
-  sourceUrl: string;
-  postedAt: string; // ISO
-  firstSeenAt?: string; // ISO — for recycled posts
-  duplicateCount: number;
-  aiTags: string[];
-  aiSummary: string;
-  mergedInto?: string;
-  hub?: string; // مؤسسة الشباب: نقطة التجمع
-  report?: AfterActionReport; // إغلاق الحلقة بعد الحل
-}
-
-export interface HistoricalRecord {
-  id: string;
-  text: string;
-  firstSeenAt: string;
-  resolvedAt?: string;
-  wilaya: string;
-  category: Category;
-  timesRecycled: number;
-  fingerprint: string[]; // key phrases used for similarity
-}
-
-export interface Volunteer {
-  id: string;
-  name: string;
-  phone: string;
-  wilaya: string;
-  skills: string[];
-  bloodType?: string;
-}
-
-export interface PipelineStep {
-  id: string;
-  label: string;
-  labelAr: string;
-  status: "idle" | "running" | "done" | "warning" | "error";
-  detail?: string;
-  durationMs: number;
-}
-
-export type Verdict = "fresh" | "recycled" | "duplicate" | "low-confidence";
-
-export interface ClassificationResult {
-  verdict: Verdict;
-  category: Category;
-  urgency: Urgency;
-  wilaya: Wilaya | null;
-  baladiya: string;
-  credibilityScore: number;
-  confidence: number;
-  extractedEntities: { label: string; value: string }[];
-  matchedHistorical?: HistoricalRecord;
-  similarity?: number;
-  mergedIntoAlert?: Alert;
-  reasoning: string[];
-  aiSummary: string;
-  title: string;
-  darijaTerms: { from: string; to: string }[];
-}
-
-export interface VolunteerProfile {
-  name: string;
-  phone: string;
-  wilayaCode: number;
-  bloodType?: string;
-  skills: string[];
-  availability: "weekends" | "evenings" | "anytime";
-  points: number;
-  badges: string[];
-  joinedClubs: string[];
+  bloodType: BloodType | null;
+  /** Volunteer skills the request needs (skills-based help, not only money or goods). */
+  requiredSkills: string[];
+  /** The needed help can be given remotely. */
+  remoteOk: boolean;
+  deadline: string | null;
   createdAt: string;
-  confirmedPoints?: number;
-  smsAlerts?: boolean;
+  sourceCount: number;
+  joinedByMe?: boolean;
 }
 
-export interface YouthClub {
-  id: string;
-  name: string;
-  institution: string; // دار الشباب / مركز الشباب
-  wilayaCode: number;
-  wilaya: string;
-  baladiya: string;
-  members: number;
-  points: number;
-  activitiesThisMonth: number;
-  focus: Category[];
-  lead: string;
-  nextActivity: { title: string; date: string };
+/** Moderator view: adds review fields. */
+export interface ModerationAlert extends PublicAlert {
+  originalText: string;
+  normalizedText: string | null;
+  verdict: "fresh" | "recycled" | "duplicate" | "low-confidence" | null;
+  needsReview: string[];
+  firstSeenAt: string | null;
+  contactName: string | null;
+  darijaTerms: { from: string; to: string }[];
+  aiConfidence: number | null;
+  reviewedAt: string | null;
+  mergedInto: string | null;
 }
 
-export type Channel = "facebook" | "instagram" | "twitter" | "whatsapp";
-
-export interface BrandedPost {
-  headline: string;
-  caption: string;
-  hashtags: string[];
-  cta: string;
-  shortLink: string;
-  category: Category;
-  urgency: Urgency;
-  wilaya: string;
-  score: number;
-  details: { icon: string; text: string }[];
-}
-
-export interface PublishedPost extends BrandedPost {
-  id: string;
-  publishedAt: string;
-  channels: Partial<Record<Channel, string>>; // channel → post URL
-  sourceText: string;
-  reach: number;
-}
-
-export type CrisisType = "flood" | "earthquake" | "fire" | "cold";
-
-export interface Crisis {
-  type: CrisisType;
-  wilayaCode: number;
-  wilaya: string;
-  startedAt: string;
-  smsSent: number;
-  volunteersNotified: number;
-}
-
-export interface Shelter {
+export interface ShelterView {
   id: string;
   name: string;
   wilayaCode: number;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   capacity: number;
   occupied: number;
   needs: string[];
-  phone: string;
+  phone: string | null;
+  isOpen: boolean;
+  updatedAt: string;
 }
 
-export interface AfterActionReport {
-  attended: number;
-  outcome: string;
+export interface CrisisView {
+  id: string;
+  type: CrisisType;
+  wilayaCode: number;
+  wilaya: string;
+  title: string;
+  startedAt: string;
+}
+
+export interface ProfileView {
+  id: string;
+  displayName: string;
+  wilayaCode: number | null;
+  skills: string[];
+  availability: Availability;
+  /** Accepts to help remotely (design, translation, consultation…). */
+  remoteOk: boolean;
+  /** Regulated professional skills verified by a moderator. */
+  verifiedSkills: string[];
+  hideFromLeaderboard: boolean;
+  phone: string | null;
+  bloodType: BloodType | null;
+  smsOptIn: boolean;
+  points: number;
   hours: number;
-  club?: string;
+  events: number;
+  byKind: Record<string, number>;
+  roles: AppRole[];
 }
 
-export interface TreePost {
+export interface ClubView {
+  id: string;
+  name: string;
+  description: string;
+  institutionName: string | null;
+  wilayaCode: number;
+  wilaya: string;
+  focus: Category[];
+  members: number;
+  points: number;
+  activities30d: number;
+  myRole: "member" | "lead" | null;
+}
+
+export interface ActivityView {
+  id: string;
+  clubId: string | null;
+  alertId: string | null;
+  title: string;
+  location: string | null;
+  wilayaCode: number;
+  startsAt: string;
+  endsAt: string | null;
+  status: string;
+}
+
+export interface TreeView {
   id: string;
   userName: string;
   wilayaCode: number;
   wilaya: string;
-  place: string; // دار الشباب / مدرسة / حي…
+  place: string;
   species: string;
   note: string;
-  lat: number;
-  lng: number;
-  photo: string | null; // data URL (user upload) or null → placeholder
+  lat: number | null;
+  lng: number | null;
+  photoUrl: string | null;
   status: "pending" | "approved" | "rejected";
   createdAt: string;
-  reviewedAt?: string;
   likes: number;
   likedByMe: boolean;
-  comments: number;
-  points: number;
-  club?: string;
-  mine?: boolean;
+  mine: boolean;
+  locationCheck: Record<string, unknown>;
 }

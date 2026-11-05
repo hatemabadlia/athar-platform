@@ -1,5 +1,12 @@
 import type { Wilaya } from "./types";
 
+/**
+ * Wilayas 1–58 (Law 84-09 + Law 19-12 of 2019) and 59–69 (2026). Mirrors the `wilayas` table seed
+ * (supabase/migrations/*_reference_seed.sql); the database is the source of truth.
+ * Wilayas 59–69 (2025–2026 reform, JO n° 40 of 2026 as reported by the press; see
+ * supabase/migrations/20261103000100_wilayas_2026.sql) — not yet checked against the JORADP text. Coordinates are approximate chef-lieu positions.
+ */
+
 export const WILAYAS: Wilaya[] = [
   { code: 1, name: "Adrar", nameAr: "أدرار", lat: 27.87, lng: -0.29 },
   { code: 2, name: "Chlef", nameAr: "الشلف", lat: 36.17, lng: 1.33 },
@@ -49,6 +56,27 @@ export const WILAYAS: Wilaya[] = [
   { code: 46, name: "Aïn Témouchent", nameAr: "عين تموشنت", lat: 35.3, lng: -1.14 },
   { code: 47, name: "Ghardaïa", nameAr: "غرداية", lat: 32.49, lng: 3.67 },
   { code: 48, name: "Relizane", nameAr: "غليزان", lat: 35.74, lng: 0.56 },
+  { code: 49, name: "Timimoun", nameAr: "تيميمون", lat: 29.26, lng: 0.23 },
+  { code: 50, name: "Bordj Badji Mokhtar", nameAr: "برج باجي مختار", lat: 21.33, lng: 0.95 },
+  { code: 51, name: "Ouled Djellal", nameAr: "أولاد جلال", lat: 34.42, lng: 5.06 },
+  { code: 52, name: "Béni Abbès", nameAr: "بني عباس", lat: 30.13, lng: -2.17 },
+  { code: 53, name: "In Salah", nameAr: "عين صالح", lat: 27.2, lng: 2.47 },
+  { code: 54, name: "In Guezzam", nameAr: "عين قزام", lat: 19.57, lng: 5.77 },
+  { code: 55, name: "Touggourt", nameAr: "تقرت", lat: 33.1, lng: 6.06 },
+  { code: 56, name: "Djanet", nameAr: "جانت", lat: 24.55, lng: 9.48 },
+  { code: 57, name: "El M'Ghair", nameAr: "المغير", lat: 33.95, lng: 5.92 },
+  { code: 58, name: "El Meniaa", nameAr: "المنيعة", lat: 30.58, lng: 2.88 },
+  { code: 59, name: "Aflou", nameAr: "آفلو", lat: 34.11, lng: 2.1 },
+  { code: 60, name: "Barika", nameAr: "بريكة", lat: 35.39, lng: 5.37 },
+  { code: 61, name: "El Kantara", nameAr: "القنطرة", lat: 35.22, lng: 5.71 },
+  { code: 62, name: "Bir El Ater", nameAr: "بئر العاتر", lat: 34.74, lng: 8.06 },
+  { code: 63, name: "El Aricha", nameAr: "العريشة", lat: 34.22, lng: -1.27 },
+  { code: 64, name: "Ksar Chellala", nameAr: "قصر الشلالة", lat: 35.21, lng: 2.32 },
+  { code: 65, name: "Aïn Oussera", nameAr: "عين وسارة", lat: 35.45, lng: 2.91 },
+  { code: 66, name: "Messaad", nameAr: "مسعد", lat: 34.15, lng: 3.5 },
+  { code: 67, name: "Ksar El Boukhari", nameAr: "قصر البخاري", lat: 35.89, lng: 2.75 },
+  { code: 68, name: "Bou Saâda", nameAr: "بوسعادة", lat: 35.21, lng: 4.17 },
+  { code: 69, name: "El Abiodh Sidi Cheikh", nameAr: "الأبيض سيدي الشيخ", lat: 32.9, lng: 0.55 },
 ];
 
 export const WILAYA_ALIASES: Record<string, number> = {
@@ -87,6 +115,12 @@ export const WILAYA_ALIASES: Record<string, number> = {
   "تمنراست": 11,
   "أدرار": 1,
   "بشار": 8,
+  "تيارت": 14, "الجلفة": 17, "سعيدة": 20, "سيدي بلعباس": 22, "قالمة": 24, "المسيلة": 28, "معسكر": 29,
+  "البيض": 32, "إليزي": 33, "برج بوعريريج": 34, "الطارف": 36, "تندوف": 37, "تيسمسيلت": 38, "خنشلة": 40,
+  "سوق أهراس": 41, "ميلة": 43, "عين الدفلى": 44, "النعامة": 45, "عين تموشنت": 46, "غليزان": 48, "البويرة": 10,
+  "أم البواقي": 4, "الأغواط": 3, "تيميمون": 49, "برج باجي مختار": 50, "أولاد جلال": 51, "بني عباس": 52,
+  "عين صالح": 53, "عين قزام": 54, "تقرت": 55, "جانت": 56, "المغير": 57, "المنيعة": 58,
+  "آفلو": 59, "بريكة": 60, "القنطرة": 61, "بئر العاتر": 62, "العريشة": 63, "قصر الشلالة": 64, "عين وسارة": 65, "مسعد": 66, "قصر البخاري": 67, "بوسعادة": 68, "الأبيض سيدي الشيخ": 69, "بو سعادة": 68,
 };
 
 export function findWilaya(code: number): Wilaya | undefined {

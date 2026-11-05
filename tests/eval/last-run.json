@@ -1,0 +1,308 @@
+{
+  "at": "2026-11-04T22:59:07.046Z",
+  "sha": "5e165ec",
+  "modes": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "rows": [
+    {
+      "id": "act-1",
+      "expected": "active",
+      "status": "active",
+      "category": "blood",
+      "wilaya": 16,
+      "ms": 9341,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "act-2",
+      "expected": "active",
+      "status": "active",
+      "category": "blood",
+      "wilaya": 25,
+      "ms": 2863,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "act-3",
+      "expected": "active",
+      "status": "active",
+      "category": "cleanup",
+      "wilaya": 31,
+      "ms": 3224,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "act-4",
+      "expected": "active",
+      "status": "active",
+      "category": "blood",
+      "wilaya": 5,
+      "ms": 3765,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "act-5",
+      "expected": "active",
+      "status": "active",
+      "category": "relief",
+      "wilaya": 15,
+      "ms": 3481,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "act-6",
+      "expected": "active",
+      "status": "active",
+      "category": "education",
+      "wilaya": 31,
+      "ms": 3140,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "res-1",
+      "expected": "resolved",
+      "status": "resolved",
+      "category": "relief",
+      "wilaya": 9,
+      "ms": 2873,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "res-2",
+      "expected": "resolved",
+      "status": "resolved",
+      "category": "blood",
+      "wilaya": 31,
+      "ms": 4368,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "res-3",
+      "expected": "resolved",
+      "status": "resolved",
+      "category": "cleanup",
+      "wilaya": 6,
+      "ms": 19328,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "res-4",
+      "expected": "resolved",
+      "status": "resolved",
+      "category": "relief",
+      "wilaya": 9,
+      "ms": 43164,
+      "mode": "gemini",
+      "model": "gemini-3-flash-preview"
+    },
+    {
+      "id": "res-5",
+      "expected": "resolved",
+      "status": "resolved",
+      "category": "blood",
+      "wilaya": 16,
+      "ms": 4593,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "rec-1",
+      "expected": "recycled",
+      "status": "recycled",
+      "category": "medical",
+      "wilaya": null,
+      "ms": 2539,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "rec-2",
+      "expected": "recycled",
+      "status": "recycled",
+      "category": "medical",
+      "wilaya": null,
+      "ms": 4626,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "rec-3",
+      "expected": "recycled",
+      "status": "recycled",
+      "category": "medical",
+      "wilaya": 28,
+      "ms": 2919,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "rec-4",
+      "expected": "recycled",
+      "status": "recycled",
+      "category": "relief",
+      "wilaya": 16,
+      "ms": 2861,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "rec-5",
+      "expected": "recycled",
+      "status": "recycled",
+      "category": "medical",
+      "wilaya": 28,
+      "ms": 2285,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "sus-1",
+      "expected": "suspicious",
+      "status": "suspicious",
+      "category": "orphans",
+      "wilaya": 47,
+      "ms": 2593,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "sus-2",
+      "expected": "suspicious",
+      "status": "suspicious",
+      "category": "relief",
+      "wilaya": null,
+      "ms": 2113,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "sus-3",
+      "expected": "suspicious",
+      "status": "suspicious",
+      "category": "relief",
+      "wilaya": 2,
+      "ms": 2254,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "sus-4",
+      "expected": "suspicious",
+      "status": "suspicious",
+      "category": null,
+      "wilaya": 16,
+      "ms": 1919,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "sus-5",
+      "expected": "suspicious",
+      "status": "suspicious",
+      "category": null,
+      "wilaya": null,
+      "ms": 2137,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "sus-6",
+      "expected": "suspicious",
+      "status": "suspicious",
+      "category": "medical",
+      "wilaya": 19,
+      "ms": 2988,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-1",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "blood",
+      "wilaya": 31,
+      "ms": 4024,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-2",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "cleanup",
+      "wilaya": 23,
+      "ms": 16038,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-3",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "education",
+      "wilaya": 30,
+      "ms": 10939,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-4",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "relief",
+      "wilaya": 13,
+      "ms": 4566,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-5",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "blood",
+      "wilaya": null,
+      "ms": 2827,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-6",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "relief",
+      "wilaya": null,
+      "ms": 4361,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-7",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "blood",
+      "wilaya": 9,
+      "ms": 3502,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    },
+    {
+      "id": "ins-8",
+      "expected": "insufficient",
+      "status": "insufficient",
+      "category": "blood",
+      "wilaya": 19,
+      "ms": 2942,
+      "mode": "gemini",
+      "model": "gemini-3.5-flash-lite"
+    }
+  ]
+}

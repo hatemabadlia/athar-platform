@@ -8,22 +8,40 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // ATHAR "حبر وورق" (ink & paper) system: warm paper neutrals, one deep green, clay as the single accent.
       fontFamily: {
-        sans: ["var(--font-tajawal)", "system-ui", "sans-serif"],
+        sans: ["var(--font-plex)", "system-ui", "sans-serif"],
+        display: ["var(--font-kufi)", "var(--font-plex)", "serif"],
       },
       colors: {
-        brand: {
-          50: "#ecfdf5",
-          100: "#d1fae5",
-          200: "#a7f3d0",
-          300: "#6ee7b7",
-          400: "#34d399",
-          500: "#10b981",
-          600: "#059669",
-          700: "#047857",
-          800: "#065f46",
-          900: "#064e3b",
+        // the neutral scale is warmed (paper → ink) so every existing slate-* class follows the identity
+        slate: {
+          50: "#F6F3EC", 100: "#EEEAE1", 200: "#E2DCCF", 300: "#CDC5B4", 400: "#A1998A",
+          500: "#78736A", 600: "#5B5A52", 700: "#3E433D", 800: "#27302B", 900: "#14201B", 950: "#0C1511",
         },
+        brand: {
+          50: "#EEF6F1", 100: "#D6EADF", 200: "#ADD4BF", 300: "#7DB99A", 400: "#4A9874",
+          500: "#237A56", 600: "#146846", 700: "#0F5539", 800: "#0C432E", 900: "#0A3524",
+        },
+        emerald: {
+          50: "#EEF6F1", 100: "#D6EADF", 200: "#ADD4BF", 300: "#7DB99A", 400: "#4A9874",
+          500: "#237A56", 600: "#146846", 700: "#0F5539", 800: "#0C432E", 900: "#0A3524", 950: "#06231A",
+        },
+        clay: {
+          50: "#FBF1EC", 100: "#F5DCCF", 200: "#EBB89F", 300: "#DE906C", 400: "#CF6E44",
+          500: "#B6532C", 600: "#9A4223", 700: "#7C351D", 800: "#5E2916", 900: "#421D10",
+        },
+        ink: "#14201B",
+        paper: "#F6F3EC",
+      },
+      borderRadius: { lg: "0.5rem", xl: "0.625rem", "2xl": "0.75rem", "3xl": "1rem" },
+      boxShadow: {
+        sm: "0 1px 0 rgba(20,32,27,0.05)",
+        DEFAULT: "0 1px 2px rgba(20,32,27,0.06)",
+        md: "0 2px 6px -2px rgba(20,32,27,0.10)",
+        lg: "0 8px 24px -10px rgba(20,32,27,0.18)",
+        xl: "0 14px 36px -14px rgba(20,32,27,0.22)",
+        "2xl": "0 22px 50px -18px rgba(20,32,27,0.28)",
       },
       keyframes: {
         "fade-up": {

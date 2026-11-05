@@ -1,49 +1,45 @@
 "use client";
 
-import { Check, X, TreePine, MapPin, Clock, ZoomIn } from "lucide-react";
-import { useState } from "react";
-import { useAthar } from "@/lib/store";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { Check, X, AlertTriangle } from "lucide-react";
+import type { TreeView } from "@/lib/types";
 import { TreePhoto } from "@/components/trees/tree-photo";
-import { Modal } from "@/components/ui/modal";
+import { reviewTree } from "@/app/actions/trees";
 import { timeAgo } from "@/lib/utils";
 
-export function TreeReview() {
-  const { trees, reviewTree } = useAthar();
-  const pending = trees.filter((t) => t.status === "pending");
-  const [zoom, setZoom] = useState<string | null>(null);
-  const z = trees.find((t) => t.id === zoom);
+export function TreeReview({ trees }: { trees: TreeView[] }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const [err, setErr] = useState<string | null>(null);
+  if (!trees.length) return <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">لا أشجار بانتظار المراجعة في نطاقك.</div>;
   return (
-    <div className="rounded-3xl border border-emerald-200 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="flex items-center gap-2 font-black text-slate-900"><TreePine className="h-5 w-5 text-emerald-600" /> مراجعة الأشجار — غابة إيثار</h3>
-        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">{pending.length} بانتظار التحقق</span>
-      </div>
-      {pending.length === 0 ? <p className="text-sm text-slate-500">لا توجد أشجار بانتظار المراجعة ✓</p> : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {pending.map((t) => (
-            <div key={t.id} className="overflow-hidden rounded-2xl border border-slate-200">
-              <button onClick={() => setZoom(t.id)} className="relative block w-full aspect-[4/3] bg-slate-100">
-                <TreePhoto photo={t.photo} species={t.species} wilaya={t.wilaya} />
-                <span className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white"><ZoomIn className="h-3 w-3" /> تكبير</span>
-                {!t.photo && <span className="absolute top-2 right-2 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white">بدون صورة</span>}
-              </button>
-              <div className="p-3 text-xs">
-                <div className="font-bold text-slate-900">{t.userName} · {t.species}</div>
-                <div className="flex items-center gap-1 text-slate-500"><MapPin className="h-3 w-3" /> {t.wilaya} · {t.place}</div>
-                <div className="flex items-center gap-1 text-slate-400"><Clock className="h-3 w-3" /> {timeAgo(t.createdAt)}</div>
-                {t.note && <p className="mt-1 text-slate-600 line-clamp-2">{t.note}</p>}
-                <div className="mt-2 flex gap-1.5">
-                  <button onClick={() => reviewTree(t.id, true)} className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-emerald-600 py-1.5 font-bold text-white hover:bg-emerald-700"><Check className="h-3.5 w-3.5" /> اعتماد (+50)</button>
-                  <button onClick={() => reviewTree(t.id, false)} className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-300 px-3 py-1.5 font-bold text-red-700 hover:bg-red-50"><X className="h-3.5 w-3.5" /> رفض</button>
-                </div>
+    <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {err && <p role="alert" className="sm:col-span-3 text-xs text-red-700">{err}</p>}
+      {trees.map((t) => {
+        const lc = t.locationCheck as { exif_distance_km?: number; photo_age_days?: number; gps_source?: string; exif_present?: boolean };
+        const flags = [
+          lc.exif_distance_km != null && lc.exif_distance_km > 5 && `موقع الصورة يبعد ${lc.exif_distance_km} كم عن الموقع المختار`,
+          lc.photo_age_days != null && lc.photo_age_days > 30 && `الصورة التُقطت قبل ${lc.photo_age_days} يوماً`,
+          !lc.exif_present && "لا توجد بيانات EXIF (قد تكون صورة معاد إرسالها)",
+        ].filter(Boolean) as string[];
+        return (
+          <article key={t.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+            <div className="aspect-[4/3]"><TreePhoto photo={t.photoUrl} species={t.species} wilaya={t.wilaya} /></div>
+            <div className="p-3 text-sm space-y-1">
+              <div className="font-bold">{t.species} · {t.wilaya}</div>
+              <div className="text-xs text-slate-500">{t.place} · {t.userName || "متطوع"} · {timeAgo(t.createdAt)}</div>
+              {t.note && <p className="text-xs text-slate-700">{t.note}</p>}
+              <div className="text-[11px] text-slate-500">مصدر الموقع: {lc.gps_source === "device" ? "GPS الهاتف" : "اختيار على الخريطة"}{lc.exif_distance_km != null ? ` · فرق EXIF ${lc.exif_distance_km} كم` : ""}</div>
+              {flags.map((f) => <div key={f} className="flex items-center gap-1 text-[11px] text-amber-700"><AlertTriangle className="h-3 w-3" aria-hidden />{f}</div>)}
+              <div className="flex gap-2 pt-2">
+                <button disabled={pending} onClick={() => start(async () => { const r = await reviewTree(t.id, true); if (!r.ok) setErr(r.error); else router.refresh(); })} className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-emerald-600 py-1.5 text-xs font-bold text-white"><Check className="h-4 w-4" aria-hidden /> اعتماد</button>
+                <button disabled={pending} onClick={() => start(async () => { const r = await reviewTree(t.id, false); if (!r.ok) setErr(r.error); else router.refresh(); })} className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-red-600 py-1.5 text-xs font-bold text-white"><X className="h-4 w-4" aria-hidden /> رفض</button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-      <Modal open={!!z} onClose={() => setZoom(null)} title={z ? `${z.species} — ${z.wilaya}` : ""} className="sm:max-w-2xl">
-        {z && <div className="aspect-[4/3] overflow-hidden rounded-2xl"><TreePhoto photo={z.photo} species={z.species} wilaya={z.wilaya} /></div>}
-      </Modal>
-    </div>
+          </article>
+        );
+      })}
+    </section>
   );
 }
