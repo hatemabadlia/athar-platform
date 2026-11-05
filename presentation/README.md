@@ -4,10 +4,45 @@
 |---|---|
 | `ATHAR_HACKATHON_AR.pptx` | The editable deck: 14 slides, 16:9 (13.33″ × 7.5″), Arabic RTL, Tajawal font, speaker notes on every slide, **native PowerPoint transitions and build animations** |
 | `ATHAR_SPEAKER_SCRIPT_AR.md` | Per-slide script: what the audience sees, exact words, transition, timing, emphasis and a backup answer. About 8:45 in total |
+| `ATHAR_SERVICES_AR.pptx` | **Complete services catalogue**: 15 slides covering all 29 services in 9 domains (see below) |
 | `ATHAR_JURY_QA_AR.md` | 20 likely jury questions plus "trap" questions, answered from the real implementation status |
 | `preview/` | `ATHAR_HACKATHON_AR.pdf` (LibreOffice render) and `slide-01.jpg` … `slide-14.jpg` |
 | `ASSETS/` | Fonts, generated visuals (`gen/`) and real app screenshots (`screens/`) |
 | `build/` | Scripts that regenerate everything |
+
+## Services deck: `ATHAR_SERVICES_AR.pptx`
+
+This is a second, separate deck: a complete catalogue of **every** service in the platform. It has 15 slides in the same dark RTL design, with native animations and speaker notes. Previews are in `preview/services/`. Build it with:
+
+```bash
+cd presentation/build && node build-services.js
+```
+
+- **Single source of truth.** The `S` array in `build-services.js` lists all 29 services, grouped into 9 domains. Each entry has its route, a [lucide](https://lucide.dev) icon (the app's own icon set), a description, and a status taken from `docs/MORNING_REPORT.md`. Every count on the slides (29, 23, 6, and the "n services" pills) is computed from that array, so the deck cannot drift from the list.
+- **Slides:**
+  1. Cover
+  2. The 9 domains, with service numbers and slide references
+  3. Users and the 6 roles, from the RLS rules
+  4–13. One slide per domain; the humanitarian domain takes two slides. Each one pairs real screenshots with numbered service cards.
+  14. Status matrix of all 29 services, plus what is still needed for real operation
+  15. Close
+- **Status colours:**
+  - cyan = "يعمل · مختبَر محلياً" (implemented and tested locally)
+  - purple = partial, or waiting for keys, accounts or a provider. The short note on the card names what is missing: Claude key, Telegram/WhatsApp accounts, SMS provider, device test, phone login and French.
+
+| # | Domain | Services |
+|---|---|---|
+| 1 | Intake and access | 1 Live alert map · 2 Submit an alert · 3 Multi-channel intake · 4 AI assistant |
+| 2 | AI analysis | 5 Seven-stage pipeline · 6 Duplicate/recycled detection and credibility score |
+| 3 | Moderation and governance | 7 Moderation queue · 8 Live intake queue · 9 Roles and wilaya scopes · 10 Audit/AI logs and CSV import |
+| 4 | Volunteer journey | 11 Profile and smart matching · 12 Joining alerts · 13 Clubs and activities · 14 Notifications |
+| 5 | Recognition | 15 QR attendance · 16 Points and 8 badges · 17 Certificates and public verification |
+| 6 | Humanitarian and environment | 18 Blood donor network · 19 In-kind donations · 20 Verified associations · 21 Solidarity campaigns · 22 Athar forest (trees) |
+| 7 | Crisis | 23 Crisis mode, shelters and SMS alerts |
+| 8 | Impact and data | 24 After-action reports · 25 Impact transparency and exports · 26 Seasonal forecasts |
+| 9 | Privacy and platform | 27 Privacy centre · 28 Offline web app (PWA) · 29 Login and languages |
+
+QA: the services deck passes the validator. I checked every slide in the LibreOffice render and fixed the pill/name collisions, the tile text overlaps, the crisis card titles and a bidi-garbled route. It has 574 entrance effects and only 2 clicks: slide 11 (the facts) and slide 14 (what is still needed). Everything else builds automatically.
 
 ## Before presenting
 
