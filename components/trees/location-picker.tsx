@@ -1,7 +1,7 @@
 "use client";
 
-import { TILE_URL, TILE_ATTRIBUTION } from "@/lib/map-tiles";
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import { BaseTiles } from "@/components/map/base-tiles";
+import { MapContainer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { useEffect } from "react";
 
@@ -24,7 +24,7 @@ function Recenter({ lat, lng, zoom }: { lat: number; lng: number; zoom?: number 
 export default function LocationPicker({ lat, lng, zoom, onPick }: { lat: number; lng: number; zoom?: number; onPick: (lat: number, lng: number) => void }) {
   return (
     <MapContainer center={[lat, lng]} zoom={zoom ?? 9} scrollWheelZoom className="h-full w-full" zoomControl={false}>
-      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} maxZoom={19} />
+      <BaseTiles />
       <Events onPick={onPick} />
       <Recenter lat={lat} lng={lng} zoom={zoom} />
       <Marker position={[lat, lng]} icon={pin} draggable eventHandlers={{ dragend: (e) => { const p = (e.target as L.Marker).getLatLng(); onPick(p.lat, p.lng); } }} />

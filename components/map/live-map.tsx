@@ -1,7 +1,7 @@
 "use client";
 
-import { TILE_URL, TILE_ATTRIBUTION } from "@/lib/map-tiles";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { BaseTiles } from "@/components/map/base-tiles";
+import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import type { PublicAlert, ShelterView } from "@/lib/types";
@@ -72,7 +72,7 @@ export default function LiveMap({ alerts, onHelp, focusId, shelters = [] }: {
 
   return (
     <MapContainer center={[33.5, 2.5]} zoom={5.4} zoomSnap={0.2} minZoom={4.5} scrollWheelZoom className="h-full w-full rounded-3xl" zoomControl={false}>
-      <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} maxZoom={19} />
+      <BaseTiles />
       <FitOnChange points={focusPoints} />
       {shelters.filter((s) => s.lat != null && s.lng != null).map((sh) => (
         <Marker key={sh.id} position={[sh.lat!, sh.lng!]} icon={shelterIcon}>

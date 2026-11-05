@@ -1,7 +1,7 @@
 /* Athar service worker — offline shell for low-connectivity areas.
  * Rules: never cache API, auth or private pages; cache public HTML only when the server marked the
  * response as anonymous (x-athar-public: 1); static assets cache-first; map tiles in a bounded cache. */
-const VERSION = "athar-v1";
+const VERSION = "athar-v2"; // v2: old CARTO tiles ("API key required") are purged on activate
 const SHELL = ["/offline", "/icons/icon-192.png", "/manifest.webmanifest"];
 const PRIVATE = /^\/(api|auth|admin|ingest|profile|notifications|certificates|login)(\/|$)/;
 const TILE_LIMIT = 400;
@@ -25,12 +25,12 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
 
-  if (url.hostname.endsWith("basemaps.cartocdn.com")) {
+  if (url.hostname === "tile.openstreetmap.org" || url.hostname.endsWith("tile.openstreetmap.fr")) {
     event.respondWith(caches.open(`${VERSION}-tiles`).then(async (c) => {
       const hit = await c.match(req);
       if (hit) return hit;
       const res = await fetch(req);
-      if (res.ok || res.type === "opaque") { c.put(req, res.clone()); trim(`${VERSION}-tiles`, TILE_LIMIT); }
+      if (res.ok) { c.put(req, res.clone()); trim(`${VERSION}-tiles`, TILE_LIMIT); }
       return res;
     }));
     return;
