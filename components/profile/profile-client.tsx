@@ -268,6 +268,7 @@ function ProfileForm({ initial, onDone, canCancel }: { initial: ProfileView; onD
   const [skills, setSkills] = useState<string[]>(initial.skills);
   const [availability, setAvailability] = useState(initial.availability);
   const [remoteOk, setRemoteOk] = useState(initial.remoteOk);
+  const [hideLb, setHideLb] = useState(initial.hideFromLeaderboard);
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const input = "w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200";
@@ -275,7 +276,7 @@ function ProfileForm({ initial, onDone, canCancel }: { initial: ProfileView; onD
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     start(async () => {
-      const r = await saveProfile({ displayName: name, wilayaCode, skills, availability, remoteOk, phone: phone || undefined, bloodType, bloodConsent, smsOptIn });
+      const r = await saveProfile({ displayName: name, wilayaCode, skills, availability, remoteOk, hideFromLeaderboard: hideLb, phone: phone || undefined, bloodType, bloodConsent, smsOptIn });
       if (!r.ok) { setError(r.error); return; }
       router.refresh(); onDone();
     });
@@ -329,6 +330,10 @@ function ProfileForm({ initial, onDone, canCancel }: { initial: ProfileView; onD
               <button type="button" key={k} aria-pressed={availability === k} onClick={() => setAvailability(k)} className={cn("rounded-xl border py-2 text-sm font-bold", availability === k ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 text-slate-700")}>{l}</button>
             ))}
           </div></fieldset>
+        <label className="flex items-start gap-2 text-xs text-slate-700">
+          <input type="checkbox" checked={hideLb} onChange={(e) => setHideLb(e.target.checked)} className="mt-0.5" />
+          <span>لا تُظهر اسمي في لوحة الشرف العامة (يبقى ترتيبي ظاهراً لي وحدي).</span>
+        </label>
         <label className="flex items-start gap-2 text-xs text-slate-700">
           <input type="checkbox" checked={smsOptIn} onChange={(e) => setSmsOptIn(e.target.checked)} className="mt-0.5" />
           <span>أرغب في تلقي رسائل SMS عند إعلان حالة طوارئ في ولايتي (تتطلب رقم هاتف).</span>

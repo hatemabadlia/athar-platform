@@ -1151,14 +1151,14 @@ isOneToOne: true
                   Relationships: []
                 },"profiles": {
                   Row: {
-                    "availability": Database["public"]['Enums']["availability"],"baladiya_id": number | null,"created_at": string,"deleted_at": string | null,"display_name": string,"id": string,"locale": string,"onboarded": boolean,"skills": (string)[],"updated_at": string,"wilaya_code": number | null,"remote_ok": boolean
+                    "availability": Database["public"]['Enums']["availability"],"baladiya_id": number | null,"created_at": string,"deleted_at": string | null,"display_name": string,"id": string,"locale": string,"onboarded": boolean,"skills": (string)[],"updated_at": string,"wilaya_code": number | null,"remote_ok": boolean,"hide_from_leaderboard": boolean
                   }
                   ComputedFields: never
                   Insert: {
-                    "availability"?: Database["public"]['Enums']["availability"],"baladiya_id"?: number | null,"created_at"?: string,"deleted_at"?: string | null,"display_name"?: string,"id": string,"locale"?: string,"onboarded"?: boolean,"skills"?: (string)[],"updated_at"?: string,"wilaya_code"?: number | null,"remote_ok"?: boolean
+                    "availability"?: Database["public"]['Enums']["availability"],"baladiya_id"?: number | null,"created_at"?: string,"deleted_at"?: string | null,"display_name"?: string,"id": string,"locale"?: string,"onboarded"?: boolean,"skills"?: (string)[],"updated_at"?: string,"wilaya_code"?: number | null,"remote_ok"?: boolean,"hide_from_leaderboard"?: boolean
                   }
                   Update: {
-                    "availability"?: Database["public"]['Enums']["availability"],"baladiya_id"?: number | null,"created_at"?: string,"deleted_at"?: string | null,"display_name"?: string,"id"?: string,"locale"?: string,"onboarded"?: boolean,"skills"?: (string)[],"updated_at"?: string,"wilaya_code"?: number | null,"remote_ok"?: boolean
+                    "availability"?: Database["public"]['Enums']["availability"],"baladiya_id"?: number | null,"created_at"?: string,"deleted_at"?: string | null,"display_name"?: string,"id"?: string,"locale"?: string,"onboarded"?: boolean,"skills"?: (string)[],"updated_at"?: string,"wilaya_code"?: number | null,"remote_ok"?: boolean,"hide_from_leaderboard"?: boolean
                   }
                   Relationships: [
                     {
@@ -1731,6 +1731,15 @@ isOneToOne: false
                            },
 "verify_skill":
 { Args: { "p_target": string; "p_skill": string; "p_approve": boolean; "p_note"?: string }; Returns: undefined
+                           },
+"volunteer_leaderboard":
+{ Args: { "p_wilaya"?: number; "p_since"?: string; "p_limit"?: number }; Returns: { "rank": number; "display_name": string; "wilaya_code": number | null; "points": number; "hours": number; "actions": number; "is_me": boolean }[]
+                           },
+"my_leaderboard_rank":
+{ Args: { "p_wilaya"?: number; "p_since"?: string }; Returns: { "rank": number; "points": number; "hours": number; "ranked": number }[]
+                           },
+"club_leaderboard":
+{ Args: { "p_wilaya"?: number; "p_since"?: string; "p_limit"?: number }; Returns: { "rank": number; "club_id": string; "name": string; "wilaya_code": number; "institution_name": string | null; "members": number; "points": number; "hours": number; "checkins": number; "trees": number }[]
                            },
 "notify_compatible_donors":
 { Args: { "alert": string }; Returns: number

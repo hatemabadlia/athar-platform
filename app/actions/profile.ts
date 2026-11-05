@@ -19,6 +19,7 @@ const Profile = z.object({
   bloodConsent: z.boolean(),
   smsOptIn: z.boolean(),
   remoteOk: z.boolean().default(false),
+  hideFromLeaderboard: z.boolean().default(false),
 });
 
 export async function saveProfile(input: z.infer<typeof Profile>): Promise<ActionResult> {
@@ -35,7 +36,7 @@ export async function saveProfile(input: z.infer<typeof Profile>): Promise<Actio
   if (!user) return { ok: false, error: "يجب تسجيل الدخول" };
 
   const { error: e1 } = await supabase.from("profiles").update({
-    display_name: d.displayName, wilaya_code: d.wilayaCode, skills: d.skills, availability: d.availability, remote_ok: d.remoteOk, onboarded: true,
+    display_name: d.displayName, wilaya_code: d.wilayaCode, skills: d.skills, availability: d.availability, remote_ok: d.remoteOk, hide_from_leaderboard: d.hideFromLeaderboard, onboarded: true,
   }).eq("id", user.id);
   if (e1) return toActionError(e1);
   const { error: e2 } = await supabase.from("profile_private").update({

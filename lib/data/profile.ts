@@ -17,7 +17,7 @@ export async function getMyProfile(): Promise<ProfileView | null> {
   const points = (pts ?? {}) as { points?: number; hours?: number; events?: number; by_kind?: Record<string, number> };
   return {
     id: p.id, displayName: p.display_name, wilayaCode: p.wilaya_code, skills: p.skills, availability: p.availability,
-    remoteOk: p.remote_ok ?? false, verifiedSkills: (verified ?? []).map((v) => v.skill),
+    remoteOk: p.remote_ok ?? false, hideFromLeaderboard: p.hide_from_leaderboard ?? false, verifiedSkills: (verified ?? []).map((v) => v.skill),
     phone: priv?.phone ?? null, bloodType: priv?.blood_type ?? null, smsOptIn: priv?.sms_opt_in ?? false,
     points: Number(points.points ?? 0), hours: Number(points.hours ?? 0), events: Number(points.events ?? 0),
     byKind: points.by_kind ?? {}, roles: (roles ?? []).map((r) => r.role as AppRole),

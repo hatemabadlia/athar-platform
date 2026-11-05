@@ -12,6 +12,8 @@ insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000005c1', 'doc31@t.dz',    'authenticated', 'authenticated');
 insert into public.user_roles (user_id, role, wilaya_code) values
   ('00000000-0000-0000-0000-0000000005a1', 'moderator', 31), ('00000000-0000-0000-0000-0000000005a2', 'moderator', 16);
+-- isolate from any existing data (demo seed): only this test's fixtures have skills. Rolled back at the end.
+update public.profiles set skills = '{}' where id::text not like '00000000-0000-0000-0000-00000000050%' and id::text not like '00000000-0000-0000-0000-0000000005%';
 update public.profiles set wilaya_code = 31, skills = '{تصميم وإعلام}'                 where id = '00000000-0000-0000-0000-0000000005b1';
 update public.profiles set wilaya_code = 16, skills = '{تصميم وإعلام}', remote_ok = true where id = '00000000-0000-0000-0000-0000000005b2';
 update public.profiles set wilaya_code = 16, skills = '{تصميم وإعلام}'                 where id = '00000000-0000-0000-0000-0000000005b3';

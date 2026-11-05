@@ -90,6 +90,7 @@ export function ClubsClient({ clubs, activities, signedIn }: { clubs: ClubView[]
                 <li key={c.id} className="flex items-center justify-between text-sm"><span><b className="text-slate-400">{i + 1}.</b> {c.name} <span className="text-[10px] text-slate-500">({c.wilaya})</span></span><b className="tabular-nums">{c.points}</b></li>
               ))}</ol>
             )}
+            <Link href="/leaderboard?tab=clubs" className="mt-3 block text-center text-xs font-bold text-amber-700 underline">لوحة الشرف الكاملة ←</Link>
           </div>
         </aside>
       </div>

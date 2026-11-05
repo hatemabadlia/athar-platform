@@ -253,6 +253,13 @@ async function seedCommunity(ids: Record<string, string>) {
     for (const m of [c.lead, ...c.members]) {
       await db.from("attendance").insert({ activity_id: past.id, user_id: ids[m], checked_in_by: ids[c.lead], token_nonce: `demo-${randomUUID()}`, hours: 3, checked_in_at: ago(8) });
     }
+    if (c.key === "c16") {
+      // a second completed activity, so club and volunteer rankings are not all tied
+      const past2 = mustId(await db.from("club_activities").insert({ club_id: row.id, title: "توزيع قفف الشتاء", wilaya_code: c.wilaya_code,
+        starts_at: ago(15), ends_at: ago(15, -4), status: "done", created_by: ids[c.lead], location: c.institution_name }).select("id").single(), "activity 2");
+      for (const m of [c.lead, ...c.members])
+        await db.from("attendance").insert({ activity_id: past2.id, user_id: ids[m], checked_in_by: ids[c.lead], token_nonce: `demo-${randomUUID()}`, hours: 4, checked_in_at: ago(15) });
+    }
     await db.from("club_activities").insert({ club_id: row.id, title: "ورشة إسعافات أولية", wilaya_code: c.wilaya_code,
       starts_at: ahead(3), ends_at: ahead(3.1), status: "planned", created_by: ids[c.lead], location: c.institution_name });
   }
@@ -267,7 +274,8 @@ async function seedCommunity(ids: Record<string, string>) {
   ] as const;
   const treeIds: string[] = [];
   for (const [i, [who, w, place, species, lat, lng]] of trees.entries()) {
-    const t = mustId(await db.from("trees").insert({ user_id: ids[who], wilaya_code: w, place, species, lat, lng,
+    const club = clubs.find((c) => c.lead === who || c.members.includes(who));
+    const t = mustId(await db.from("trees").insert({ user_id: ids[who], wilaya_code: w, place, species, lat, lng, club_id: club ? clubIds[club.key] : null,
       note: "غرستها مع النادي — بيانات تجريبية", status: i < 10 ? "approved" : "pending",
       reviewed_by: i < 10 ? ids.ministry : null, reviewed_at: i < 10 ? ago(i % 6) : null, created_at: ago(i % 6 + 1) }).select("id").single(), "tree");
     treeIds.push(t.id);

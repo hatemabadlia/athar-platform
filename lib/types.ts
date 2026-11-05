@@ -101,6 +101,7 @@ export interface ProfileView {
   remoteOk: boolean;
   /** Regulated professional skills verified by a moderator. */
   verifiedSkills: string[];
+  hideFromLeaderboard: boolean;
   phone: string | null;
   bloodType: BloodType | null;
   smsOptIn: boolean;

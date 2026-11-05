@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Send, Droplets, CalendarHeart, Building2, Gift, BadgeCheck, TreePine, BarChart3, ShieldCheck, Sparkles, ArrowLeft } from "lucide-react";
+import { Send, Droplets, CalendarHeart, Building2, Gift, BadgeCheck, TreePine, BarChart3, ShieldCheck, Sparkles, ArrowLeft, Trophy } from "lucide-react";
 import { getViewer } from "@/lib/server/guards";
 import { getT } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
@@ -19,6 +19,7 @@ const COPY = {
       associations: ["الجمعيات المعتمدة", "جمعيات تحقّقت منها المنصة."],
       trees: ["غابة إيثار", "اغرس شجرة، صوّرها، ويتحقق منها مشرف."],
       impact: ["الأثر الوطني", "أرقام حقيقية من المنصة لكل ولاية."],
+      leaderboard: ["لوحة الشرف", "ترتيب المتطوعين والنوادي حسب الأعمال المؤكَّدة فقط."],
       admin: ["لوحة الإشراف", "مراجعة النداءات في ولايتك، الأدوار، الطوارئ."],
       ingest: ["محرك المعالجة", "طابور الاستقبال والمراحل السبع."],
     },
@@ -35,6 +36,7 @@ const COPY = {
       associations: ["Associations vérifiées", "Associations vérifiées par la plateforme."],
       trees: ["Forêt Athar", "Plantez un arbre, photographiez-le, un modérateur le vérifie."],
       impact: ["Impact national", "Chiffres réels de la plateforme, par wilaya."],
+      leaderboard: ["Tableau d'honneur", "Bénévoles et clubs classés sur des actions confirmées."],
       admin: ["Modération", "Appels de votre wilaya, rôles, urgences."],
       ingest: ["Traitement", "File d'entrée et les sept étapes."],
     },
@@ -50,6 +52,7 @@ const PUBLIC = [
   { key: "associations", href: "/associations", icon: BadgeCheck, tone: "bg-emerald-50 text-emerald-700" },
   { key: "trees", href: "/trees", icon: TreePine, tone: "bg-lime-50 text-lime-700" },
   { key: "impact", href: "/impact", icon: BarChart3, tone: "bg-violet-50 text-violet-700" },
+  { key: "leaderboard", href: "/leaderboard", icon: Trophy, tone: "bg-amber-50 text-amber-700" },
 ] as const;
 const STAFF = [
   { key: "admin", href: "/admin", icon: ShieldCheck, tone: "bg-emerald-50 text-emerald-800" },
