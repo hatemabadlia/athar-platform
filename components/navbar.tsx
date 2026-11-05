@@ -14,7 +14,7 @@ import { Sidebar } from "@/components/sidebar";
 type NavViewer = { email: string | null; isStaff: boolean; isMinistry: boolean } | null;
 
 /** Pages that belong to the "Act / تطوّع" hub. */
-const ACT_PATHS = ["/act", "/clubs", "/campaigns", "/donors", "/donations", "/associations", "/trees", "/submit", "/impact", "/leaderboard", "/services"];
+const ACT_PATHS = ["/act", "/clubs", "/campaigns", "/donors", "/donations", "/associations", "/trees", "/submit", "/impact", "/leaderboard", "/services", "/civic"];
 const MINE_PATHS = ["/profile", "/notifications", "/login", "/certificates"];
 
 /**

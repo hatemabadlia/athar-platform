@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Menu, X, Map, Globe2, ScanSearch, Send, Wrench, Droplets, CalendarHeart, Building2, Gift, TreePine, BadgeCheck,
-  Trophy, BarChart3, UserCircle2, Bell, ShieldCheck, Sparkles, LogIn, Lock,
+  Trophy, BarChart3, UserCircle2, Bell, ShieldCheck, Sparkles, LogIn, Lock, Camera, MapPinned, ListChecks,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,11 @@ export function Sidebar({ signedIn, isStaff, unread = 0 }: { signedIn: boolean; 
       { href: "/map", label: "خريطة إيثار", icon: Globe2, hint: "نداءات · أشجار · نوادي · إيواء" },
       { href: "/check", label: "هل هذا النداء حقيقي؟", icon: ScanSearch },
       { href: "/submit", label: "أرسل نداءً", icon: Send },
+    ] },
+    { title: "صوّر وبلّغ — مشاكل الحي", items: [
+      { href: "/civic/new", label: "بلّغ عن مشكل", icon: Camera, hint: "حفرة، إنارة، نفايات، تسرب مياه…" },
+      { href: "/civic/map", label: "خريطة البلاغات", icon: MapPinned },
+      ...(signedIn ? [{ href: "/civic/mine", label: "بلاغاتي", icon: ListChecks }] : []),
     ] },
     { title: "تطوّع", items: [
       { href: "/services", label: "تطوّع بمهارتك", icon: Wrench },

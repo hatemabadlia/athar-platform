@@ -15,6 +15,8 @@ import { SheltersPanel } from "@/components/admin/shelters-panel";
 import { TreeReview } from "@/components/admin/tree-review";
 import { ReportsPanel } from "@/components/admin/reports-panel";
 import { RolesPanel } from "@/components/admin/roles-panel";
+import { CivicPanel, type AdminCivic, type CivicStats } from "@/components/admin/civic-panel";
+import { signedCivicUrls } from "@/lib/data/civic";
 import { SkillVerifyPanel } from "@/components/admin/skill-verify-panel";
 import { ImportPanel } from "@/components/admin/import-panel";
 import { AuditPanel } from "@/components/admin/audit-panel";
@@ -27,11 +29,11 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "لوحة الإشراف" };
 
 const TABS = [
-  ["queue", "النداءات"], ["associations", "الجمعيات"], ["trees", "الأشجار"], ["reports", "التقارير"], ["crisis", "الطوارئ"], ["shelters", "مراكز الإيواء"],
+  ["queue", "النداءات"], ["civic", "صوّر وبلّغ"], ["associations", "الجمعيات"], ["trees", "الأشجار"], ["reports", "التقارير"], ["crisis", "الطوارئ"], ["shelters", "مراكز الإيواء"],
   ["forecast", "التوقعات"], ["roles", "الأدوار"], ["import", "استيراد"], ["audit", "السجل والذكاء الاصطناعي"],
 ] as const;
 
-export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; status?: string; q?: string; alert?: string }> }) {
+export default async function AdminPage({ searchParams }: { searchParams: Promise<{ tab?: string; status?: string; q?: string; alert?: string; cstatus?: string; ccat?: string; cw?: string }> }) {
   const viewer = await getViewer();
   if (!viewer?.isStaff) return <Forbidden signedIn={!!viewer} what="لوحة الإشراف" />;
   const sp = await searchParams;
@@ -53,6 +55,31 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     if (uids.length) { const { data } = await supabase.from("public_profiles").select("id, display_name").in("id", uids); (data ?? []).forEach((n) => names.set(n.id as string, n.display_name as string)); }
     body = <ModerationQueue alerts={alerts} status={status} q={sp.q ?? ""} openId={sp.alert ?? null}
       participants={(parts ?? []).map((p) => ({ alertId: p.alert_id, userId: p.user_id, status: p.status, hours: p.hours, name: names.get(p.user_id) ?? "" }))} />;
+  } else if (tab === "civic") {
+    // RLS limits rows to the wilayas this moderator covers (the ministry sees all).
+    let q = supabase.from("civic_reports").select("*").order("created_at", { ascending: false }).limit(200);
+    if (sp.cstatus) q = q.eq("status", sp.cstatus as never);
+    else q = q.in("status", ["submitted", "pending_review", "needs_info", "verified", "forwarded", "in_progress"]);
+    if (sp.ccat) q = q.eq("category", sp.ccat);
+    if (sp.cw && /^\d{1,2}$/.test(sp.cw)) q = q.eq("wilaya_code", Number(sp.cw));
+    const { data: rows } = await q;
+    const list = (rows ?? []).filter((r) => viewer.isMinistry || viewer.scope.includes(r.wilaya_code ?? -1));
+    const ids = list.map((r) => r.id);
+    const [{ data: evs }, { data: flags }, { data: sup }, { data: cstats }] = await Promise.all([
+      ids.length ? supabase.from("civic_report_events").select("id, report_id, kind, from_status, to_status, body, photo_path, actor_role, is_internal, created_at").in("report_id", ids).order("created_at") : Promise.resolve({ data: [] }),
+      ids.length ? supabase.from("civic_flags").select("report_id, reason, created_at").in("report_id", ids) : Promise.resolve({ data: [] }),
+      ids.length ? supabase.from("civic_public_reports").select("id, supporters, confirmations").in("id", ids) : Promise.resolve({ data: [] }),
+      supabase.rpc("civic_stats", { p_wilaya: viewer.isMinistry ? undefined : viewer.scope[0] }),
+    ]);
+    const paths = [...list.flatMap((r) => r.photo_paths), ...(evs ?? []).map((e) => e.photo_path).filter(Boolean) as string[]];
+    const urls = await signedCivicUrls(paths);
+    const supMap = new Map((sup ?? []).map((s) => [s.id, s]));
+    body = <CivicPanel stats={cstats as unknown as CivicStats} filters={{ status: sp.cstatus ?? "", cat: sp.ccat ?? "", w: sp.cw ?? "" }}
+      reports={list.map((r) => ({ id: r.id, ref: r.ref, category: r.category as AdminCivic["category"], description: r.description, notes: r.notes, severity: r.severity, status: r.status,
+        lat: r.lat, lng: r.lng, address: r.address, wilayaCode: r.wilaya_code, photoUrls: r.photo_paths.map((p) => urls[p]).filter(Boolean), photoPublic: r.photo_public,
+        ai: (r.ai ?? {}) as Record<string, unknown>, aiMode: r.ai_mode, signals: (r.signals ?? {}) as Record<string, unknown>, forwardedTo: r.forwarded_to, createdAt: r.created_at,
+        resolvedAt: r.resolved_at, supporters: Number(supMap.get(r.id)?.supporters ?? 0), confirmations: Number(supMap.get(r.id)?.confirmations ?? 0),
+        flags: (flags ?? []).filter((f) => f.report_id === r.id), events: (evs ?? []).filter((e) => e.report_id === r.id).map((e) => ({ ...e, photoUrl: e.photo_path ? urls[e.photo_path] ?? null : null })) }))} />;
   } else if (tab === "associations") {
     const { data } = await supabase.from("associations").select("id, name, approval_number, wilaya_code, description, status, created_at, document_paths").order("created_at", { ascending: false }).limit(100);
     const paths = (data ?? []).flatMap((a) => a.document_paths);
@@ -104,7 +131,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-5">
-      <RealtimeRefresh tables={["alerts", "intake_items"]} channel="admin" />
+      <RealtimeRefresh tables={["alerts", "intake_items", "civic_reports"]} channel="admin" />
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1 text-xs font-bold text-white"><ShieldCheck className="h-3.5 w-3.5" aria-hidden /> النطاق: {scopeLabel}</div>

@@ -12,31 +12,9 @@ import { supabaseBrowser } from "@/lib/supabase/client";
 import { addTree } from "@/app/actions/trees";
 import { cn } from "@/lib/utils";
 
+import { readExif, resizeImage, type Exif } from "@/lib/image";
+
 const LocationPicker = dynamic(() => import("./location-picker"), { ssr: false, loading: () => <div className="h-full w-full skeleton" /> });
-
-type Exif = { lat: number | null; lng: number | null; takenAt: string | null };
-
-async function readExif(file: File): Promise<Exif> {
-  try {
-    const exifr = (await import("exifr")).default;
-    const d = await exifr.parse(file, { gps: true, pick: ["DateTimeOriginal", "latitude", "longitude"] });
-    const dt = d?.DateTimeOriginal instanceof Date ? d.DateTimeOriginal.toISOString() : null;
-    return { lat: typeof d?.latitude === "number" ? d.latitude : null, lng: typeof d?.longitude === "number" ? d.longitude : null, takenAt: dt };
-  } catch { return { lat: null, lng: null, takenAt: null }; }
-}
-
-/** Re-encode to JPEG ≤ 1280px. Canvas re-encoding drops all EXIF metadata from the uploaded copy. */
-async function resizeImage(file: File, max = 1280): Promise<Blob> {
-  const url = URL.createObjectURL(file);
-  const img = new Image();
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
-  const scale = Math.min(1, max / Math.max(img.width, img.height));
-  const c = document.createElement("canvas");
-  c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
-  c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
-  URL.revokeObjectURL(url);
-  return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("encode"))), "image/jpeg", 0.8));
-}
 
 export function AddTreeModal({ open, onClose, defaultWilaya }: { open: boolean; onClose: () => void; defaultWilaya: number }) {
   const router = useRouter();

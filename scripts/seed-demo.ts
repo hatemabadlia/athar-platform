@@ -54,6 +54,7 @@ async function reset() {
   }
   // Content that would otherwise survive user deletion (owner set null) is removed explicitly.
   if (ids.length) {
+    await db.from("civic_reports").delete().in("reporter_id", ids);
     await db.from("crises").delete().in("started_by", ids);
     await db.from("campaigns").delete().in("created_by", ids);
     await db.from("club_activities").delete().in("created_by", ids);

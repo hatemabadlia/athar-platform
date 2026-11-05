@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Wrench, Globe2, Clock, CheckCircle2 } from "lucide-react";
+import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Wrench, Globe2, Camera, Clock, CheckCircle2 } from "lucide-react";
 import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types";
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
@@ -98,6 +98,14 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
           ))}
         </ol>
       </section>
+
+      <Link href="/civic" className="group flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-orange-200 bg-gradient-to-l from-orange-50 to-white p-4 sm:p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-600 text-white"><Camera className="h-5 w-5" aria-hidden /></span>
+          <div><div className="font-black text-slate-900">جديد: صوّر وبلّغ</div><div className="text-sm text-slate-600">شفت مشكل في حيّك؟ حفرة، إنارة، نفايات… صوّرو، بلّغ عليه، وتابع إصلاحه.</div></div>
+        </div>
+        <span className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-black text-white group-hover:bg-orange-700">بلّغ الآن</span>
+      </Link>
 
       <div id="alerts" className="scroll-mt-24 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="toolbar" aria-label={t.portal.filterLabel}>
         {FILTERS.map(({ key, icon: Icon }) => {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Send, Droplets, CalendarHeart, Building2, Gift, BadgeCheck, TreePine, BarChart3, ShieldCheck, Sparkles, ArrowLeft, Trophy, Wrench } from "lucide-react";
+import { Send, Droplets, CalendarHeart, Building2, Gift, BadgeCheck, TreePine, BarChart3, ShieldCheck, Sparkles, ArrowLeft, Trophy, Wrench, Camera } from "lucide-react";
 import { getViewer } from "@/lib/server/guards";
 import { getT } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ const COPY = {
     staff: "للمشرفين",
     items: {
       submit: ["أرسل نداءً", "تعرف حاجة حقيقية؟ أرسلها ليتحقق منها مشرف ولايتها."],
+      civic: ["صوّر وبلّغ", "شفت مشكل في حيّك؟ حفرة، إنارة، نفايات… صوّرو وبلّغ عليه في أقل من دقيقة."],
       services: ["تطوّع بمهارتك", "ماشي كل مساعدة مادية: تصميم، ترجمة، توصيل، دروس، استشارة مهنية — في ولايتك أو عن بُعد."],
       donors: ["شبكة المتبرعين بالدم", "سجّل فصيلتك: نُعلمك عندما يحتاج مريض قريب فصيلة متوافقة."],
       campaigns: ["الحملات الموسمية", "قفة رمضان، الدخول المدرسي، الشتاء — بدون تكرار المستفيدين."],
@@ -30,6 +31,7 @@ const COPY = {
     staff: "Modération",
     items: {
       submit: ["Signaler un besoin", "Vous connaissez un vrai besoin ? Envoyez-le au modérateur de la wilaya."],
+      civic: ["Signaler un problème", "Nid-de-poule, éclairage, déchets… photographiez et signalez en moins d'une minute."],
       services: ["Bénévolat de compétences", "Toute aide n'est pas matérielle : design, traduction, transport, cours, conseil — sur place ou à distance."],
       donors: ["Réseau de donneurs de sang", "Indiquez votre groupe : nous vous prévenons quand un patient compatible proche en a besoin."],
       campaigns: ["Campagnes", "Ramadan, rentrée, hiver — sans doublons de bénéficiaires."],
@@ -48,6 +50,7 @@ const COPY = {
 const PUBLIC = [
   { key: "submit", href: "/submit", icon: Send, tone: "bg-slate-900 text-white", big: true },
   { key: "services", href: "/services", icon: Wrench, tone: "bg-teal-600 text-white", big: true },
+  { key: "civic", href: "/civic", icon: Camera, tone: "bg-orange-600 text-white", big: true },
   { key: "donors", href: "/donors", icon: Droplets, tone: "bg-rose-50 text-rose-700" },
   { key: "campaigns", href: "/campaigns", icon: CalendarHeart, tone: "bg-indigo-50 text-indigo-700" },
   { key: "clubs", href: "/clubs", icon: Building2, tone: "bg-amber-50 text-amber-700" },

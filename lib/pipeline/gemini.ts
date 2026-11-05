@@ -17,13 +17,13 @@ type GeminiResponse = {
 };
 
 /** One structured-output call. Returns parsed JSON text plus token usage. Throws with the HTTP status on failure. */
-export async function geminiJson(opts: { system: string; user: string; schema: object; model?: string; timeoutMs?: number }) {
+export async function geminiJson(opts: { system: string; user: string; schema: object; model?: string; timeoutMs?: number; images?: { mime: string; data: string }[]; maxModels?: number; attempts?: number }) {
   const env = serverEnv();
   if (!env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not set");
-  const models = [opts.model ?? env.ATHAR_GEMINI_MODEL, ...FALLBACK_MODELS].filter((m, i, a) => a.indexOf(m) === i);
+  const models = [opts.model ?? env.ATHAR_GEMINI_MODEL, ...FALLBACK_MODELS].filter((m, i, a) => a.indexOf(m) === i).slice(0, opts.maxModels ?? 99);
   const errors: string[] = [];
   for (const model of models) {
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < (opts.attempts ?? 3); attempt++) {
       let res: Response;
       try {
         res = await fetch(`${BASE}/${model}:generateContent`, {
@@ -31,7 +31,7 @@ export async function geminiJson(opts: { system: string; user: string; schema: o
         headers: { "content-type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: opts.system }] },
-          contents: [{ role: "user", parts: [{ text: opts.user }] }],
+          contents: [{ role: "user", parts: [...(opts.images ?? []).map((i) => ({ inline_data: { mime_type: i.mime, data: i.data } })), { text: opts.user }] }],
           generationConfig: { responseMimeType: "application/json", responseJsonSchema: opts.schema, temperature: 0.2 },
         }),
         signal: AbortSignal.timeout(opts.timeoutMs ?? 20_000),

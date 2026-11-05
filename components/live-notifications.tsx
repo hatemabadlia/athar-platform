@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Droplets, Bell, X, Wrench } from "lucide-react";
+import { Droplets, Bell, X, Wrench, Camera } from "lucide-react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -41,15 +41,16 @@ export function LiveNotifications({ userId }: { userId: string }) {
       {notes.map((n) => {
         const blood = n.kind === "blood_request";
         const skill = n.kind === "skill_request";
-        const Icon = blood ? Droplets : skill ? Wrench : Bell;
+        const civic = n.kind === "civic_update";
+        const Icon = blood ? Droplets : skill ? Wrench : civic ? Camera : Bell;
         return (
-          <div key={n.id} role="alert" className={cn("animate-fade-up rounded-2xl border p-4 shadow-2xl", blood ? "border-rose-300 bg-rose-600 text-white" : skill ? "border-teal-300 bg-teal-600 text-white" : "border-slate-200 bg-white text-slate-900")}>
+          <div key={n.id} role="alert" className={cn("animate-fade-up rounded-2xl border p-4 shadow-2xl", blood ? "border-rose-300 bg-rose-600 text-white" : skill ? "border-teal-300 bg-teal-600 text-white" : civic ? "border-orange-300 bg-orange-600 text-white" : "border-slate-200 bg-white text-slate-900")}>
             <div className="flex items-start gap-3">
-              <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", blood || skill ? "bg-white/20" : "bg-emerald-50 text-emerald-700")}><Icon className="h-5 w-5" aria-hidden /></span>
+              <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", blood || skill || civic ? "bg-white/20" : "bg-emerald-50 text-emerald-700")}><Icon className="h-5 w-5" aria-hidden /></span>
               <div className="min-w-0 flex-1">
                 <div className="font-black">{n.title}</div>
-                {n.body && <p className={cn("mt-0.5 text-sm", blood || skill ? "text-white/90" : "text-slate-600")}>{n.body}</p>}
-                {n.link?.startsWith("/") && <Link href={n.link} onClick={() => setNotes((p) => p.filter((x) => x.id !== n.id))} className={cn("mt-2 inline-block rounded-xl px-3 py-1.5 text-xs font-black", blood ? "bg-white text-rose-700" : skill ? "bg-white text-teal-700" : "bg-slate-900 text-white")}>فتح النداء</Link>}
+                {n.body && <p className={cn("mt-0.5 text-sm", blood || skill || civic ? "text-white/90" : "text-slate-600")}>{n.body}</p>}
+                {n.link?.startsWith("/") && <Link href={n.link} onClick={() => setNotes((p) => p.filter((x) => x.id !== n.id))} className={cn("mt-2 inline-block rounded-xl px-3 py-1.5 text-xs font-black", blood ? "bg-white text-rose-700" : skill ? "bg-white text-teal-700" : civic ? "bg-white text-orange-700" : "bg-slate-900 text-white")}>{civic ? "فتح البلاغ" : "فتح النداء"}</Link>}
               </div>
               <button onClick={() => setNotes((p) => p.filter((x) => x.id !== n.id))} aria-label="إغلاق" className="opacity-70 hover:opacity-100"><X className="h-4 w-4" /></button>
             </div>

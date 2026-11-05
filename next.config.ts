@@ -15,7 +15,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: https://tile.openstreetmap.org https://*.tile.openstreetmap.fr ${supabaseUrl}`,
   "font-src 'self' data:",
-  `connect-src 'self' ${supabaseUrl} ${supabaseWs} https://tile.openstreetmap.org https://*.tile.openstreetmap.fr https://challenges.cloudflare.com`,
+  `connect-src 'self' ${supabaseUrl} ${supabaseWs} https://tile.openstreetmap.org https://*.tile.openstreetmap.fr https://nominatim.openstreetmap.org https://challenges.cloudflare.com`,
   "frame-src https://challenges.cloudflare.com",
   "worker-src 'self' blob:",
   "media-src 'self' blob:",

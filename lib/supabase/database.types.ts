@@ -23,6 +23,67 @@ export type Database = {
           }
         },"public": {
           Tables: {
+            "civic_categories": {
+                  Row: {
+                    "key": string,"label_ar": string,"label_fr": string,"emoji": string,"color": string,"sort_order": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "key": string,"label_ar": string,"label_fr": string,"emoji": string,"color": string,"sort_order": number
+                  }
+                  Update: {
+                    "key"?: string,"label_ar"?: string,"label_fr"?: string,"emoji"?: string,"color"?: string,"sort_order"?: number
+                  }
+                  Relationships: []
+                },"civic_reports": {
+                  Row: {
+                    "id": string,"ref": string,"reporter_id": string | null,"category": string,"description": string,"notes": string | null,"severity": Database["public"]["Enums"]["civic_severity"],"status": Database["public"]["Enums"]["civic_status"],"lat": number,"lng": number,"accuracy_m": number | null,"location_source": string,"address": string | null,"wilaya_code": number | null,"photo_paths": string[],"photo_hashes": number[],"photo_public": boolean,"ai": Json,"ai_mode": string,"signals": Json,"duplicate_of": string | null,"forwarded_to": string | null,"forwarded_at": string | null,"verified_at": string | null,"resolved_at": string | null,"closed_at": string | null,"created_at": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: string,"ref"?: string,"reporter_id"?: string | null,"category"?: string,"description"?: string,"notes"?: string | null,"severity"?: Database["public"]["Enums"]["civic_severity"],"status"?: Database["public"]["Enums"]["civic_status"],"lat"?: number,"lng"?: number,"accuracy_m"?: number | null,"location_source"?: string,"address"?: string | null,"wilaya_code"?: number | null,"photo_paths"?: string[],"photo_hashes"?: number[],"photo_public"?: boolean,"ai"?: Json,"ai_mode"?: string,"signals"?: Json,"duplicate_of"?: string | null,"forwarded_to"?: string | null,"forwarded_at"?: string | null,"verified_at"?: string | null,"resolved_at"?: string | null,"closed_at"?: string | null,"created_at"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "id"?: string,"ref"?: string,"reporter_id"?: string | null,"category"?: string,"description"?: string,"notes"?: string | null,"severity"?: Database["public"]["Enums"]["civic_severity"],"status"?: Database["public"]["Enums"]["civic_status"],"lat"?: number,"lng"?: number,"accuracy_m"?: number | null,"location_source"?: string,"address"?: string | null,"wilaya_code"?: number | null,"photo_paths"?: string[],"photo_hashes"?: number[],"photo_public"?: boolean,"ai"?: Json,"ai_mode"?: string,"signals"?: Json,"duplicate_of"?: string | null,"forwarded_to"?: string | null,"forwarded_at"?: string | null,"verified_at"?: string | null,"resolved_at"?: string | null,"closed_at"?: string | null,"created_at"?: string,"updated_at"?: string
+                  }
+                  Relationships: []
+                },"civic_report_events": {
+                  Row: {
+                    "id": number,"report_id": string,"kind": string,"from_status": Database["public"]["Enums"]["civic_status"] | null,"to_status": Database["public"]["Enums"]["civic_status"] | null,"body": string | null,"photo_path": string | null,"actor_id": string | null,"actor_role": string,"is_internal": boolean,"created_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: number,"report_id"?: string,"kind"?: string,"from_status"?: Database["public"]["Enums"]["civic_status"] | null,"to_status"?: Database["public"]["Enums"]["civic_status"] | null,"body"?: string | null,"photo_path"?: string | null,"actor_id"?: string | null,"actor_role"?: string,"is_internal"?: boolean,"created_at"?: string
+                  }
+                  Update: {
+                    "id"?: number,"report_id"?: string,"kind"?: string,"from_status"?: Database["public"]["Enums"]["civic_status"] | null,"to_status"?: Database["public"]["Enums"]["civic_status"] | null,"body"?: string | null,"photo_path"?: string | null,"actor_id"?: string | null,"actor_role"?: string,"is_internal"?: boolean,"created_at"?: string
+                  }
+                  Relationships: []
+                },"civic_supports": {
+                  Row: {
+                    "report_id": string,"user_id": string,"kind": string,"created_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "report_id": string,"user_id": string,"kind": string,"created_at"?: string
+                  }
+                  Update: {
+                    "report_id"?: string,"user_id"?: string,"kind"?: string,"created_at"?: string
+                  }
+                  Relationships: []
+                },"civic_flags": {
+                  Row: {
+                    "id": number,"report_id": string,"user_id": string,"reason": string,"created_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "report_id": string,"user_id": string,"reason": string
+                  }
+                  Update: {
+                    "reason"?: string
+                  }
+                  Relationships: []
+                },
             "ai_runs": {
                   Row: {
                     "cost_usd": number | null,"created_at": string,"error": string | null,"id": number,"input_hash": string,"input_tokens": number | null,"intake_item_id": string | null,"latency_ms": number | null,"mode": string,"model": string | null,"output": Json | null,"output_tokens": number | null,"stage": string,"success": boolean
@@ -1546,6 +1607,19 @@ isOneToOne: false
                 }
           }
           Views: {
+            "civic_public_reports": {
+                  Row: {
+                    "id": string,"ref": string,"category": string,"description": string,"severity": Database["public"]["Enums"]["civic_severity"],"status": Database["public"]["Enums"]["civic_status"],"lat": number,"lng": number,"address": string | null,"wilaya_code": number | null,"photo_paths": string[],"photo_public": boolean,"forwarded_to": string | null,"forwarded_at": string | null,"verified_at": string | null,"resolved_at": string | null,"closed_at": string | null,"created_at": string,"duplicate_of": string | null,"supporters": number,"confirmations": number
+                  }
+                  ComputedFields: never
+                  Relationships: []
+                },"civic_public_events": {
+                  Row: {
+                    "id": number,"report_id": string,"kind": string,"to_status": Database["public"]["Enums"]["civic_status"] | null,"body": string | null,"photo_path": string | null,"actor_role": string,"created_at": string
+                  }
+                  ComputedFields: never
+                  Relationships: []
+                },
             "alert_participation": {
                   Row: {
                     "alert_id": string,"confirmed": number | null,"joined": number | null
@@ -1744,6 +1818,39 @@ isOneToOne: false
 "skill_supply_demand":
 { Args: { "p_wilaya"?: number }; Returns: { "skill": string; "regulated": boolean; "remote": boolean; "volunteers": number; "open_requests": number }[]
                            },
+"civic_create":
+{ Args: { "p_category": string; "p_description": string; "p_notes": string | null; "p_severity": Database["public"]["Enums"]["civic_severity"]; "p_lat": number; "p_lng": number; "p_accuracy": number | null; "p_source": string; "p_address": string | null; "p_photo_paths": string[]; "p_photo_hashes": number[]; "p_ai": Json; "p_ai_mode": string; "p_signals": Json }; Returns: { "id": string; "ref": string }[]
+                           },
+"civic_nearby":
+{ Args: { "p_lat": number; "p_lng": number; "p_category": string; "p_hashes"?: number[]; "p_radius_m"?: number }; Returns: { "id": string; "ref": string; "category": string; "status": Database["public"]["Enums"]["civic_status"]; "description": string | null; "distance_m": number; "same_category": boolean; "image_match": boolean; "supporters": number; "created_at": string; "is_public": boolean; "mine": boolean }[]
+                           },
+"civic_support":
+{ Args: { "p_report": string; "p_kind": string }; Returns: number
+                           },
+"civic_comment":
+{ Args: { "p_report": string; "p_body": string }; Returns: undefined
+                           },
+"civic_flag":
+{ Args: { "p_report": string; "p_reason": string }; Returns: undefined
+                           },
+"civic_reply_info":
+{ Args: { "p_report": string; "p_body": string }; Returns: undefined
+                           },
+"civic_set_status":
+{ Args: { "p_report": string; "p_status": Database["public"]["Enums"]["civic_status"]; "p_note"?: string; "p_forwarded_to"?: string; "p_duplicate_of"?: string }; Returns: undefined
+                           },
+"civic_internal_note":
+{ Args: { "p_report": string; "p_body": string }; Returns: undefined
+                           },
+"civic_add_resolution":
+{ Args: { "p_report": string; "p_body": string; "p_photo_path"?: string }; Returns: undefined
+                           },
+"civic_set_photo_public":
+{ Args: { "p_report": string; "p_public": boolean }; Returns: undefined
+                           },
+"civic_stats":
+{ Args: { "p_wilaya"?: number }; Returns: Json
+                           },
 "notify_compatible_donors":
 { Args: { "alert": string }; Returns: number
                            },
@@ -1791,7 +1898,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "ai_verdict": "fresh"|"recycled"|"duplicate"|"low-confidence","alert_category": "blood"|"relief"|"cleanup"|"orphans"|"medical"|"education"|"skills","alert_status": "pending"|"approved"|"rejected"|"resolved"|"recycled"|"merged"|"expired","app_role": "volunteer"|"club_lead"|"association"|"moderator"|"djsl_admin"|"ministry_admin","availability": "weekends"|"evenings"|"anytime","blood_type": "O-"|"O+"|"A-"|"A+"|"B-"|"B+"|"AB-"|"AB+","crisis_type": "flood"|"earthquake"|"fire"|"cold"|"other","institution_kind": "youth_house"|"youth_center"|"hospital"|"blood_center"|"school"|"civil_protection"|"other","intake_channel": "web_form"|"telegram"|"whatsapp"|"rss"|"moderator_paste"|"api","intake_status": "queued"|"processing"|"processed"|"failed"|"rejected"|"spam","review_status": "pending"|"approved"|"rejected","urgency": "critical"|"medium"|"normal","volunteer_status": "joined"|"confirmed"|"no_show"|"cancelled"
+            "ai_verdict": "fresh"|"recycled"|"duplicate"|"low-confidence","civic_status": "submitted"|"pending_review"|"needs_info"|"verified"|"forwarded"|"in_progress"|"resolved"|"closed"|"rejected"|"duplicate","civic_severity": "low"|"medium"|"high"|"danger","alert_category": "blood"|"relief"|"cleanup"|"orphans"|"medical"|"education"|"skills","alert_status": "pending"|"approved"|"rejected"|"resolved"|"recycled"|"merged"|"expired","app_role": "volunteer"|"club_lead"|"association"|"moderator"|"djsl_admin"|"ministry_admin","availability": "weekends"|"evenings"|"anytime","blood_type": "O-"|"O+"|"A-"|"A+"|"B-"|"B+"|"AB-"|"AB+","crisis_type": "flood"|"earthquake"|"fire"|"cold"|"other","institution_kind": "youth_house"|"youth_center"|"hospital"|"blood_center"|"school"|"civil_protection"|"other","intake_channel": "web_form"|"telegram"|"whatsapp"|"rss"|"moderator_paste"|"api","intake_status": "queued"|"processing"|"processed"|"failed"|"rejected"|"spam","review_status": "pending"|"approved"|"rejected","urgency": "critical"|"medium"|"normal","volunteer_status": "joined"|"confirmed"|"no_show"|"cancelled"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1911,7 +2018,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "ai_verdict": ["fresh", "recycled", "duplicate", "low-confidence"],"alert_category": ["blood", "relief", "cleanup", "orphans", "medical", "education", "skills"],"alert_status": ["pending", "approved", "rejected", "resolved", "recycled", "merged", "expired"],"app_role": ["volunteer", "club_lead", "association", "moderator", "djsl_admin", "ministry_admin"],"availability": ["weekends", "evenings", "anytime"],"blood_type": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"],"crisis_type": ["flood", "earthquake", "fire", "cold", "other"],"institution_kind": ["youth_house", "youth_center", "hospital", "blood_center", "school", "civil_protection", "other"],"intake_channel": ["web_form", "telegram", "whatsapp", "rss", "moderator_paste", "api"],"intake_status": ["queued", "processing", "processed", "failed", "rejected", "spam"],"review_status": ["pending", "approved", "rejected"],"urgency": ["critical", "medium", "normal"],"volunteer_status": ["joined", "confirmed", "no_show", "cancelled"]
+            "ai_verdict": ["fresh", "recycled", "duplicate", "low-confidence"],"civic_status": ["submitted", "pending_review", "needs_info", "verified", "forwarded", "in_progress", "resolved", "closed", "rejected", "duplicate"],"civic_severity": ["low", "medium", "high", "danger"],"alert_category": ["blood", "relief", "cleanup", "orphans", "medical", "education", "skills"],"alert_status": ["pending", "approved", "rejected", "resolved", "recycled", "merged", "expired"],"app_role": ["volunteer", "club_lead", "association", "moderator", "djsl_admin", "ministry_admin"],"availability": ["weekends", "evenings", "anytime"],"blood_type": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"],"crisis_type": ["flood", "earthquake", "fire", "cold", "other"],"institution_kind": ["youth_house", "youth_center", "hospital", "blood_center", "school", "civil_protection", "other"],"intake_channel": ["web_form", "telegram", "whatsapp", "rss", "moderator_paste", "api"],"intake_status": ["queued", "processing", "processed", "failed", "rejected", "spam"],"review_status": ["pending", "approved", "rejected"],"urgency": ["critical", "medium", "normal"],"volunteer_status": ["joined", "confirmed", "no_show", "cancelled"]
           }
         }
 } as const

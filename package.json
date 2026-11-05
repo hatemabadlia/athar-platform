@@ -16,7 +16,8 @@
     "seed:demo": "tsx --conditions=react-server --env-file=.env.local scripts/seed-demo.ts",
     "eval:ai": "tsx --conditions=react-server --env-file=.env.local scripts/eval-ai.ts",
     "ai:smoke": "tsx --conditions=react-server --env-file=.env.local scripts/ai-smoke.ts",
-    "demo:check": "tsx --env-file=.env.local scripts/demo-journeys.ts"
+    "demo:check": "tsx --env-file=.env.local scripts/demo-journeys.ts",
+    "civic:check": "tsx --env-file=.env.local scripts/civic-journey.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
