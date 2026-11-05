@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Wrench, Clock, CheckCircle2 } from "lucide-react";
+import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Wrench, Globe2, Clock, CheckCircle2 } from "lucide-react";
 import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types";
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
@@ -113,6 +113,9 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
         <div className="relative h-[420px] lg:h-[640px] rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100">
           <LiveMap alerts={visible} onHelp={setHelpTarget} focusId={focusId} shelters={shelters} />
+          <Link href="/map" className="absolute top-4 end-4 z-[500] flex items-center gap-1.5 rounded-2xl bg-white/95 px-3 py-2 text-xs font-bold text-slate-800 shadow backdrop-blur hover:bg-white">
+            <Globe2 className="h-4 w-4 text-emerald-700" aria-hidden /> خريطة إيثار الكاملة
+          </Link>
           <div className="absolute bottom-4 end-4 z-[500] flex gap-3 rounded-2xl bg-white/90 px-4 py-2 text-xs font-semibold shadow backdrop-blur">
             <Legend color="#dc2626" label={t.urgency.critical} /><Legend color="#ea580c" label={t.urgency.medium} /><Legend color="#16a34a" label={t.urgency.normal} />
             {shelters.length > 0 && <span className="flex items-center gap-1.5 text-red-700">🏛️ {t.portal.shelter}</span>}

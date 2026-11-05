@@ -9,6 +9,7 @@ import { setLocale } from "@/app/actions/locale";
 import { useEffect, useState } from "react";
 import { useLocale, useT } from "@/lib/i18n/client";
 import { Logo } from "@/components/logo";
+import { Sidebar } from "@/components/sidebar";
 
 type NavViewer = { email: string | null; isStaff: boolean; isMinistry: boolean } | null;
 
@@ -32,7 +33,7 @@ export function Navbar({ viewer, unread = 0 }: { viewer: NavViewer; unread?: num
   const t = useT();
   const locale = useLocale();
   const sections = [
-    { href: "/", label: t.nav.alerts, icon: Map, active: pathname === "/" || pathname.startsWith("/crisis") },
+    { href: "/", label: t.nav.alerts, icon: Map, active: pathname === "/" || pathname.startsWith("/crisis") || pathname.startsWith("/map") },
     { href: "/check", label: t.nav.check, icon: ScanSearch, active: pathname.startsWith("/check") },
     { href: "/act", label: t.nav.act, icon: HandHeart, active: ACT_PATHS.some((p) => pathname.startsWith(p)) },
     { href: viewer ? "/profile" : `/login?next=${encodeURIComponent(pathname)}`, label: t.nav.mine, icon: UserCircle2, active: MINE_PATHS.some((p) => pathname.startsWith(p)) },
@@ -43,7 +44,10 @@ export function Navbar({ viewer, unread = 0 }: { viewer: NavViewer; unread?: num
     <>
       <header className="sticky top-0 z-[900] border-b border-slate-200/70 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-          <Link href="/" aria-label={t.brand.home} className="shrink-0"><Logo tagline={t.brand.tagline} /></Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Sidebar signedIn={!!viewer} isStaff={!!viewer?.isStaff} unread={count} />
+            <Link href="/" aria-label={t.brand.home}><Logo tagline={t.brand.tagline} /></Link>
+          </div>
 
           <nav aria-label={t.nav.main} className="hidden md:flex items-center gap-1 rounded-2xl bg-slate-100/80 p-1">
             {sections.map(({ href, label, icon: Icon, active }) => (
