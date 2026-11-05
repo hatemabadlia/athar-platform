@@ -68,9 +68,6 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
 
       <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-xl">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.35),transparent_55%),radial-gradient(ellipse_at_bottom_left,rgba(6,95,70,0.5),transparent_60%)]" aria-hidden />
-        <svg className="absolute -left-24 -bottom-24 h-96 w-96 text-emerald-400/10" viewBox="0 0 48 48" aria-hidden>
-          <rect x="8.5" y="8.5" width="31" height="31" rx="5" fill="currentColor" /><rect x="8.5" y="8.5" width="31" height="31" rx="5" fill="currentColor" transform="rotate(45 24 24)" />
-        </svg>
         <div className="relative grid gap-8 p-6 sm:p-10 lg:grid-cols-[1.4fr_1fr] lg:items-center">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-white/15">
@@ -174,7 +171,7 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
                     <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {t.portal.attended(r.attended)}</span>
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {t.portal.hours(r.hours)}</span>
                     {r.organization && <span>{r.organization}</span>}
-                    <span>{timeAgoIn(t.time, r.createdAt)}</span>
+                    <span suppressHydrationWarning>{timeAgoIn(t.time, r.createdAt)}</span>
                   </div>
                 </div>
               );

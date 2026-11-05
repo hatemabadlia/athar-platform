@@ -16,15 +16,23 @@ export function LiveNotifications({ userId }: { userId: string }) {
   const [notes, setNotes] = useState<Note[]>([]);
   useEffect(() => {
     const supabase = supabaseBrowser();
-    const ch = supabase.channel(`notes-${userId}`)
+    let ch: ReturnType<typeof supabase.channel> | null = null;
+    let cancelled = false;
+    (async () => {
+      // Realtime must carry the user's JWT, otherwise RLS ("own notifications") filters every event out.
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (data.session) await supabase.realtime.setAuth(data.session.access_token);
+      ch = supabase.channel(`notes-${userId}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, (p) => {
         const n = p.new as Note;
         setNotes((prev) => [n, ...prev].slice(0, 3));
         window.dispatchEvent(new CustomEvent("athar:unread", { detail: 1 }));
         try { navigator.vibrate?.([200, 100, 200]); } catch { /* not supported */ }
       })
-      .subscribe();
-    return () => { supabase.removeChannel(ch); };
+      .subscribe((status) => { document.documentElement.dataset.liveNotes = status; });
+    })();
+    return () => { cancelled = true; if (ch) supabase.removeChannel(ch); };
   }, [userId]);
 
   if (!notes.length) return null;

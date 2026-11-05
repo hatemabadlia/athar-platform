@@ -61,7 +61,7 @@ export function AlertCard({
           </h3>
           <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-slate-500">
             <span className="flex items-center gap-1"><MapPin className="h-3 w-3" aria-hidden /> {alert.wilaya}{alert.baladiya ? ` · ${alert.baladiya}` : ""}</span>
-            <span className="flex items-center gap-1"><Clock className="h-3 w-3" aria-hidden /> {timeAgoIn(t.time, alert.createdAt)}</span>
+            <span className="flex items-center gap-1" suppressHydrationWarning><Clock className="h-3 w-3" aria-hidden /> {timeAgoIn(t.time, alert.createdAt)}</span>
             <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {t.card.volunteers(alert.volunteersJoined, needed)}</span>
             {alert.institution && <span className="flex items-center gap-1 text-indigo-600"><Building2 className="h-3 w-3" aria-hidden /> {alert.institution}</span>}
           </div>

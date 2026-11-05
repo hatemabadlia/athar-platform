@@ -42,10 +42,6 @@ function ok(r: { error: { message: string } | null }, what: string) {
   if (r.error) throw new Error(`${what}: ${r.error.message}`);
 }
 
-function must<T>(r: { data: T | null; error: { message: string } | null }, what: string): NonNullable<T> {
-  if (r.error || r.data === null) throw new Error(`${what}: ${r.error?.message ?? "no data"}`);
-  return r.data as NonNullable<T>;
-}
 
 // ---------------------------------------------------------------- reset
 async function reset() {
