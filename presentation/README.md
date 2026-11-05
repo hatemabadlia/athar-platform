@@ -2,7 +2,7 @@
 
 | File | What it is |
 |---|---|
-| `ATHAR_HACKATHON_AR.pptx` | The editable deck: 14 slides, 16:9 (13.33″ × 7.5″), Arabic RTL, Tajawal font, speaker notes on every slide |
+| `ATHAR_HACKATHON_AR.pptx` | The editable deck: 14 slides, 16:9 (13.33″ × 7.5″), Arabic RTL, Tajawal font, speaker notes on every slide, **native PowerPoint transitions and build animations** |
 | `ATHAR_SPEAKER_SCRIPT_AR.md` | Per-slide script: what the audience sees, exact words, transition, timing, emphasis and a backup answer. About 8:45 in total |
 | `ATHAR_JURY_QA_AR.md` | 20 likely jury questions plus "trap" questions, answered from the real implementation status |
 | `preview/` | `ATHAR_HACKATHON_AR.pdf` (LibreOffice render) and `slide-01.jpg` … `slide-14.jpg` |
@@ -14,6 +14,31 @@
 1. **Install Tajawal** on the presenting machine from `ASSETS/fonts/Tajawal-Regular.ttf` and `Tajawal-Bold.ttf`. These are merged Arabic and Latin subsets of Google's Tajawal, under the SIL Open Font License 1.1. Without the font, PowerPoint substitutes another one and line breaks may shift. The PDF in `preview/` has the font embedded and is a safe fallback.
 2. **Check the QR code.** It encodes `https://github.com/hatemabadlia/athar-platform`, captioned "مستودع المشروع". Whether that repository is public has **not been verified**. If it is private, or if you have a live demo URL, replace `REPO_URL` in `build/build-deck.js` and rebuild.
 3. **Contact details are intentionally absent.** None were verified, so none were invented. Add them on slide 14 if you want them.
+
+## Animations
+
+Every slide has a fade transition. Slides 1 and 14 fade through black. On top of that, 392 native entrance animations build each slide in reading order, right to left. Most of them play **automatically**. The presenter clicks only at 10 "reveal" moments, and each one is marked **[🖱️ نقرة]** in the speaker script.
+
+| Slide | Plays automatically | On click |
+|---|---|---|
+| 1 Hook | Question fades in slowly, then the "يحتاج / مستعدّ" labels | Logo and "إيثار" line |
+| 2 Problem | Picture, then the 6 problems rise one by one | — |
+| 3 Story | Label, then card → broken link → card → broken link → card | Punchline "حلقة الوصل" |
+| 4 Solution | Athar hub zooms in, links appear, 6 actors pop in one by one | Tagline |
+| 5 How it works | 5 steps rise right to left, each arrow wipes in before the next step; step 3 (human review) zooms | "القرار الحسّاس…" callout |
+| 6 AI | Darija message → arrow → structured card → fields → capability chips | Real screenshots |
+| 7 Platform | 3 screenshots one by one, then the QR card | — |
+| 8 Difference | "Today" column, row by row | The whole "مع إيثار" column, row by row |
+| 9 Modules | 8 tiles pop in sequence, then the footnote | — |
+| 10 Impact | Map, then citizen → municipality → wilaya → national | Empty "—" metrics |
+| 11 Tech | Architecture layers and the Claude/pgvector box | ① 69 / 42 / 7 ② privacy list |
+| 12 Roadmap | Timeline line wipes right to left, then phases 1 to 5 | — |
+| 13 Ask | 6 asks pop in | — |
+| 14 Close | Closing sentence fades slowly, then logo, then QR | Final purple sentence |
+
+How it works: pptxgenjs cannot write animations. `build-deck.js` tags shapes with `anim(step, effect, trigger, ms)`, which stores the tag in the shape name. `build/animate.js` then rewrites each slide's XML with a `<p:transition>` and a `<p:timing>` tree. The effects use PowerPoint's own presets: Fade, Float-in ("rise"), Zoom, and Wipe from the right. They stay editable in PowerPoint's Animation Pane. To change an animation, edit the `anim(...)` calls and rebuild. To remove all animations, delete the `require("./animate.js")` line.
+
+Checked: the file passes the validator, and the LibreOffice import shows 14 transitions, 392 entrance effects and exactly 10 click triggers. **Playback in Microsoft PowerPoint itself was not tested in this environment.** Rehearse once in PowerPoint before presenting. Keynote and Google Slides import the transitions but may simplify some effects.
 
 ## Honesty rules applied
 
@@ -67,7 +92,7 @@ cd presentation/build && npm install
    cd presentation/build && node assets.js
    ```
 
-3. **Deck:**
+3. **Deck** (this also runs `animate.js`):
 
    ```bash
    cd presentation/build && node build-deck.js
