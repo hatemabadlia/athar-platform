@@ -3,6 +3,7 @@ import { Send, Droplets, CalendarHeart, Building2, Gift, BadgeCheck, TreePine, B
 import { getViewer } from "@/lib/server/guards";
 import { getT } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
+import { Masthead } from "@/components/ui/masthead";
 
 export const dynamic = "force-dynamic";
 
@@ -73,33 +74,55 @@ export async function generateMetadata() {
 export default async function ActPage() {
   const [{ locale }, viewer] = await Promise.all([getT(), getViewer()]);
   const c = COPY[locale];
+  const featured = PUBLIC.filter((i) => "big" in i && i.big);
+  const rest = PUBLIC.filter((i) => !("big" in i && i.big));
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 space-y-8">
-      <header>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">{c.title}</h1>
-        <p className="mt-2 max-w-2xl text-slate-600">{c.lead}</p>
-      </header>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {PUBLIC.map(({ key, ...i }) => <Card key={key} {...i} text={c.items[key]} />)}
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 space-y-10">
+      <Masthead eyebrow={locale === "fr" ? "Agir" : "تطوّع"} title={c.title} lede={c.lead} />
+
+      {/* three ways in, set like a magazine contents spread */}
+      <div className="grid gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 md:grid-cols-3">
+        {featured.map(({ key, href, icon: Icon }, i) => (
+          <Link key={key} href={href} className="group flex flex-col bg-white p-6 transition-colors hover:bg-paper">
+            <div className="flex items-center justify-between">
+              <span className={cn("font-display text-sm tabular-nums", key === "civic" ? "text-clay-600" : "text-brand-700")}>0{i + 1}</span>
+              <Icon className="h-5 w-5 text-slate-400 transition-colors group-hover:text-ink" aria-hidden />
+            </div>
+            <h2 className="mt-6 font-display text-2xl text-ink">{c.items[key][0]}</h2>
+            <p className="mt-2 flex-1 text-sm leading-7 text-slate-600">{c.items[key][1]}</p>
+            <span className="mt-5 text-sm font-semibold text-ink"><span className="link">{locale === "fr" ? "Commencer" : "ابدأ"}</span> ←</span>
+          </Link>
+        ))}
       </div>
+
+      <section>
+        <p className="eyebrow">{locale === "fr" ? "Autres façons d'agir" : "طرق أخرى للمساهمة"}</p>
+        <ol className="mt-2 grid md:grid-cols-2 md:gap-x-10">
+          {rest.map(({ key, href, icon: Icon }, i) => (
+            <li key={key} className="border-b border-slate-200">
+              <Link href={href} className="group flex items-start gap-4 py-5">
+                <span className="w-6 shrink-0 pt-0.5 font-display text-sm tabular-nums text-slate-400">{String(i + 4).padStart(2, "0")}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-2 text-base font-semibold text-ink"><Icon className="h-4 w-4 text-slate-400 transition-colors group-hover:text-brand-700" aria-hidden />{c.items[key][0]}</span>
+                  <span className="mt-1 block text-sm leading-6 text-slate-600">{c.items[key][1]}</span>
+                </span>
+                <ArrowLeft className="mt-1 h-4 w-4 shrink-0 text-slate-300 transition-transform group-hover:-translate-x-1 group-hover:text-ink rtl:rotate-0 ltr:rotate-180" aria-hidden />
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       {viewer?.isStaff && (
         <section>
-          <h2 className="mb-3 text-sm font-black text-slate-500">{c.staff}</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{STAFF.map(({ key, ...i }) => <Card key={key} {...i} text={c.items[key]} />)}</div>
+          <p className="eyebrow">{c.staff}</p>
+          <ul className="mt-2 grid md:grid-cols-2 md:gap-x-10">
+            {STAFF.map(({ key, href, icon: Icon }) => (
+              <li key={key} className="border-b border-slate-200"><Link href={href} className="flex items-center gap-3 py-4 text-sm"><Icon className="h-4 w-4 text-brand-700" aria-hidden /><b className="font-semibold text-ink">{c.items[key][0]}</b><span className="text-slate-500">{c.items[key][1]}</span></Link></li>
+            ))}
+          </ul>
         </section>
       )}
     </div>
-  );
-}
-
-function Card({ href, icon: Icon, tone, text, big }: { href: string; icon: React.ElementType; tone: string; text: readonly [string, string]; big?: boolean }) {
-  return (
-    <Link href={href} className={cn("group relative flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md", big && "sm:col-span-2 lg:col-span-2 border-slate-900")}>
-      <div className={cn("flex h-11 w-11 items-center justify-center rounded-2xl", tone)}><Icon className="h-5 w-5" aria-hidden /></div>
-      <div className="mt-4">
-        <div className="flex items-center justify-between gap-2 font-black text-slate-900">{text[0]}<ArrowLeft className="h-4 w-4 text-slate-300 transition group-hover:text-slate-900 rtl:rotate-0 ltr:rotate-180" aria-hidden /></div>
-        <p className="mt-1 text-sm text-slate-600">{text[1]}</p>
-      </div>
-    </Link>
   );
 }

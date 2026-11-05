@@ -13,11 +13,11 @@ import { VoiceInput } from "@/components/voice-input";
 import { cn } from "@/lib/utils";
 
 const STATUS: Record<VerifyStatus, { icon: React.ElementType; label: string; tone: string; ring: string; chip: string }> = {
-  active: { icon: ShieldCheck, label: "موثّق ونشط", tone: "from-emerald-600 to-emerald-800", ring: "ring-emerald-200", chip: "bg-emerald-100 text-emerald-800" },
-  resolved: { icon: CheckCircle2, label: "سبق حلّه", tone: "from-sky-600 to-sky-800", ring: "ring-sky-200", chip: "bg-sky-100 text-sky-800" },
-  recycled: { icon: History, label: "قديم أو مكرر", tone: "from-amber-500 to-amber-700", ring: "ring-amber-200", chip: "bg-amber-100 text-amber-900" },
-  suspicious: { icon: AlertTriangle, label: "يستدعي الحذر", tone: "from-rose-600 to-rose-800", ring: "ring-rose-200", chip: "bg-rose-100 text-rose-800" },
-  insufficient: { icon: HelpCircle, label: "أدلة غير كافية", tone: "from-slate-600 to-slate-800", ring: "ring-slate-200", chip: "bg-slate-100 text-slate-700" },
+  active: { icon: ShieldCheck, label: "موثّق ونشط", tone: "#146846", ring: "ring-emerald-200", chip: "bg-emerald-100 text-emerald-800" },
+  resolved: { icon: CheckCircle2, label: "سبق حلّه", tone: "#0369a1", ring: "ring-sky-200", chip: "bg-sky-100 text-sky-800" },
+  recycled: { icon: History, label: "قديم أو مكرر", tone: "#b45309", ring: "ring-amber-200", chip: "bg-amber-100 text-amber-900" },
+  suspicious: { icon: AlertTriangle, label: "يستدعي الحذر", tone: "#B6532C", ring: "ring-rose-200", chip: "bg-rose-100 text-rose-800" },
+  insufficient: { icon: HelpCircle, label: "أدلة غير كافية", tone: "#3E433D", ring: "ring-slate-200", chip: "bg-slate-100 text-slate-700" },
 };
 
 const RECO: Record<Recommendation, { icon: React.ElementType; label: string; cls: string }> = {
@@ -102,9 +102,8 @@ function Result({ r, text, onReset, onReview }: { r: CheckOutcome; text: string;
 
   return (
     <div className="space-y-4 animate-fade-up" aria-live="polite">
-      <section className={cn("relative overflow-hidden rounded-3xl bg-gradient-to-l p-6 sm:p-8 text-white shadow-xl ring-8", s.tone, s.ring)}>
-        <div className="absolute -left-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" aria-hidden />
-        <div className="relative flex items-start gap-4">
+      <section className="relative overflow-hidden rounded-2xl pattern-zellige p-6 text-white sm:p-8" style={{ backgroundColor: s.tone }}>
+                <div className="relative flex items-start gap-4">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur"><Icon className="h-9 w-9" aria-hidden /></div>
           <div className="min-w-0">
             <div className="text-xs font-bold uppercase tracking-wide text-white/75">النتيجة · {s.label}</div>

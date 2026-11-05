@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Tajawal } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Reem_Kufi } from "next/font/google";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
@@ -18,12 +18,8 @@ import { getT } from "@/lib/i18n/server";
 import { dirOf } from "@/lib/i18n/dict";
 import { I18nProvider } from "@/lib/i18n/client";
 
-const tajawal = Tajawal({
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700", "800", "900"],
-  variable: "--font-tajawal",
-  display: "swap",
-});
+const plex = IBM_Plex_Sans_Arabic({ subsets: ["arabic", "latin"], weight: ["400", "500", "600", "700"], variable: "--font-plex", display: "swap" });
+const kufi = Reem_Kufi({ subsets: ["arabic", "latin"], weight: ["500", "600", "700"], variable: "--font-kufi", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t, locale } = await getT();
@@ -44,7 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     ? (await (await supabaseServer()).from("notifications").select("id", { count: "exact", head: true }).is("read_at", null)).count ?? 0
     : 0;
   return (
-    <html lang={locale} dir={dirOf(locale)} className={tajawal.variable}>
+    <html lang={locale} dir={dirOf(locale)} className={`${plex.variable} ${kufi.variable}`}>
       <body className="font-sans min-h-screen flex flex-col">
         <I18nProvider locale={locale}>
         <IntroSplash />
@@ -54,14 +50,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <CrisisBanner crises={crises} />
         <OfflineSync />
         <main id="main" className="flex-1"><LocaleScope>{children}</LocaleScope></main>
-        <footer className="border-t border-slate-200 bg-white">
-          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 pb-24 sm:pb-5 text-xs text-slate-500">
-            <span>{t.footer.disclaimer}</span>
-            <nav className="flex gap-4">
-              <Link href="/privacy" className="hover:text-slate-900">{t.footer.privacy}</Link>
-              <Link href="/impact" className="hover:text-slate-900">{t.footer.impact}</Link>
-              <Link href="/submit" className="hover:text-slate-900">{t.footer.submit}</Link>
-            </nav>
+        <footer className="mt-16 bg-ink text-paper pattern-zellige">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-28 pt-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:pb-12">
+            <div>
+              <div className="font-display text-3xl">إيثار</div>
+              <p className="mt-3 max-w-sm text-sm leading-7 text-paper/70">منصة جزائرية تربط من يحتاج بمن يستطيع — بعد التحقق. الذكاء الاصطناعي يقترح، ومشرف الولاية يقرّر، والأثر يُحتسب فقط حين يُؤكَّد.</p>
+            </div>
+            {([
+              ["المنصة", [["/", "النداءات الموثّقة"], ["/check", "هل هذا النداء حقيقي؟"], ["/map", "خريطة إيثار"], ["/submit", t.footer.submit]]],
+              ["شارك", [["/services", "تطوّع بمهارتك"], ["/donors", "شبكة المتبرعين بالدم"], ["/clubs", "نوادي دور الشباب"], ["/civic", "صوّر وبلّغ"]]],
+              ["الثقة", [["/impact", t.footer.impact], ["/leaderboard", "لوحة الشرف"], ["/privacy", t.footer.privacy], ["/associations", "الجمعيات المعتمدة"]]],
+            ] as const).map(([title, links]) => (
+              <nav key={title} aria-label={title}>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-paper/45">{title}</div>
+                <ul className="mt-4 space-y-2.5 text-sm">{links.map(([href, label]) => <li key={href}><Link href={href} className="text-paper/80 transition-colors hover:text-paper">{label}</Link></li>)}</ul>
+              </nav>
+            ))}
+          </div>
+          <div className="border-t border-white/10">
+            <p className="mx-auto max-w-7xl px-4 py-5 text-[11px] leading-5 text-paper/50 sm:px-6 pb-24 md:pb-5">{t.footer.disclaimer} إيثار ليست جهة رسمية ولا خدمة طوارئ — للطوارئ: الحماية المدنية 14 · الشرطة 17.</p>
           </div>
         </footer>
         <Chatbot signedIn={!!viewer} />

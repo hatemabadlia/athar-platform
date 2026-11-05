@@ -6,6 +6,7 @@ import { getT } from "@/lib/i18n/server";
 import { findWilaya } from "@/lib/wilayas";
 import { cn } from "@/lib/utils";
 import { WilayaFilter } from "./wilaya-filter";
+import { Masthead } from "@/components/ui/masthead";
 
 export const dynamic = "force-dynamic";
 
@@ -78,11 +79,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8 space-y-6">
-      <header className="text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400 text-slate-900 shadow-lg shadow-amber-400/30"><Trophy className="h-7 w-7" aria-hidden /></div>
-        <h1 className="mt-4 text-3xl sm:text-4xl font-black tracking-tight text-slate-900">{c.title}</h1>
-        <p className="mx-auto mt-2 max-w-2xl text-sm sm:text-base text-slate-600">{c.lead}</p>
-      </header>
+      <Masthead eyebrow={tab === "clubs" ? c.clubs : c.volunteers} title={c.title} lede={c.lead} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav className="flex gap-1 rounded-2xl bg-slate-100 p-1" aria-label={c.title}>

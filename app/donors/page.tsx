@@ -20,7 +20,7 @@ export default async function DonorsPage() {
   const bt = profile?.bloodType as BloodType | null;
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 space-y-5">
-      <section className="rounded-3xl bg-gradient-to-l from-rose-600 to-rose-900 p-6 text-white">
+      <section className="rounded-3xl bg-ink pattern-zellige p-6 text-white">
         <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-black"><Droplets className="h-7 w-7" aria-hidden /> شبكة المتبرعين بالدم</h1>
         <p className="mt-2 text-sm text-white/85 max-w-2xl">سجّل كمتبرع ليُخطرك المشرفون عند نداء دم متوافق مع فصيلتك في ولايتك. هويتك ورقمك لا يظهران لأحد. الأهلية الطبية يقررها مركز حقن الدم وحده.</p>
       </section>

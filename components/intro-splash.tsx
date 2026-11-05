@@ -30,12 +30,12 @@ export function IntroSplash() {
   const skip = () => { setState("leaving"); setTimeout(() => setState("hidden"), 500); };
   return (
     <div role="dialog" aria-label="إيثار" aria-live="polite" onClick={skip}
-      className="fixed inset-0 z-[3000] flex flex-col items-center justify-center bg-[radial-gradient(ellipse_at_center,#064e3b_0%,#020617_70%)] text-white"
+      className="fixed inset-0 z-[3000] flex flex-col items-center justify-center bg-ink pattern-zellige text-white"
       style={{ opacity: state === "leaving" ? 0 : 1, transform: state === "leaving" ? "scale(1.04)" : "none", transition: "opacity .55s ease, transform .55s ease" }}>
       <SealCanvas mode="intro" className="h-[46vh] w-full max-w-[560px]" />
       <div className="intro-title mt-2 text-center">
-        <div className="text-5xl sm:text-6xl font-black tracking-tight">إيثار</div>
-        <div className="mt-2 text-base sm:text-lg font-bold text-emerald-300">تحقّق قبل أن تشارك</div>
+        <div className="font-display text-5xl sm:text-6xl">إيثار</div>
+        <div className="mt-2 text-base sm:text-lg font-bold text-brand-200">تحقّق قبل أن تشارك</div>
       </div>
       <button onClick={(e) => { e.stopPropagation(); skip(); }} className="absolute bottom-8 rounded-full border border-white/20 px-4 py-1.5 text-xs font-bold text-white/70 hover:text-white">تخطّي</button>
     </div>

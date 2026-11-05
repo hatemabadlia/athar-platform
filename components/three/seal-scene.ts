@@ -11,9 +11,9 @@ import * as THREE from "three";
 export type SealMode = "intro" | "hero";
 export interface SealScene { dispose: () => void }
 
-const EMERALD = new THREE.Color("#059669");
-const MINT = new THREE.Color("#34d399");
-const RED = new THREE.Color("#f43f5e");
+const EMERALD = new THREE.Color("#1B7A53");
+const MINT = new THREE.Color("#9FD3B5");
+const RED = new THREE.Color("#D9744A");
 
 function roundedSquare(size: number, r: number) {
   const s = size / 2, sh = new THREE.Shape();
@@ -37,7 +37,7 @@ export function createSealScene(canvas: HTMLCanvasElement, mode: SealMode, opts:
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.55));
   const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(3, 4, 6); scene.add(key);
-  const rim = new THREE.PointLight(0x34d399, 30, 20); rim.position.set(-4, -2, 3); scene.add(rim);
+  const rim = new THREE.PointLight(0x9fd3b5, 24, 20); rim.position.set(-4, -2, 3); scene.add(rim);
 
   // --- the seal
   const seal = new THREE.Group(); scene.add(seal);
@@ -49,7 +49,7 @@ export function createSealScene(canvas: HTMLCanvasElement, mode: SealMode, opts:
 
   const checkPath = new THREE.CatmullRomCurve3([new THREE.Vector3(-0.62, 0.02, 0), new THREE.Vector3(-0.18, -0.42, 0), new THREE.Vector3(0.66, 0.5, 0)], false, "catmullrom", 0.05);
   const checkGeo = new THREE.TubeGeometry(checkPath, 64, 0.11, 12, false);
-  const checkMat = new THREE.MeshStandardMaterial({ color: 0xecfdf5, emissive: 0xd1fae5, emissiveIntensity: 0.35, roughness: 0.3 });
+  const checkMat = new THREE.MeshStandardMaterial({ color: 0xf6f3ec, emissive: 0xeee6d6, emissiveIntensity: 0.35, roughness: 0.3 });
   const check = new THREE.Mesh(checkGeo, checkMat); check.position.z = 0.34; seal.add(check);
   const checkTotal = checkGeo.index ? checkGeo.index.count : 0;
 

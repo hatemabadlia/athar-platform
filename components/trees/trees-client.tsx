@@ -43,7 +43,7 @@ export function TreesClient({ trees, viewerId, defaultWilaya }: { trees: TreeVie
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-6">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-l from-emerald-700 via-green-800 to-slate-900 p-6 sm:p-8 text-white">
+      <section className="relative overflow-hidden rounded-3xl bg-ink pattern-zellige p-6 sm:p-8 text-white">
         <div className="absolute -left-10 -top-10 text-[180px] opacity-10 select-none" aria-hidden>🌳</div>
         <div className="relative grid lg:grid-cols-[1fr_auto] gap-6 items-center">
           <div>

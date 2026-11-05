@@ -30,7 +30,7 @@ export function DonationsClient({ items, matches, viewerId, defaultWilaya }: { i
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-5">
-      <section className="rounded-3xl bg-gradient-to-l from-amber-600 to-orange-800 p-6 text-white flex flex-wrap items-center justify-between gap-3">
+      <section className="rounded-3xl bg-ink pattern-zellige p-6 text-white flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black">تبرعات عينية — عروض ⇄ احتياجات</h1>
           <p className="mt-1 text-sm text-white/85">ملابس، غذاء، أدوات مدرسية، نقل، استشارة مجانية… يقترح إيثار المطابقة حسب الفئة والولاية والكمية، ويكشف رقم الطرف الآخر بعد القبول فقط.</p>

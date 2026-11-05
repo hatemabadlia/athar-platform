@@ -33,28 +33,28 @@ export function AlertCard({
     <div
       onClick={onSelect}
       className={cn(
-        "group cursor-pointer rounded-2xl border bg-white p-4 transition-all hover:shadow-md",
-        active ? "border-brand-500 ring-2 ring-brand-200" : "border-slate-200"
+        "group relative cursor-pointer overflow-hidden rounded-xl border bg-white p-4 ps-5 transition-colors",
+        active ? "border-ink" : "border-slate-200 hover:border-slate-400"
       )}
     >
+      {/* urgency as a quiet edge rule rather than a glowing dot */}
+      <span className="absolute inset-y-0 start-0 w-1" style={{ background: urg.hex }} aria-hidden />
       <div className="flex items-start gap-3">
-        <div className="mt-1 h-3 w-3 shrink-0 rounded-full ring-4" style={{ background: urg.hex, ["--tw-ring-color" as string]: `${urg.hex}33` }} />
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-1.5 mb-1">
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${cat.bg} ${cat.color}`}>
-              {cat.emoji} {t.category[alert.category]}
-            </span>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${urg.bg} ${urg.color}`}>{t.urgency[alert.urgency]}</span>
-            <span className="flex items-center gap-0.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700" title={t.card.reviewedTitle}>
-              <ShieldCheck className="h-3 w-3" aria-hidden /> {t.card.reviewed}
+          <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px]">
+            <span className="font-medium text-slate-600">{cat.emoji} {t.category[alert.category]}</span>
+            <span className="text-slate-300" aria-hidden>·</span>
+            <span className="font-semibold" style={{ color: urg.hex }}>{t.urgency[alert.urgency]}</span>
+            <span className="ms-auto flex items-center gap-1 font-medium text-brand-700" title={t.card.reviewedTitle}>
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> {t.card.reviewed}
             </span>
             {suggested && (
-              <span className="flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
-                <Sparkles className="h-3 w-3" /> {t.card.suggested}
+              <span className="flex items-center gap-1 rounded bg-amber-50 px-1.5 py-0.5 font-semibold text-amber-800">
+                <Sparkles className="h-3 w-3" aria-hidden /> {t.card.suggested}
               </span>
             )}
           </div>
-          <h3 className="font-bold text-slate-900 leading-snug">
+          <h3 className="text-[15px] font-semibold leading-6 text-ink">
             <button type="button" aria-pressed={active} onClick={(e) => { e.stopPropagation(); onSelect(); }} className="text-start hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 rounded">
               {alert.title}<span className="sr-only"> — {t.card.showOnMap}</span>
             </button>
@@ -73,7 +73,7 @@ export function AlertCard({
             </div>
           )}
           {needed > 0 && (
-            <div className="mt-2 h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
+            <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-slate-100">
               <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: urg.hex }} />
             </div>
           )}
@@ -83,13 +83,13 @@ export function AlertCard({
       <button
         onClick={(e) => { e.stopPropagation(); onHelp(); }}
         disabled={remaining === 0 && !alert.joinedByMe}
-        className="flex-1 rounded-xl border border-brand-600 py-1.5 text-xs font-bold text-brand-700 transition-colors hover:bg-brand-600 hover:text-white disabled:border-slate-200 disabled:text-slate-400 disabled:hover:bg-transparent"
+        className="flex-1 rounded-lg bg-ink py-2 text-xs font-semibold text-paper transition-colors hover:bg-brand-800 disabled:bg-slate-100 disabled:text-slate-400"
       >
         {alert.joinedByMe ? t.card.joined : remaining === 0 ? t.card.full : t.card.help(remaining)}
       </button>
       {onShare && (
         <button onClick={(e) => { e.stopPropagation(); onShare(); }} aria-label="مشاركة النداء" title="مشاركة النداء"
-          className="rounded-xl border border-slate-200 px-3 text-slate-600 transition-colors hover:border-brand-600 hover:text-brand-700">
+          className="rounded-lg border border-slate-200 px-3 text-slate-500 transition-colors hover:border-slate-400 hover:text-ink">
           <Share2 className="h-4 w-4" aria-hidden />
         </button>
       )}

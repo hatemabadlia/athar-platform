@@ -32,7 +32,7 @@ export function ClubsClient({ clubs, activities, signedIn }: { clubs: ClubView[]
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-6">
-      <section className="rounded-3xl bg-gradient-to-l from-indigo-700 to-slate-900 p-6 text-white">
+      <section className="rounded-3xl bg-ink pattern-zellige p-6 text-white">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black">نوادي التطوع</h1>

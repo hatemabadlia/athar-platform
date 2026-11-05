@@ -29,7 +29,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
   const pct = Math.min(100, Math.round((Number(p.units ?? 0) / c.goal_units) * 100));
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 space-y-5">
-      <section className="rounded-3xl bg-gradient-to-l from-indigo-700 to-slate-900 p-6 text-white">
+      <section className="rounded-3xl bg-ink pattern-zellige p-6 text-white">
         <div className="text-xs font-bold opacity-80">{KIND_AR[c.kind]} · {c.wilaya_code ? findWilaya(c.wilaya_code)?.nameAr : "وطنية"} · {formatDate(c.starts_on)} → {formatDate(c.ends_on)}</div>
         <h1 className="text-2xl sm:text-3xl font-black">{c.title}</h1>
         {c.description && <p className="mt-1 text-sm text-white/85">{c.description}</p>}

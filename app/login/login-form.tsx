@@ -43,8 +43,9 @@ export function LoginForm() {
 
   const input = "w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200";
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h1 className="text-2xl font-black text-slate-900">{t.login.title}</h1>
+    <div className="self-center rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+      <p className="eyebrow">إيثار</p>
+      <h1 className="mt-3 font-display text-3xl text-ink">{t.login.title}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.login.intro}</p>
       {stage === "email" ? (
         <form onSubmit={sendCode} className="mt-5 space-y-3">

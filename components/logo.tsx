@@ -13,14 +13,14 @@ export function LogoMark({ className, mono }: { className?: string; mono?: boole
       {!mono && (
         <defs>
           <linearGradient id={id} gradientUnits="userSpaceOnUse" x1="8" y1="8" x2="40" y2="40">
-            <stop offset="0" stopColor="#10b981" />
-            <stop offset="1" stopColor="#065f46" />
+            <stop offset="0" stopColor="#2A8A62" />
+            <stop offset="1" stopColor="#0C432E" />
           </linearGradient>
         </defs>
       )}
       <rect x="8.5" y="8.5" width="31" height="31" rx="5" fill={fill} />
       <rect x="8.5" y="8.5" width="31" height="31" rx="5" fill={fill} transform="rotate(45 24 24)" />
-      <path d="M16.5 24.5l5 5L31.5 19" fill="none" stroke={mono ? "white" : "#ecfdf5"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16.5 24.5l5 5L31.5 19" fill="none" stroke={mono ? "white" : "#F6F3EC"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -30,8 +30,8 @@ export function Logo({ tagline, className }: { tagline?: string; className?: str
     <span className={cn("flex items-center gap-2.5", className)}>
       <LogoMark />
       <span className="leading-none">
-        <span className="block text-[22px] font-black tracking-tight text-slate-900">إيثار</span>
-        {tagline && <span className="mt-1 block text-[10px] font-bold text-emerald-700">{tagline}</span>}
+        <span className="block font-display text-[24px] font-semibold leading-none text-ink">إيثار</span>
+        {tagline && <span className="mt-1 block text-[10px] font-medium text-slate-500">{tagline}</span>}
       </span>
     </span>
   );

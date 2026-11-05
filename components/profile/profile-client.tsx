@@ -36,7 +36,7 @@ export function ProfileClient(props: {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-6">
-      <section className="rounded-3xl bg-gradient-to-l from-brand-700 to-slate-900 p-6 text-white">
+      <section className="rounded-3xl bg-ink pattern-zellige p-6 text-white">
         <div className="flex flex-col md:flex-row md:items-center gap-5">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-white/15 text-3xl font-black" aria-hidden>{profile.displayName.trim().charAt(0)}</div>
           <div className="flex-1 min-w-0">

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Wrench, Wifi, Sparkles, UserCog, BadgeCheck, Send } from "lucide-react";
+import { Wifi, Sparkles, UserCog, BadgeCheck, Send } from "lucide-react";
 import type { PublicAlert } from "@/lib/types";
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
@@ -10,6 +10,7 @@ import { ShareCard } from "@/components/public/share-card";
 import { SKILLS, SKILL_META } from "@/lib/reference/meta";
 import { usableSkills } from "@/lib/matching";
 import { cn } from "@/lib/utils";
+import { Masthead } from "@/components/ui/masthead";
 
 type Me = { wilayaCode: number | null; skills: string[]; verifiedSkills: string[]; remoteOk: boolean } | null;
 type Supply = { skill: string; regulated: boolean; remote: boolean; volunteers: number; requests: number };
@@ -46,12 +47,9 @@ export function ServicesClient({ alerts, signedIn, me, supply }: { alerts: Publi
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 space-y-6">
-      <header className="relative overflow-hidden rounded-[2rem] bg-gradient-to-l from-teal-700 to-slate-900 p-6 sm:p-10 text-white">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold ring-1 ring-white/15"><Wrench className="h-3.5 w-3.5" aria-hidden /> تطوّع بمهارتك</div>
-        <h1 className="mt-3 text-3xl sm:text-4xl font-black leading-tight">ماشي كل مساعدة مادية.</h1>
-        <p className="mt-2 max-w-2xl text-sm sm:text-base text-white/80">وقتك ومهارتك قد يساويان أكثر من أي تبرّع. إيثار يفهم من النداء المهارة المطلوبة، ويقترحه على من يملكها في ولايته — أو عن بُعد.</p>
-        <ul className="mt-4 flex flex-wrap gap-2">{EXAMPLES.map((e) => <li key={e} className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/90 ring-1 ring-white/10">{e}</li>)}</ul>
-      </header>
+      <Masthead eyebrow="تطوّع بمهارتك" title="ماشي كل مساعدة مادية."
+        lede="وقتك ومهارتك قد يساويان أكثر من أي تبرّع. إيثار يفهم من النداء المهارة المطلوبة، ويقترحه على من يملكها في ولايته — أو عن بُعد."
+        aside={<ul className="flex flex-wrap gap-x-4 gap-y-2 text-[13px] text-slate-600 lg:justify-end">{EXAMPLES.map((e) => <li key={e} className="flex items-center gap-2"><span className="h-1 w-1 rounded-full bg-brand-600" aria-hidden />{e}</li>)}</ul>} />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <main className="space-y-4 min-w-0">
