@@ -8,6 +8,7 @@ import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
 import { ShareCard } from "@/components/public/share-card";
+import { SealCanvas } from "@/components/three/seal-canvas";
 import { CATEGORY_META, CRISIS_META } from "@/lib/reference/meta";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n/client";
@@ -80,10 +81,13 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
               <a href="#alerts" className="inline-flex items-center gap-2 rounded-2xl bg-white/10 px-5 py-3 text-sm sm:text-base font-bold text-white ring-1 ring-white/20 transition hover:bg-white/15"><ShieldCheck className="h-5 w-5" aria-hidden /> {t.portal.ctaAlerts}</a>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3 text-center lg:grid-cols-1 lg:text-start">
-            <Stat value={stats.filtered} label={t.portal.statFiltered} icon={Recycle} accent />
-            <Stat value={stats.approved} label={t.portal.statApproved} icon={ShieldCheck} />
-            <Stat value={stats.critical} label={t.portal.statCritical} icon={Activity} />
+          <div>
+            <SealCanvas mode="hero" className="mx-auto h-[220px] w-full max-w-[420px] sm:h-[280px]" />
+            <div className="mt-1 grid grid-cols-3 gap-3 text-center">
+              <Stat value={stats.filtered} label={t.portal.statFiltered} icon={Recycle} accent />
+              <Stat value={stats.approved} label={t.portal.statApproved} icon={ShieldCheck} />
+              <Stat value={stats.critical} label={t.portal.statCritical} icon={Activity} />
+            </div>
           </div>
         </div>
         <ol className="relative grid grid-cols-2 gap-px border-t border-white/10 bg-white/10 sm:grid-cols-4">
@@ -191,11 +195,11 @@ export function Portal({ alerts, crises, shelters, stats, matches, signedIn, has
 
 function Stat({ value, label, icon: Icon, accent }: { value: number; label: string; icon: React.ElementType; accent?: boolean }) {
   return (
-    <div className={cn("rounded-2xl px-3 py-3 lg:flex lg:items-center lg:gap-4 lg:px-5", accent ? "bg-emerald-500/15 ring-1 ring-emerald-400/30" : "bg-white/5 ring-1 ring-white/10")}>
-      <Icon className={cn("mx-auto mb-1 h-4 w-4 lg:mx-0 lg:mb-0 lg:h-6 lg:w-6", accent ? "text-emerald-300" : "text-slate-400")} aria-hidden />
+    <div className={cn("rounded-2xl px-3 py-3", accent ? "bg-emerald-500/15 ring-1 ring-emerald-400/30" : "bg-white/5 ring-1 ring-white/10")}>
+      <Icon className={cn("mx-auto mb-1 h-4 w-4", accent ? "text-emerald-300" : "text-slate-400")} aria-hidden />
       <div>
-        <div className="text-2xl lg:text-3xl font-black tabular-nums">{value}</div>
-        <div className="text-[10px] lg:text-xs font-semibold leading-tight text-slate-400">{label}</div>
+        <div className="text-2xl font-black tabular-nums">{value}</div>
+        <div className="text-[10px] font-semibold leading-tight text-slate-400">{label}</div>
       </div>
     </div>
   );

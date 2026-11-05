@@ -5,6 +5,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Chatbot } from "@/components/chatbot";
 import { LiveNotifications } from "@/components/live-notifications";
+import { IntroSplash } from "@/components/intro-splash";
 import { supabaseServer } from "@/lib/supabase/server";
 import { CrisisBanner } from "@/components/crisis-banner";
 import { OfflineSync } from "@/components/offline-sync";
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={locale} dir={dirOf(locale)} className={tajawal.variable}>
       <body className="font-sans min-h-screen flex flex-col">
         <I18nProvider locale={locale}>
+        <IntroSplash />
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-[2000] focus:rounded-lg focus:bg-white focus:px-3 focus:py-2 focus:shadow">{t.skip}</a>
         <Navbar viewer={viewer ? { email: viewer.email, isStaff: viewer.isStaff, isMinistry: viewer.isMinistry } : null} unread={unread} />
         {viewer && <LiveNotifications userId={viewer.id} />}

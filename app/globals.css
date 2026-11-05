@@ -53,3 +53,8 @@ html, body {
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+
+/* Intro splash: title rises in after the seal assembles */
+.intro-title { animation: intro-title 0.9s 1.2s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes intro-title { from { opacity: 0; transform: translateY(14px); letter-spacing: .2em; } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .intro-title { animation: none; } }
