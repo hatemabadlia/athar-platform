@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import QRCode from "qrcode";
 import { Award, Sparkles, MapPin, Droplets, Wrench, Clock, Building2, FileBadge, QrCode as QrIcon, Smartphone, ShieldCheck, Download, Trash2, Loader2, RefreshCw } from "lucide-react";
-import { SKILLS, BLOOD_TYPES, BADGES, CATEGORY_META, URGENCY_META } from "@/lib/reference/meta";
+import { SKILLS, SKILL_META, BLOOD_TYPES, BADGES, CATEGORY_META, URGENCY_META } from "@/lib/reference/meta";
 import { WILAYAS } from "@/lib/wilayas";
 import type { BloodType, ProfileView, PublicAlert } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ export function ProfileClient(props: {
               <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" aria-hidden /> {wilaya?.nameAr ?? "—"}</span>
               {profile.bloodType && <span className="flex items-center gap-1"><Droplets className="h-3.5 w-3.5" aria-hidden /> {profile.bloodType} (خاص)</span>}
               <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" aria-hidden /> {{ weekends: "نهاية الأسبوع", evenings: "مساءً", anytime: "متاح دائماً" }[profile.availability]}</span>
-              <span className="flex items-center gap-1"><Wrench className="h-3.5 w-3.5" aria-hidden /> {profile.skills.length ? profile.skills.join("، ") : "بدون مهارات محددة"}</span>
+              <span className="flex items-center gap-1"><Wrench className="h-3.5 w-3.5" aria-hidden /> {profile.skills.length ? profile.skills.map((s) => (SKILL_META as Record<string, { regulated: boolean }>)[s]?.regulated ? `${s}${profile.verifiedSkills.includes(s) ? " ✓" : " (غير موثّقة)"}` : s).join("، ") : "بدون مهارات محددة"}{profile.remoteOk ? " · عن بُعد" : ""}</span>
               <Link href="/trees" className="font-bold text-emerald-200">🌳 {props.treesApproved} شجرة موثّقة</Link>
             </div>
             <div className="mt-3 max-w-md">
@@ -267,6 +267,7 @@ function ProfileForm({ initial, onDone, canCancel }: { initial: ProfileView; onD
   const [smsOptIn, setSmsOptIn] = useState(initial.smsOptIn);
   const [skills, setSkills] = useState<string[]>(initial.skills);
   const [availability, setAvailability] = useState(initial.availability);
+  const [remoteOk, setRemoteOk] = useState(initial.remoteOk);
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const input = "w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200";
@@ -274,7 +275,7 @@ function ProfileForm({ initial, onDone, canCancel }: { initial: ProfileView; onD
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     start(async () => {
-      const r = await saveProfile({ displayName: name, wilayaCode, skills, availability, phone: phone || undefined, bloodType, bloodConsent, smsOptIn });
+      const r = await saveProfile({ displayName: name, wilayaCode, skills, availability, remoteOk, phone: phone || undefined, bloodType, bloodConsent, smsOptIn });
       if (!r.ok) { setError(r.error); return; }
       router.refresh(); onDone();
     });
@@ -303,10 +304,25 @@ function ProfileForm({ initial, onDone, canCancel }: { initial: ProfileView; onD
             <span>أوافق على حفظ فصيلة دمي (معلومة صحية حساسة) لاقتراح نداءات الدم المتوافقة. لا تظهر لأي مستخدم آخر، ويمكنني حذفها في أي وقت.</span>
           </label>
         )}
-        <fieldset><legend className="mb-1 block text-sm font-semibold">المهارات</legend>
+        <fieldset><legend className="mb-1 block text-sm font-semibold">مهاراتي — ماشي كل مساعدة مادية</legend>
+          <p className="mb-2 text-[11px] text-slate-500">اختر ما تستطيع تقديمه بوقتك ومهارتك. المهن المنظَّمة (طبيب، محامٍ، أخصائي نفساني) لا تُقترح عليك إلا بعد توثيقها من مشرف ولايتك.</p>
           <div className="flex flex-wrap gap-1.5">
-            {SKILLS.map((s) => <button type="button" key={s} aria-pressed={skills.includes(s)} onClick={() => setSkills((k) => (k.includes(s) ? k.filter((x) => x !== s) : [...k, s]))} className={cn("rounded-full border px-3 py-1.5 text-xs font-bold", skills.includes(s) ? "border-brand-600 bg-brand-600 text-white" : "border-slate-300 text-slate-700")}>{s}</button>)}
-          </div></fieldset>
+            {SKILLS.map((s) => {
+              const on = skills.includes(s);
+              const regulated = SKILL_META[s].regulated;
+              const verified = initial.verifiedSkills.includes(s);
+              return (
+                <button type="button" key={s} aria-pressed={on} onClick={() => setSkills((k) => (k.includes(s) ? k.filter((x) => x !== s) : [...k, s]))}
+                  className={cn("rounded-full border px-3 py-1.5 text-xs font-bold", on ? "border-brand-600 bg-brand-600 text-white" : "border-slate-300 text-slate-700")}>
+                  {s}{regulated && <span className={cn("ms-1 text-[10px]", on ? "text-white/80" : verified ? "text-emerald-700" : "text-amber-700")}>{verified ? "✓ موثّقة" : "· تتطلب توثيقاً"}</span>}
+                </button>
+              );
+            })}
+          </div>
+          <label className="mt-3 flex items-start gap-2 text-xs text-slate-700">
+            <input type="checkbox" checked={remoteOk} onChange={(e) => setRemoteOk(e.target.checked)} className="mt-0.5" />
+            <span>أستطيع المساعدة عن بُعد (تصميم، ترجمة، دروس، استشارة…) حتى خارج ولايتي.</span>
+          </label></fieldset>
         <fieldset><legend className="mb-1 block text-sm font-semibold">التوفر</legend>
           <div className="grid grid-cols-3 gap-2">
             {([["weekends", "نهاية الأسبوع"], ["evenings", "مساءً"], ["anytime", "متاح دائماً"]] as const).map(([k, l]) => (

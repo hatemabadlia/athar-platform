@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Clock, Users, ShieldCheck, Building2, Sparkles, Share2 } from "lucide-react";
+import { MapPin, Clock, Users, ShieldCheck, Building2, Sparkles, Share2, Wrench, Wifi } from "lucide-react";
 import type { PublicAlert } from "@/lib/types";
 import { CATEGORY_META, URGENCY_META } from "@/lib/reference/meta";
 import { cn } from "@/lib/utils";
@@ -65,6 +65,13 @@ export function AlertCard({
             <span className="flex items-center gap-1"><Users className="h-3 w-3" aria-hidden /> {t.card.volunteers(alert.volunteersJoined, needed)}</span>
             {alert.institution && <span className="flex items-center gap-1 text-indigo-600"><Building2 className="h-3 w-3" aria-hidden /> {alert.institution}</span>}
           </div>
+          {alert.requiredSkills.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-1">
+              <Wrench className="h-3 w-3 text-teal-600" aria-hidden />
+              {alert.requiredSkills.map((s) => <span key={s} className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-800">{s}</span>)}
+              {alert.remoteOk && <span className="flex items-center gap-0.5 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-bold text-sky-800"><Wifi className="h-3 w-3" aria-hidden /> عن بُعد</span>}
+            </div>
+          )}
           {needed > 0 && (
             <div className="mt-2 h-1.5 w-full rounded-full bg-slate-100 overflow-hidden">
               <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: urg.hex }} />

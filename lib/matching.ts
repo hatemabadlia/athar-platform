@@ -4,6 +4,7 @@
  * It is a matching aid; transfusion decisions belong to medical staff.
  */
 import type { Availability, BloodType, Category, PublicAlert } from "@/lib/types";
+import { isRegulatedSkill } from "@/lib/reference/meta";
 
 export const RED_CELL_COMPATIBILITY: Record<BloodType, BloodType[]> = {
   "O-": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"],
@@ -32,6 +33,7 @@ const SKILL_FOR_CATEGORY: Record<Category, string[]> = {
   cleanup: ["تنظيم فعاليات"],
   orphans: ["دعم نفسي", "تعليم ودعم مدرسي"],
   blood: [],
+  skills: [],
 };
 
 export interface VolunteerForMatching {
@@ -39,6 +41,15 @@ export interface VolunteerForMatching {
   bloodType: BloodType | null;
   skills: string[];
   availability: Availability;
+  /** Regulated professional skills a moderator has verified (doctor, lawyer, psychologist). */
+  verifiedSkills?: string[];
+  /** The volunteer accepts to help remotely. */
+  remoteOk?: boolean;
+}
+
+/** Skills of this volunteer that the request needs and that count (regulated skills only when verified). */
+export function usableSkills(v: VolunteerForMatching, required: string[]): string[] {
+  return required.filter((s) => v.skills.includes(s) && (!isRegulatedSkill(s) || (v.verifiedSkills ?? []).includes(s)));
 }
 
 export interface Match { alert: PublicAlert; score: number; reasons: string[] }
@@ -51,7 +62,16 @@ export function matchAlerts(v: VolunteerForMatching, alerts: PublicAlert[], limi
     if (a.deadline && new Date(a.deadline) < now) continue;
     let score = 0;
     const reasons: string[] = [];
-    if (v.wilayaCode && a.wilayaCode === v.wilayaCode) { score += 3; reasons.push("في ولايتك"); }
+    const sameWilaya = !!v.wilayaCode && a.wilayaCode === v.wilayaCode;
+    const remote = !sameWilaya && a.remoteOk && !!v.remoteOk;
+    if (sameWilaya) { score += 3; reasons.push("في ولايتك"); }
+    if (a.requiredSkills.length) {
+      const mine = usableSkills(v, a.requiredSkills);
+      if (!mine.length) { if (a.category === "skills") continue; }
+      else { score += 4; reasons.push(`مهارتك مطلوبة: ${mine.join("، ")}`); }
+      if (remote && mine.length) { score += 1; reasons.push("يمكن المساعدة عن بُعد"); }
+      else if (!sameWilaya) continue; // skills help outside the wilaya only when both accept remote work
+    }
     if (a.category === "blood") {
       if (v.bloodType && a.bloodType) {
         if (canDonateTo(v.bloodType, a.bloodType)) {
@@ -62,8 +82,10 @@ export function matchAlerts(v: VolunteerForMatching, alerts: PublicAlert[], limi
         }
       } else if (v.bloodType) { score += 1; reasons.push("نداء دم بدون فصيلة محددة"); }
     }
-    const skills = SKILL_FOR_CATEGORY[a.category].filter((s) => v.skills.includes(s));
-    if (skills.length) { score += 2; reasons.push(`مهارة مطلوبة: ${skills.join("، ")}`); }
+    if (!a.requiredSkills.length) {
+      const skills = SKILL_FOR_CATEGORY[a.category].filter((s) => v.skills.includes(s));
+      if (skills.length) { score += 2; reasons.push(`مهارة مفيدة: ${skills.join("، ")}`); }
+    }
     if (a.urgency === "critical") { score += 1; reasons.push("حالة حرجة"); }
     if (v.availability === "anytime" && a.urgency === "critical") score += 1;
     if (score >= 3) out.push({ alert: a, score, reasons });

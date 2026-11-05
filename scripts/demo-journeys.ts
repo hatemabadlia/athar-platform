@@ -114,8 +114,36 @@ async function main() {
       const toast = donor.page.getByRole("alert").filter({ hasText: "نداء دم متوافق" });
       await toast.waitFor({ timeout: 20_000 }).catch(() => {});
       record("Donor receives live blood alert (second session)", await toast.isVisible(), pick.email);
+      await donor.page.waitForTimeout(1000); // let the toast's fade-in finish before the screenshot
       await shot(donor.page, "04b-donor-phone-alert");
       await mod.ctx.close(); await donor.ctx.close();
+    }
+  }
+
+  // 5 — Skills-based help: Oran moderator notifies designers; a remote designer in another wilaya gets it live
+  {
+    const { data: a } = await db.from("alerts").select("id").eq("status", "approved").contains("required_skills", ["تصميم وإعلام"]).eq("wilaya_code", 31).limit(1).single();
+    const { data: recent } = await db.from("audit_log").select("id").eq("action", "notify_skilled").eq("entity_id", a?.id ?? "").gte("created_at", new Date(Date.now() - 6 * 3600_000).toISOString());
+    if (!a) record("Skilled volunteer receives live request (second session)", false, "no approved design request in Oran in the demo data");
+    else if (recent?.length) record("Skilled volunteer receives live request (second session)", false, "already notified in the last 6 h (by design) — reseed or retry later");
+    else {
+      const vol = await session(browser, "lina@demo.athar.dz", true); // Tizi Ouzou designer who accepts remote work
+      await vol.page.goto(BASE); await vol.page.waitForLoadState("networkidle");
+      const suggested = await vol.page.getByText("مهارتك مطلوبة: تصميم وإعلام").first().isVisible().catch(() => false);
+      record("Remote designer sees the Oran request suggested with the reason", suggested);
+      await vol.page.waitForFunction(() => document.documentElement.dataset.liveNotes === "SUBSCRIBED", null, { timeout: 30_000 }).catch(() => {});
+      const mod = await session(browser, "djsl31@demo.athar.dz");
+      await mod.page.goto(`${BASE}/admin?status=approved&alert=${a.id}`); await mod.page.waitForLoadState("networkidle");
+      await mod.page.getByText("عدّ المتطوعين المناسبين").click();
+      const countText = await mod.page.getByText(/متطوع مناسب/).first().textContent({ timeout: 15_000 }).catch(() => "");
+      await mod.page.getByRole("button", { name: "إخطارهم" }).last().click();
+      await shot(mod.page, "05a-admin-skills");
+      const toast = vol.page.getByRole("alert").filter({ hasText: "مهارتك مطلوبة" });
+      await toast.waitFor({ timeout: 20_000 }).catch(() => {});
+      record("Skilled volunteer receives live request (second session)", await toast.isVisible(), countText?.trim());
+      await vol.page.waitForTimeout(1000);
+      await shot(vol.page, "05b-volunteer-skill-alert");
+      await mod.ctx.close(); await vol.ctx.close();
     }
   }
 

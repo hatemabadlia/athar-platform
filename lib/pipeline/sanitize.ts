@@ -6,6 +6,7 @@
 import { findWilaya, detectWilaya } from "@/lib/wilayas";
 import type { Analysis } from "./types";
 import { extractBloodType, extractPhones, normalizePhone, phoneAppearsIn } from "./text";
+import { SKILLS } from "@/lib/reference/meta";
 
 export function sanitizeAnalysis(a: Analysis, original: string): { analysis: Analysis; dropped: string[] } {
   const dropped: string[] = [];
@@ -32,6 +33,10 @@ export function sanitizeAnalysis(a: Analysis, original: string): { analysis: Ana
     const w = detectWilaya(a.normalized_text) ?? detectWilaya(original);
     if (w) out.wilaya_code = w.code;
   }
+
+  // skills: only the canonical list, no duplicates (the schema already restricts the AI, rules may not)
+  out.required_skills = [...new Set((a.required_skills ?? []).filter((s) => (SKILLS as readonly string[]).includes(s)))];
+  out.remote_possible = !!a.remote_possible && out.required_skills.length > 0;
 
   out.confidence = Math.max(0, Math.min(1, Number.isFinite(a.confidence) ? a.confidence : 0));
   if (a.quantity != null && (a.quantity <= 0 || a.quantity > 10000)) out.quantity = null;

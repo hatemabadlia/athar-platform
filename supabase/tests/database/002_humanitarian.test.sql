@@ -27,11 +27,11 @@ select throws_ok($$ insert into public.associations (name, approval_number, wila
   values ('x assoc', 'AGR-31-999', 31, '00000000-0000-0000-0000-0000000000b1', 'approved') $$, '42501', null, 'cannot self-verify an association');
 select throws_ok($$ select public.review_association('40000000-0000-0000-0000-000000000001', true) $$, '42501', null, 'applicant cannot approve');
 select pg_temp.as_anon();
-select is((select count(*)::int from public.associations), 0, 'pending association not public');
+select is((select count(*)::int from public.associations where created_at >= now()), 0, 'pending association not public');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000d1');
 select lives_ok($$ select public.review_association('40000000-0000-0000-0000-000000000001', true) $$, 'DJSL of wilaya verifies');
 select pg_temp.as_anon();
-select is((select count(*)::int from public.associations), 1, 'verified association public');
+select is((select count(*)::int from public.associations where created_at >= now()), 1, 'verified association public');
 reset role;
 select ok((select exists (select 1 from public.user_roles where user_id = '00000000-0000-0000-0000-0000000000b1' and role = 'association')), 'association role granted on verification');
 

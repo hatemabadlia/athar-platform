@@ -11,7 +11,7 @@ export interface ToolOutput { json: unknown; alerts?: PublicAlert[] }
 
 export async function searchAlerts(args: { wilaya_code?: number; category?: string; donor_blood_type?: string; limit?: number }): Promise<ToolOutput> {
   const supabase = await supabaseServer();
-  let q = supabase.from("alerts").select("id,title,summary,category,urgency,status,wilaya_code,baladiya_name,institution_name,lat,lng,location_precision,credibility_score,credibility_reasons,ai_mode,volunteers_needed,blood_type,deadline,created_at,source_count")
+  let q = supabase.from("alerts").select("id,title,summary,category,urgency,status,wilaya_code,baladiya_name,institution_name,lat,lng,location_precision,credibility_score,credibility_reasons,ai_mode,volunteers_needed,blood_type,required_skills,remote_ok,deadline,created_at,source_count")
     .eq("status", "approved").order("created_at", { ascending: false }).limit(Math.min(args.limit ?? 5, 10));
   if (args.wilaya_code) q = q.eq("wilaya_code", args.wilaya_code);
   if (args.category && (CATEGORIES as readonly string[]).includes(args.category)) q = q.eq("category", args.category as Category);

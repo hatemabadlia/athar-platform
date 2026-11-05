@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { isRegulatedSkill } from "@/lib/reference/meta";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getViewer } from "@/lib/server/guards";
@@ -142,6 +143,21 @@ export async function revokeRole(userId: string, role: (typeof ROLES)[number]): 
   const supabase = await supabaseServer();
   const { error } = await supabase.rpc("revoke_role", { target: userId, r: role });
   if (error) return toActionError(error);
+  revalidatePath("/admin");
+  return { ok: true };
+}
+
+// ---------------- professional skills ----------------
+/** A moderator (of the volunteer's wilaya) or the ministry verifies a regulated skill: doctor, lawyer, psychologist. */
+export async function verifySkillByEmail(email: string, skill: string, approve: boolean, note: string): Promise<ActionResult> {
+  if (!z.string().email().safeParse(email).success || !isRegulatedSkill(skill)) return { ok: false, error: "بيانات غير صالحة" };
+  const supabase = await supabaseServer();
+  const { data: users, error } = await supabase.rpc("find_user_by_email", { email });
+  if (error) return toActionError(error);
+  const target = (users as { id: string }[] | null)?.[0];
+  if (!target) return { ok: false, error: "لا يوجد مستخدم بهذا البريد." };
+  const { error: e2 } = await supabase.rpc("verify_skill", { p_target: target.id, p_skill: skill, p_approve: approve, p_note: note.trim().slice(0, 300) || undefined });
+  if (e2) return toActionError(e2);
   revalidatePath("/admin");
   return { ok: true };
 }

@@ -104,6 +104,7 @@ export async function processIntake(intakeId: string): Promise<PipelineOutcome> 
       ...analysis.phone_numbers.map((p) => `هاتف: ${formatPhone(p)}`), analysis.blood_type && `فصيلة: ${analysis.blood_type}`,
       analysis.quantity && `العدد: ${analysis.quantity}`, analysis.deadline_text && `الموعد: ${analysis.deadline_text}`,
       analysis.institution && `مؤسسة: ${analysis.institution}`,
+      analysis.required_skills.length > 0 && `مهارات مطلوبة: ${analysis.required_skills.join("، ")}${analysis.remote_possible ? " (عن بُعد ممكن)" : ""}`,
     ].filter(Boolean);
     stages.push({ id: "entities", labelAr: STAGE_LABELS.entities, mode, durationMs: 0,
       status: dropped.length ? "warning" : "done",
@@ -197,6 +198,8 @@ export async function processIntake(intakeId: string): Promise<PipelineOutcome> 
         lng: wilaya?.lng ?? null,
         location_precision: "wilaya",
         blood_type: analysis.blood_type,
+        required_skills: analysis.required_skills,
+        remote_ok: analysis.remote_possible,
         quantity: analysis.quantity,
         contact_name: analysis.contact_name,
         volunteers_needed: analysis.quantity ?? 0,

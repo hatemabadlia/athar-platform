@@ -148,6 +148,7 @@ function Result({ r, text, onReset, onReview }: { r: CheckOutcome; text: string;
               <Row k="النوع" v={cat ? `${cat.emoji} ${cat.labelAr}` : "غير واضح"} />
               <Row k="الولاية" v={r.understood.wilaya ?? "غير مذكورة"} />
               {r.understood.bloodType && <Row k="الفصيلة" v={r.understood.bloodType} />}
+              {r.understood.skills.length > 0 && <Row k="مهارات مطلوبة" v={`${r.understood.skills.join("، ")}${r.understood.remote ? " · عن بُعد" : ""}`} />}
               <Row k="رقم اتصال" v={r.understood.hasPhone ? "موجود (لا نعرضه)" : "غير موجود"} />
             </dl>
             {r.understood.msa && <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">{r.understood.msa}</p>}

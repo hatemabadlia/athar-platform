@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Clock, CheckCircle2 } from "lucide-react";
+import { Droplets, HandHeart, Waves, Baby, LayoutGrid, Stethoscope, GraduationCap, Activity, ShieldCheck, Recycle, ScanSearch, Users, Wrench, Clock, CheckCircle2 } from "lucide-react";
 import type { Category, CrisisView, PublicAlert, ShelterView } from "@/lib/types";
 import { AlertCard } from "@/components/public/alert-card";
 import { HelpModal } from "@/components/public/help-modal";
@@ -17,7 +17,7 @@ const LiveMap = dynamic(() => import("@/components/map/live-map"), { ssr: false,
 
 const FILTERS: { key: Category | "all"; icon: React.ElementType }[] = [
   { key: "all", icon: LayoutGrid }, { key: "blood", icon: Droplets }, { key: "relief", icon: HandHeart }, { key: "cleanup", icon: Waves },
-  { key: "orphans", icon: Baby }, { key: "medical", icon: Stethoscope }, { key: "education", icon: GraduationCap },
+  { key: "orphans", icon: Baby }, { key: "medical", icon: Stethoscope }, { key: "education", icon: GraduationCap }, { key: "skills", icon: Wrench },
 ];
 const ORDER = { critical: 0, medium: 1, normal: 2 } as const;
 

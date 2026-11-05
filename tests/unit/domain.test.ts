@@ -20,7 +20,7 @@ describe("blood compatibility (red cells)", () => {
 
 const alert = (o: Partial<PublicAlert>): PublicAlert => ({ id: Math.random().toString(), title: "t", summary: "", category: "blood", urgency: "medium", status: "approved",
   wilayaCode: 16, wilaya: "", baladiya: null, institution: null, lat: null, lng: null, locationPrecision: "wilaya", credibilityScore: 70, credibilityReasons: [],
-  aiMode: "heuristic", volunteersNeeded: 5, volunteersJoined: 0, bloodType: "A+", deadline: null, createdAt: "2026-10-31T00:00:00Z", sourceCount: 1, ...o });
+  aiMode: "heuristic", volunteersNeeded: 5, volunteersJoined: 0, bloodType: "A+", requiredSkills: [], remoteOk: false, deadline: null, createdAt: "2026-10-31T00:00:00Z", sourceCount: 1, ...o });
 
 describe("volunteer matching", () => {
   const v = { wilayaCode: 16, bloodType: "O-" as const, skills: ["إسعافات أولية"], availability: "anytime" as const };

@@ -7,9 +7,9 @@ import type { CredibilityReason, ModerationAlert, PublicAlert } from "@/lib/type
 type AlertRow = Database["public"]["Tables"]["alerts"]["Row"];
 
 const PUBLIC_COLUMNS =
-  "id,title,summary,category,urgency,status,wilaya_code,baladiya_name,institution_name,lat,lng,location_precision,credibility_score,credibility_reasons,ai_mode,volunteers_needed,blood_type,deadline,created_at,source_count";
+  "id,title,summary,category,urgency,status,wilaya_code,baladiya_name,institution_name,lat,lng,location_precision,credibility_score,credibility_reasons,ai_mode,volunteers_needed,blood_type,required_skills,remote_ok,deadline,created_at,source_count";
 
-export function mapPublic(r: Pick<AlertRow, "id" | "title" | "summary" | "category" | "urgency" | "status" | "wilaya_code" | "baladiya_name" | "institution_name" | "lat" | "lng" | "location_precision" | "credibility_score" | "credibility_reasons" | "ai_mode" | "volunteers_needed" | "blood_type" | "deadline" | "created_at" | "source_count">, joined = 0): PublicAlert {
+export function mapPublic(r: Pick<AlertRow, "id" | "title" | "summary" | "category" | "urgency" | "status" | "wilaya_code" | "baladiya_name" | "institution_name" | "lat" | "lng" | "location_precision" | "credibility_score" | "credibility_reasons" | "ai_mode" | "volunteers_needed" | "blood_type" | "required_skills" | "remote_ok" | "deadline" | "created_at" | "source_count">, joined = 0): PublicAlert {
   const w = r.wilaya_code ? findWilaya(r.wilaya_code) : undefined;
   return {
     id: r.id, title: r.title, summary: r.summary, category: r.category, urgency: r.urgency, status: r.status,
@@ -18,7 +18,7 @@ export function mapPublic(r: Pick<AlertRow, "id" | "title" | "summary" | "catego
     locationPrecision: r.location_precision as PublicAlert["locationPrecision"],
     credibilityScore: r.credibility_score, credibilityReasons: (r.credibility_reasons ?? []) as unknown as CredibilityReason[],
     aiMode: r.ai_mode as PublicAlert["aiMode"], volunteersNeeded: r.volunteers_needed, volunteersJoined: joined,
-    bloodType: r.blood_type, deadline: r.deadline, createdAt: r.created_at, sourceCount: r.source_count,
+    bloodType: r.blood_type, requiredSkills: r.required_skills ?? [], remoteOk: r.remote_ok ?? false, deadline: r.deadline, createdAt: r.created_at, sourceCount: r.source_count,
   };
 }
 

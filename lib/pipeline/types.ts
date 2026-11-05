@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { SKILLS } from "@/lib/reference/meta";
 
-export const CATEGORIES = ["blood", "relief", "cleanup", "orphans", "medical", "education"] as const;
+export const CATEGORIES = ["blood", "relief", "cleanup", "orphans", "medical", "education", "skills"] as const;
 export const URGENCIES = ["critical", "medium", "normal"] as const;
 export const BLOOD_TYPES = ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"] as const;
 export type Category = (typeof CATEGORIES)[number];
@@ -32,6 +33,8 @@ export const AnalysisSchema = z.object({
   deadline_text: z.string().nullable().describe("Deadline or time as written (e.g. 'before 17:00', 'tomorrow morning')"),
   contact_name: z.string().nullable(),
   required_resources: z.array(z.string()),
+  required_skills: z.array(z.enum(SKILLS as [string, ...string[]])).describe("Volunteer skills the request explicitly needs, from the allowed list only (e.g. a designer, translator, driver, doctor's consultation). Empty if the help is only material (money, goods, blood)."),
+  remote_possible: z.boolean().describe("true only if the needed help can clearly be given at a distance (online design, translation, remote consultation, tutoring by video)"),
   mentioned_dates: z.array(z.string()).describe("Every explicit date or year mentioned (e.g. '2021', '14/03/2021')"),
   money_request: z.boolean().describe("true if it asks to transfer money (CCP, bank, BaridiMob, etc.)"),
   title: z.string().describe("Short Arabic title, max 80 characters"),

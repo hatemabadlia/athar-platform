@@ -44,6 +44,10 @@ export interface PublicAlert {
   volunteersNeeded: number;
   volunteersJoined: number;
   bloodType: BloodType | null;
+  /** Volunteer skills the request needs (skills-based help, not only money or goods). */
+  requiredSkills: string[];
+  /** The needed help can be given remotely. */
+  remoteOk: boolean;
   deadline: string | null;
   createdAt: string;
   sourceCount: number;
@@ -93,6 +97,10 @@ export interface ProfileView {
   wilayaCode: number | null;
   skills: string[];
   availability: Availability;
+  /** Accepts to help remotely (design, translation, consultation…). */
+  remoteOk: boolean;
+  /** Regulated professional skills verified by a moderator. */
+  verifiedSkills: string[];
   phone: string | null;
   bloodType: BloodType | null;
   smsOptIn: boolean;

@@ -15,6 +15,7 @@ import { SheltersPanel } from "@/components/admin/shelters-panel";
 import { TreeReview } from "@/components/admin/tree-review";
 import { ReportsPanel } from "@/components/admin/reports-panel";
 import { RolesPanel } from "@/components/admin/roles-panel";
+import { SkillVerifyPanel } from "@/components/admin/skill-verify-panel";
 import { ImportPanel } from "@/components/admin/import-panel";
 import { AuditPanel } from "@/components/admin/audit-panel";
 import { ForecastPanel } from "@/components/admin/forecast-panel";
@@ -87,8 +88,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     const uids = [...new Set((roles ?? []).map((r) => r.user_id))];
     const { data: names } = uids.length ? await supabase.from("public_profiles").select("id, display_name").in("id", uids) : { data: [] };
     const nm = new Map((names ?? []).map((n) => [n.id as string, n.display_name as string]));
-    body = <RolesPanel roles={(roles ?? []).map((r) => ({ userId: r.user_id, role: r.role, wilayaCode: r.wilaya_code, grantedAt: r.granted_at, name: nm.get(r.user_id) ?? "" }))}
-      isMinistry={viewer.isMinistry} adminWilayas={adminWilayas ?? []} />;
+    body = <div className="space-y-5"><SkillVerifyPanel /><RolesPanel roles={(roles ?? []).map((r) => ({ userId: r.user_id, role: r.role, wilayaCode: r.wilaya_code, grantedAt: r.granted_at, name: nm.get(r.user_id) ?? "" }))}
+      isMinistry={viewer.isMinistry} adminWilayas={adminWilayas ?? []} /></div>;
   } else if (tab === "import") {
     const counts = await Promise.all((["institutions", "shelters", "baladiyas", "historical_posts"] as const).map(async (t) => [t, (await supabase.from(t).select("*", { count: "exact", head: true })).count ?? 0] as const));
     body = <ImportPanel counts={Object.fromEntries(counts)} />;

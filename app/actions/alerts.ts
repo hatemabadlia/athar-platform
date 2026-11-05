@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { SKILLS } from "@/lib/reference/meta";
 import { supabaseServer } from "@/lib/supabase/server";
 import { toActionError, type ActionResult } from "@/lib/server/result";
 import { CATEGORIES, URGENCIES, BLOOD_TYPES } from "@/lib/pipeline/types";
@@ -66,6 +67,8 @@ const Correction = z.object({
   volunteers_needed: z.number().int().min(0).max(10000),
   deadline: z.string().datetime({ offset: true }).nullable(),
   contact_name: z.string().trim().max(80).nullable(),
+  required_skills: z.array(z.enum(SKILLS as unknown as [string, ...string[]])).max(8).default([]),
+  remote_ok: z.boolean().default(false),
 });
 
 /** Moderator correction of extracted fields (RLS limits rows to the moderator's wilaya). */

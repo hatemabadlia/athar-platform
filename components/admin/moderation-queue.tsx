@@ -5,14 +5,14 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, X, CheckCircle2, GitMerge, Recycle, RotateCcw, Phone, Loader2, Search, AlertTriangle } from "lucide-react";
 import type { ModerationAlert, Category, Urgency, BloodType } from "@/lib/types";
-import { CATEGORY_META, URGENCY_META, STATUS_META, BLOOD_TYPES } from "@/lib/reference/meta";
+import { CATEGORY_META, URGENCY_META, STATUS_META, BLOOD_TYPES, SKILLS } from "@/lib/reference/meta";
 import { WILAYAS } from "@/lib/wilayas";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { ScoreRing } from "@/components/ui/score-ring";
 import { reviewAlert, correctAlert, getAlertContact, confirmVolunteer } from "@/app/actions/alerts";
 import { submitReport } from "@/app/actions/clubs";
-import { notifyDonors, donorCount } from "@/app/actions/modules";
+import { notifyDonors, donorCount, notifySkilled, skilledCount } from "@/app/actions/modules";
 import { formatPhone } from "@/lib/pipeline/text";
 import { cn, timeAgo } from "@/lib/utils";
 
@@ -86,6 +86,7 @@ function AlertDetail({ alert: a, participants, onClose }: { alert: ModerationAle
     title: a.title, summary: a.summary, category: a.category as Category, urgency: a.urgency as Urgency, wilaya_code: a.wilayaCode,
     baladiya_name: a.baladiya, institution_name: a.institution, blood_type: a.bloodType as BloodType | null, volunteers_needed: a.volunteersNeeded,
     deadline: a.deadline ? a.deadline.slice(0, 16) : "", contact_name: a.contactName,
+    required_skills: a.requiredSkills ?? [], remote_ok: a.remoteOk ?? false,
   });
   const run = (fn: () => Promise<{ ok: boolean; error?: string }>, okText: string, close = false) => start(async () => {
     const r = await fn();
@@ -131,6 +132,7 @@ function AlertDetail({ alert: a, participants, onClose }: { alert: ModerationAle
             </div>
           )}
           {a.category === "blood" && a.status === "approved" && <DonorNotify alertId={a.id} />}
+          {a.status === "approved" && (a.requiredSkills?.length ?? 0) > 0 && <SkillNotify alertId={a.id} skills={a.requiredSkills} remote={a.remoteOk} />}
           {(a.status === "approved" || a.status === "resolved") && <AlertReport alertId={a.id} />}
         </div>
 
@@ -149,6 +151,17 @@ function AlertDetail({ alert: a, participants, onClose }: { alert: ModerationAle
             <div><label className="text-[11px] font-bold" htmlFor="f-d">الموعد النهائي</label><input id="f-d" type="datetime-local" className={input} value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></div>
           </div>
           <div><label className="text-[11px] font-bold" htmlFor="f-c">اسم جهة الاتصال</label><input id="f-c" className={input} value={f.contact_name ?? ""} onChange={(e) => setF({ ...f, contact_name: e.target.value })} /></div>
+          <fieldset>
+            <legend className="text-[11px] font-bold">المهارات المطلوبة (مساعدة غير مادية)</legend>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {SKILLS.map((s) => {
+                const on = f.required_skills.includes(s);
+                return <button type="button" key={s} aria-pressed={on} onClick={() => setF({ ...f, required_skills: on ? f.required_skills.filter((x) => x !== s) : [...f.required_skills, s] })}
+                  className={on ? "rounded-full bg-teal-600 px-2 py-0.5 text-[11px] font-bold text-white" : "rounded-full border border-slate-300 px-2 py-0.5 text-[11px] text-slate-600"}>{s}</button>;
+              })}
+            </div>
+            <label className="mt-1 flex items-center gap-1.5 text-[11px]"><input type="checkbox" checked={f.remote_ok} onChange={(e) => setF({ ...f, remote_ok: e.target.checked })} /> يمكن تقديمها عن بُعد</label>
+          </fieldset>
           <Button size="sm" variant="outline" onClick={save} disabled={pending}>حفظ التصحيحات</Button>
 
           <div className="border-t border-slate-100 pt-3 space-y-2">
@@ -228,6 +241,22 @@ function DonorNotify({ alertId }: { alertId: string }) {
             <button disabled={pending || n === 0} onClick={() => start(async () => { const r = await notifyDonors(alertId); setMsg(r.ok ? `أُخطر ${r.data} متبرع (إشعار داخل المنصة)` : r.error); })} className="rounded bg-rose-600 px-2 py-0.5 font-bold text-white">إخطارهم</button></div>}
       {msg && <p role="status">{msg}</p>}
       <p className="text-[10px] text-slate-500">لا تُكشف هويات المتبرعين. الأهلية الطبية يقررها مركز حقن الدم.</p>
+    </div>
+  );
+}
+
+function SkillNotify({ alertId, skills, remote }: { alertId: string; skills: string[]; remote: boolean }) {
+  const [n, setN] = useState<number | null>(null);
+  const [pending, start] = useTransition();
+  const [msg, setMsg] = useState<string | null>(null);
+  return (
+    <div className="rounded-2xl border border-teal-200 bg-teal-50 p-3 text-xs space-y-2">
+      <div className="font-bold text-teal-800">مهارات مطلوبة: {skills.join("، ")}{remote ? " · عن بُعد" : ""}</div>
+      {n == null ? <button disabled={pending} onClick={() => start(async () => { const r = await skilledCount(alertId); if (r.ok) setN(r.data!); else setMsg(r.error); })} className="font-bold underline">عدّ المتطوعين المناسبين</button>
+        : <div className="flex items-center gap-2"><span>{n} متطوع مناسب{remote ? " (من ولايتك أو عن بُعد)" : " في الولاية"}</span>
+            <button disabled={pending || n === 0} onClick={() => start(async () => { const r = await notifySkilled(alertId); setMsg(r.ok ? `أُخطر ${r.data} متطوع (إشعار داخل المنصة)` : r.error); })} className="rounded bg-teal-600 px-2 py-0.5 font-bold text-white">إخطارهم</button></div>}
+      {msg && <p role="status">{msg}</p>}
+      <p className="text-[10px] text-slate-500">لا تُكشف هويات المتطوعين. المهن المنظَّمة تُحتسب فقط بعد توثيقها.</p>
     </div>
   );
 }

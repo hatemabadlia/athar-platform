@@ -14,6 +14,7 @@ export const CATEGORY_META: Record<
   orphans: { label: "Orphans", labelAr: "أيتام", color: "text-violet-700", bg: "bg-violet-100", emoji: "🧒" },
   medical: { label: "Medical", labelAr: "طبي", color: "text-sky-700", bg: "bg-sky-100", emoji: "🏥" },
   education: { label: "Education", labelAr: "تعليم", color: "text-indigo-700", bg: "bg-indigo-100", emoji: "📚" },
+  skills: { label: "Skills & services", labelAr: "مهارات وخدمات", color: "text-teal-700", bg: "bg-teal-100", emoji: "🛠️" },
 };
 
 export const URGENCY_META: Record<
@@ -38,10 +39,31 @@ export const STATUS_META: Record<
   expired: { labelAr: "منتهي", color: "text-slate-500", bg: "bg-slate-100" },
 };
 
-export const SKILLS = [
-  "إسعافات أولية", "نقل وتوزيع", "طبخ", "تعليم ودعم مدرسي", "تصميم وإعلام",
-  "برمجة", "تنظيم فعاليات", "ترجمة", "دعم نفسي", "صيانة وبناء",
-];
+/**
+ * Skills a volunteer can offer — not all help is money or goods. Mirrors the `skills` table.
+ * regulated: a professional skill that only counts after a moderator verifies it (doctor, lawyer, psychologist);
+ * remote: usually possible at a distance (a designer in Oran can help an association in Tamanrasset).
+ */
+export const SKILL_META = {
+  "إسعافات أولية": { fr: "Premiers secours", regulated: false, remote: false },
+  "نقل وتوزيع": { fr: "Transport et livraison", regulated: false, remote: false },
+  "طبخ": { fr: "Cuisine", regulated: false, remote: false },
+  "تعليم ودعم مدرسي": { fr: "Cours et soutien scolaire", regulated: false, remote: true },
+  "تصميم وإعلام": { fr: "Design et communication", regulated: false, remote: true },
+  "برمجة": { fr: "Programmation et sites web", regulated: false, remote: true },
+  "تنظيم فعاليات": { fr: "Organisation d'événements", regulated: false, remote: false },
+  "ترجمة": { fr: "Traduction", regulated: false, remote: true },
+  "مرافقة إدارية": { fr: "Accompagnement administratif", regulated: false, remote: false },
+  "تصوير": { fr: "Photo et vidéo", regulated: false, remote: false },
+  "دعم نفسي": { fr: "Écoute et soutien", regulated: false, remote: true },
+  "صيانة وبناء": { fr: "Bricolage et construction", regulated: false, remote: false },
+  "استشارة طبية": { fr: "Consultation médicale", regulated: true, remote: true },
+  "استشارة قانونية": { fr: "Conseil juridique", regulated: true, remote: true },
+  "أخصائي نفساني": { fr: "Psychologue", regulated: true, remote: true },
+} as const;
+export type Skill = keyof typeof SKILL_META;
+export const SKILLS = Object.keys(SKILL_META) as Skill[];
+export const isRegulatedSkill = (s: string) => (SKILL_META as Record<string, { regulated: boolean }>)[s]?.regulated === true;
 
 export const BLOOD_TYPES = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"] as const;
 

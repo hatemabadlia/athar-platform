@@ -12,12 +12,13 @@ import { PRIVACY_POLICY_VERSION } from "@/lib/consent";
 const Profile = z.object({
   displayName: z.string().trim().min(2, "الاسم قصير").max(80),
   wilayaCode: z.number().int().min(1).max(69),
-  skills: z.array(z.enum(SKILLS as unknown as [string, ...string[]])).max(10),
+  skills: z.array(z.enum(SKILLS as unknown as [string, ...string[]])).max(15),
   availability: z.enum(["weekends", "evenings", "anytime"]),
   phone: z.string().trim().max(20).optional(),
   bloodType: z.enum(BLOOD_TYPES).nullable(),
   bloodConsent: z.boolean(),
   smsOptIn: z.boolean(),
+  remoteOk: z.boolean().default(false),
 });
 
 export async function saveProfile(input: z.infer<typeof Profile>): Promise<ActionResult> {
@@ -34,7 +35,7 @@ export async function saveProfile(input: z.infer<typeof Profile>): Promise<Actio
   if (!user) return { ok: false, error: "يجب تسجيل الدخول" };
 
   const { error: e1 } = await supabase.from("profiles").update({
-    display_name: d.displayName, wilaya_code: d.wilayaCode, skills: d.skills, availability: d.availability, onboarded: true,
+    display_name: d.displayName, wilaya_code: d.wilayaCode, skills: d.skills, availability: d.availability, remote_ok: d.remoteOk, onboarded: true,
   }).eq("id", user.id);
   if (e1) return toActionError(e1);
   const { error: e2 } = await supabase.from("profile_private").update({

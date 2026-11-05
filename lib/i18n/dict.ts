@@ -17,7 +17,7 @@ const ar = {
   },
   footer: { disclaimer: "إيثار — منصة تطوعية. درجات المصداقية أداة فرز وليست دليلاً على صحة أي نداء.", privacy: "الخصوصية", impact: "الأثر", submit: "أرسل نداءً" },
   crisis: { banner: "وضع الطوارئ", details: "التفاصيل ونقاط التجمع" },
-  category: { blood: "تبرع بالدم", relief: "إغاثة", cleanup: "بيئة", orphans: "أيتام ومسنون", medical: "طبي", education: "تعليم" } as Record<Category, string>,
+  category: { blood: "تبرع بالدم", relief: "إغاثة", cleanup: "بيئة", orphans: "أيتام ومسنون", medical: "طبي", education: "تعليم", skills: "مهارات وخدمات" } as Record<Category, string>,
   urgency: { critical: "حرج", medium: "متوسط", normal: "عادي" } as Record<Urgency, string>,
   portal: {
     crisisMode: (t: string, w: string) => `🚨 وضع الطوارئ — ${t} في ${w}`,
@@ -100,7 +100,7 @@ const fr: Dict = {
   },
   footer: { disclaimer: "Athar — plateforme bénévole. Le score de crédibilité est un outil de tri, pas une preuve qu'un appel est authentique.", privacy: "Confidentialité", impact: "Impact", submit: "Signaler un besoin" },
   crisis: { banner: "Mode urgence", details: "Détails et points de rassemblement" },
-  category: { blood: "Don de sang", relief: "Secours", cleanup: "Environnement", orphans: "Orphelins et aînés", medical: "Médical", education: "Éducation" },
+  category: { blood: "Don de sang", relief: "Secours", cleanup: "Environnement", orphans: "Orphelins et aînés", medical: "Médical", education: "Éducation", skills: "Compétences" },
   urgency: { critical: "Critique", medium: "Moyen", normal: "Normal" },
   portal: {
     crisisMode: (t, w) => `🚨 Mode urgence — ${t} à ${w}`,

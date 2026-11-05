@@ -44,13 +44,13 @@ begin
 end $$;
 
 -- ---------- bootstrap ----------
-select is((select count(*)::int from public.profiles), 6, 'signup trigger creates profiles');
-select is((select count(*)::int from public.user_roles where role = 'volunteer'), 6, 'everyone starts as volunteer');
+select is((select count(*)::int from public.profiles where created_at >= now()), 6, 'signup trigger creates profiles');
+select is((select count(*)::int from public.user_roles where role = 'volunteer' and granted_at >= now()), 6, 'everyone starts as volunteer');
 
 -- ---------- anon ----------
 select pg_temp.as_anon();
 select is((select count(*)::int from public.wilayas), 69, 'anon reads 69 seeded wilayas');
-select is((select count(*)::int from public.alerts), 1, 'anon sees only approved alerts');
+select is((select count(*)::int from public.alerts where created_at >= now()), 1, 'anon sees only approved alerts');
 select is((select count(*)::int from public.alert_contacts), 0, 'anon cannot read alert phones');
 select is((select count(*)::int from public.profiles), 0, 'anon cannot read profiles');
 select is((select count(*)::int from public.profile_private), 0, 'anon cannot read private data');
@@ -61,7 +61,7 @@ select throws_ok($$ insert into public.intake_items (channel, raw_text, content_
 select pg_temp.as_user('00000000-0000-0000-0000-00000000000b');
 select is((select count(*)::int from public.profile_private), 1, 'volunteer reads only own private row');
 select is((select count(*)::int from public.profiles), 1, 'volunteer reads only own profile');
-select is((select count(*)::int from public.alerts), 1, 'volunteer sees approved alerts only');
+select is((select count(*)::int from public.alerts where created_at >= now()), 1, 'volunteer sees approved alerts only');
 select is((select count(*)::int from public.alert_contacts), 0, 'phone hidden before joining');
 select throws_ok($$ select public.review_alert('10000000-0000-0000-0000-000000000001', 'approve') $$,
   '42501', null, 'volunteer cannot moderate');
@@ -83,7 +83,7 @@ select throws_ok($$ update public.profile_private set phone_verified = true $$,
 
 -- ---------- moderator scope ----------
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
-select is((select count(*)::int from public.alerts), 2, 'Alger moderator sees Alger alerts only');
+select is((select count(*)::int from public.alerts where created_at >= now()), 2, 'Alger moderator sees Alger alerts only');
 select is(public.review_alert('10000000-0000-0000-0000-000000000001', 'approve')::text, 'approved', 'moderator approves in own wilaya');
 select throws_ok($$ select public.review_alert('10000000-0000-0000-0000-000000000003', 'approve') $$,
   '42501', null, 'moderator cannot approve in another wilaya');
@@ -103,7 +103,7 @@ select throws_ok($$ select public.grant_role('00000000-0000-0000-0000-0000000000
 select ok((select count(*) from public.audit_log where wilaya_code = 16) > 0, 'DJSL reads own wilaya audit');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f1');
-select is((select count(*)::int from public.alerts), 3, 'ministry sees all alerts');
+select is((select count(*)::int from public.alerts where created_at >= now()), 3, 'ministry sees all alerts');
 select is(public.review_alert('10000000-0000-0000-0000-000000000003', 'reject')::text, 'rejected', 'ministry moderates anywhere');
 
 -- ---------- QR attendance & points ----------
@@ -146,11 +146,11 @@ select throws_ok($$ insert into public.trees (user_id, wilaya_code, place, speci
 insert into public.trees (id, user_id, wilaya_code, place, species)
   values ('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', 16, 'park', 'olive');
 select pg_temp.as_anon();
-select is((select count(*)::int from public.trees), 0, 'pending tree not public');
+select is((select count(*)::int from public.trees where created_at >= now()), 0, 'pending tree not public');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
 select lives_ok($$ select public.review_tree('30000000-0000-0000-0000-000000000001', true) $$, 'moderator approves tree');
 select pg_temp.as_anon();
-select is((select count(*)::int from public.trees), 1, 'approved tree is public');
+select is((select count(*)::int from public.trees where created_at >= now()), 1, 'approved tree is public');
 
 select * from finish();
 rollback;

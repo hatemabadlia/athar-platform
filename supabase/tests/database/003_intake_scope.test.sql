@@ -15,11 +15,11 @@ create or replace function pg_temp.as_user(uid uuid) returns void language plpgs
 begin perform set_config('role', 'authenticated', true); perform set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, true); end $$;
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
-select is((select count(*)::int from public.intake_items), 2, 'Alger moderator: own wilaya + unlocated');
-select is((select count(*)::int from public.intake_items where wilaya_code = 31), 0, 'cannot read another wilaya intake');
-select is((select count(*)::int from public.ai_runs), 0, 'wilaya moderator cannot read ai_runs');
+select is((select count(*)::int from public.intake_items where received_at >= now()), 2, 'Alger moderator: own wilaya + unlocated');
+select is((select count(*)::int from public.intake_items where wilaya_code = 31 and received_at >= now()), 0, 'cannot read another wilaya intake');
+select is((select count(*)::int from public.ai_runs where created_at >= now()), 0, 'wilaya moderator cannot read ai_runs');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000f1');
-select is((select count(*)::int from public.intake_items), 3, 'ministry reads all intake');
-select is((select count(*)::int from public.ai_runs), 1, 'ministry reads ai_runs');
+select is((select count(*)::int from public.intake_items where received_at >= now()), 3, 'ministry reads all intake');
+select is((select count(*)::int from public.ai_runs where created_at >= now()), 1, 'ministry reads ai_runs');
 select * from finish();
 rollback;

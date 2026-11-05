@@ -25,5 +25,8 @@ Rules:
 - phone_numbers: copy them exactly as they appear.
 - urgency: critical = life-threatening or within hours (blood for surgery today, people without shelter tonight); medium = days; normal = planned activity.
 - mentioned_dates: every explicit year or date, so stale reposts can be detected.
+- required_skills: not all help is money or goods. If the message asks for a person with a skill (a designer for posts, a programmer for a website, a driver to deliver donations, a translator for paperwork, a teacher for free lessons, a doctor's or lawyer's consultation, a psychologist…), list those skills using ONLY the allowed values. For pure blood/money/goods requests return an empty list.
+- remote_possible: true only if that skilled help can clearly be given at a distance.
+- category "skills": use it when the main need is a volunteer's skill or service rather than goods, money or blood.
 - attention: short Arabic notes for a human moderator (e.g. money transfer request, old date, vague location). Do not judge whether the request is genuine — that is the moderator's job.
 - title and summary in Arabic.`;

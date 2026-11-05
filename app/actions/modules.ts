@@ -206,3 +206,19 @@ export async function markNotificationsRead(): Promise<ActionResult> {
   revalidatePath("/notifications");
   return { ok: true };
 }
+
+// ---------------- skills-based volunteering ----------------
+export async function skilledCount(alertId: string): Promise<ActionResult<number>> {
+  const supabase = await supabaseServer();
+  const { data, error } = await supabase.rpc("count_skilled_volunteers", { alert: alertId });
+  if (error) return toActionError(error);
+  return { ok: true, data: data as number };
+}
+
+/** In-app notification to volunteers whose (verified, when regulated) skills match. Identities are never returned. */
+export async function notifySkilled(alertId: string): Promise<ActionResult<number>> {
+  const supabase = await supabaseServer();
+  const { data, error } = await supabase.rpc("notify_skilled_volunteers", { alert: alertId });
+  if (error) return error.message.includes("recently") ? { ok: false, error: "أُبلغ المتطوعون خلال آخر 6 ساعات." } : toActionError(error);
+  return { ok: true, data: data as number };
+}

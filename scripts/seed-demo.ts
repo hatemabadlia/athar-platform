@@ -77,24 +77,24 @@ async function reset() {
 }
 
 // ---------------------------------------------------------------- people
-type Person = { key: string; name: string; wilaya: number; skills: string[]; blood?: string; roles?: { role: string; wilaya?: number }[] };
+type Person = { key: string; name: string; wilaya: number; skills: string[]; blood?: string; remote?: boolean; verified?: string[]; roles?: { role: string; wilaya?: number }[] };
 const PEOPLE: Person[] = [
   { key: "ministry", name: "مديرية الحياة الجمعوية (تجريبي)", wilaya: 16, skills: [], roles: [{ role: "ministry_admin" }] },
   { key: "djsl16", name: "مديرية الشباب — الجزائر (تجريبي)", wilaya: 16, skills: [], roles: [{ role: "djsl_admin", wilaya: 16 }] },
   { key: "djsl31", name: "مديرية الشباب — وهران (تجريبي)", wilaya: 31, skills: [], roles: [{ role: "djsl_admin", wilaya: 31 }] },
   { key: "mod9", name: "مشرف البليدة (تجريبي)", wilaya: 9, skills: [], roles: [{ role: "moderator", wilaya: 9 }] },
-  { key: "amina", name: "أمينة ب.", wilaya: 16, skills: ["إسعافات أولية", "تنظيم"], blood: "O-", roles: [{ role: "club_lead" }] },
-  { key: "yacine", name: "ياسين ك.", wilaya: 16, skills: ["سياقة", "حمل ونقل"], blood: "O+" },
-  { key: "sara", name: "سارة م.", wilaya: 31, skills: ["تدريس", "تصميم"], blood: "A+", roles: [{ role: "club_lead" }] },
-  { key: "walid", name: "وليد ح.", wilaya: 31, skills: ["سياقة", "طبخ"], blood: "B+" },
-  { key: "imene", name: "إيمان ر.", wilaya: 25, skills: ["تمريض", "إسعافات أولية"], blood: "AB+", roles: [{ role: "club_lead" }] },
-  { key: "anis", name: "أنيس ز.", wilaya: 25, skills: ["تصوير", "تواصل"], blood: "O+" },
-  { key: "khadidja", name: "خديجة س.", wilaya: 9, skills: ["طبخ", "تنظيم"], blood: "A-" },
-  { key: "rayan", name: "ريان ب.", wilaya: 19, skills: ["حمل ونقل", "بناء"], blood: "O-" },
-  { key: "nour", name: "نور الهدى ع.", wilaya: 6, skills: ["تدريس", "لغات"], blood: "B-" },
-  { key: "mehdi", name: "مهدي ت.", wilaya: 42, skills: ["غطس", "إسعافات أولية"], blood: "A+" },
-  { key: "lina", name: "لينة د.", wilaya: 15, skills: ["تصميم", "تواصل"], blood: "O+" },
-  { key: "hamza", name: "حمزة ل.", wilaya: 5, skills: ["سياقة", "بناء"], blood: "B+" },
+  { key: "amina", name: "أمينة ب.", wilaya: 16, skills: ["إسعافات أولية", "تنظيم فعاليات"], blood: "O-", roles: [{ role: "club_lead" }] },
+  { key: "yacine", name: "ياسين ك.", wilaya: 16, skills: ["نقل وتوزيع"], blood: "O+" },
+  { key: "sara", name: "سارة م.", wilaya: 31, skills: ["تعليم ودعم مدرسي", "تصميم وإعلام"], remote: true, blood: "A+", roles: [{ role: "club_lead" }] },
+  { key: "walid", name: "وليد ح.", wilaya: 31, skills: ["نقل وتوزيع", "طبخ"], blood: "B+" },
+  { key: "imene", name: "إيمان ر.", wilaya: 25, skills: ["استشارة طبية", "إسعافات أولية"], remote: true, verified: ["استشارة طبية"], blood: "AB+", roles: [{ role: "club_lead" }] },
+  { key: "anis", name: "أنيس ز.", wilaya: 25, skills: ["تصوير", "تصميم وإعلام"], blood: "O+" },
+  { key: "khadidja", name: "خديجة س.", wilaya: 9, skills: ["طبخ", "تنظيم فعاليات"], blood: "A-" },
+  { key: "rayan", name: "ريان ب.", wilaya: 19, skills: ["نقل وتوزيع", "صيانة وبناء"], blood: "O-" },
+  { key: "nour", name: "نور الهدى ع.", wilaya: 6, skills: ["تعليم ودعم مدرسي", "ترجمة"], remote: true, blood: "B-" },
+  { key: "mehdi", name: "مهدي ت.", wilaya: 42, skills: ["إسعافات أولية"], blood: "A+" },
+  { key: "lina", name: "لينة د.", wilaya: 15, skills: ["تصميم وإعلام", "برمجة"], remote: true, blood: "O+" },
+  { key: "hamza", name: "حمزة ل.", wilaya: 5, skills: ["نقل وتوزيع", "صيانة وبناء"], blood: "B+" },
   { key: "assoc", name: "جمعية نسيم الخير (تجريبي)", wilaya: 16, skills: [], roles: [{ role: "association" }] },
 ];
 
@@ -104,7 +104,7 @@ async function createPeople() {
     const email = `${p.key}@${DOMAIN}`;
     const id = (await createUser({ email, email_confirm: true, user_metadata: { display_name: p.name } })).id;
     ids[p.key] = id;
-    ok(await db.from("profiles").update({ display_name: p.name, wilaya_code: p.wilaya, skills: p.skills, onboarded: true }).eq("id", id), "profile");
+    ok(await db.from("profiles").update({ display_name: p.name, wilaya_code: p.wilaya, skills: p.skills, remote_ok: !!p.remote, onboarded: true }).eq("id", id), "profile");
     if (p.blood) await db.from("profile_private").update({ blood_type: p.blood } as never).eq("user_id", id);
     for (const r of p.roles ?? []) {
       ok(await db.from("user_roles").upsert({ user_id: id, role: r.role as never, wilaya_code: r.wilaya ?? null }), "role");
@@ -112,6 +112,9 @@ async function createPeople() {
     await db.from("consents").insert(["terms", ...(p.blood ? ["blood_data", "donor_registry"] : [])]
       .map((purpose) => ({ user_id: id, purpose, version: "demo" })) as never);
   }
+  // Regulated professions are verified by a moderator before they are matched (demo: by the ministry account).
+  for (const p of PEOPLE) for (const skill of p.verified ?? [])
+    ok(await db.from("skill_verifications").upsert({ user_id: ids[p.key], skill, verified_by: ids.ministry, note: "تجريبي — وثيقة مهنية" }), "skill verification");
   if (adminEmail) {
     const { data } = await db.auth.admin.listUsers({ perPage: 1000 });
     let user = data?.users.find((u) => u.email?.toLowerCase() === adminEmail.toLowerCase());
@@ -159,6 +162,12 @@ const POSTS: Post[] = [
   { text: "دار الأيتام بوهران تحتاج كتب مدرسية ومحافظ للدخول المدرسي، 60 طفل. 0555 00 01 13", channel: "telegram", daysAgo: 6, outcome: "approve", joiners: ["walid"] },
   { text: "عاجل مريض بالسرطان في المسيلة يحتاج نقل لمركز مكافحة السرطان بالبليدة كل أسبوع، اللي عندو طوموبيل ويقدر يعاون. 0555 00 01 14", channel: "whatsapp", daysAgo: 1, outcome: "pending" },
   { text: "نحتاجو متطوعين يطبخو وجبات ساخنة للأشخاص بدون مأوى فوسط العاصمة كل ليلة جمعة. 0555 00 01 15", channel: "web_form", daysAgo: 0, outcome: "pending" },
+  // Skills-based help: not every request is money, goods or blood
+  { text: "جمعية نسيم الخير في وهران تحتاج مصمم متطوع يصمملها منشورات حملة الشتاء، الخدمة تقدر تكون عن بعد. للتواصل 0555 00 01 16", channel: "web_form", daysAgo: 1, outcome: "approve", by: "assoc" },
+  { text: "عائلة لاجئة في العاصمة تحتاج مترجم يرافقها في الإجراءات الإدارية بالبلدية نهار الأحد. 0555 00 01 17", channel: "telegram", daysAgo: 0, outcome: "approve" },
+  { text: "نحتاجو سائق عندو طوموبيل يوصل تبرعات قفة الشتاء من البليدة للمدية نهار الجمعة. 0555 00 01 18", channel: "whatsapp", daysAgo: 1, outcome: "approve", joiners: ["khadidja"] },
+  { text: "جمعية أطفال السكري بقسنطينة تحتاج طبيب متطوع يقدم استشارات توجيهية للأولياء عن بعد بالفيديو. 0555 00 01 19", channel: "web_form", daysAgo: 2, outcome: "approve" },
+  { text: "جمعية بتيزي وزو تحتاج مبرمج متطوع يعاونها في موقعها الإلكتروني، الخدمة عن بعد. 0555 00 01 20", channel: "web_form", daysAgo: 0, outcome: "pending" },
   // Same campaign posted again on another channel → duplicate detection
   { text: "حملة تنظيف غابة كانستال وهران يوم السبت صباحا، احضروا القفازات، نحتاج 40 متطوعا. 0555 00 01 04", channel: "telegram", daysAgo: 1, outcome: "keep" },
   // Old post recirculating → recycled detection (matches the archive)

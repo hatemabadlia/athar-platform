@@ -23,6 +23,8 @@ export interface CheckOutcome extends VerifyResult {
     wilaya: string | null;
     bloodType: string | null;
     hasPhone: boolean;
+    skills: string[];
+    remote: boolean;
   };
 }
 
@@ -86,6 +88,7 @@ export async function checkPost(raw: string): Promise<CheckOutcome> {
     understood: {
       msa: analysis.normalized_text, darijaTerms: analysis.darija_terms.slice(0, 8), category: analysis.category,
       urgency: analysis.urgency, wilaya: wilaya?.nameAr ?? null, bloodType: analysis.blood_type, hasPhone: analysis.phone_numbers.length > 0,
+      skills: analysis.required_skills, remote: analysis.remote_possible,
     },
   };
 }
