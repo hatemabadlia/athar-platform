@@ -48,7 +48,7 @@ export interface VolunteerForMatching {
 }
 
 /** Skills of this volunteer that the request needs and that count (regulated skills only when verified). */
-export function usableSkills(v: VolunteerForMatching, required: string[]): string[] {
+export function usableSkills(v: Pick<VolunteerForMatching, "skills" | "verifiedSkills">, required: string[]): string[] {
   return required.filter((s) => v.skills.includes(s) && (!isRegulatedSkill(s) || (v.verifiedSkills ?? []).includes(s)));
 }
 

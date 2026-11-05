@@ -1741,6 +1741,9 @@ isOneToOne: false
 "club_leaderboard":
 { Args: { "p_wilaya"?: number; "p_since"?: string; "p_limit"?: number }; Returns: { "rank": number; "club_id": string; "name": string; "wilaya_code": number; "institution_name": string | null; "members": number; "points": number; "hours": number; "checkins": number; "trees": number }[]
                            },
+"skill_supply_demand":
+{ Args: { "p_wilaya"?: number }; Returns: { "skill": string; "regulated": boolean; "remote": boolean; "volunteers": number; "open_requests": number }[]
+                           },
 "notify_compatible_donors":
 { Args: { "alert": string }; Returns: number
                            },
